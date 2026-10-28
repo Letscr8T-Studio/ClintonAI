@@ -3,6 +3,13 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-28: Phase 1 database: clients read, server writes, triggers guard the trust rules
+
+- **Decision:** Signed-in users only SELECT their own rows (RLS + column grants that hide ciphertext, token references and link hashes). All writes go through server routes with the service role, after zod validation. The trust rules that can be expressed in data (withdraw never edit, permanent withdrawals, 24 h window, email lifecycle, body wiped after send, append-only history, no AI-check text column) are enforced by triggers and constraints, and proven by pgTAP tests.
+- **Defaults:** Smart Delay 5 min (range 1-30 min); open tracking off until the user turns it on (opens are a guess; privacy first).
+- **Why:** A bug in the app or a stolen user token cannot break a promise the database refuses to break.
+- **Consequences:** New tables follow the same pattern. Types are generated (`src/types/supabase.gen.ts`), never hand-written; CI checks they match. Local Supabase uses ports 547xx.
+
 ## 2026-10-28: Phase 1 starts now; survey gate waived
 
 - **Decision:** Start building the Phase 1 safety platform now, as the product plan states ("Phase 1 is the launch product and the only one built now"). The Phase 0 "survey shows people will pay" gate does not block it.

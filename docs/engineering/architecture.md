@@ -66,15 +66,23 @@ but they are still only imported from server code.
 
 `supabase/migrations/20261023000000_create_waitlist.sql`: table `waitlist` (id, email unique, source,
 did_survey, survey_completed_at, created_at), RLS on with **no policies** (only the service role can
-read/write), view `waitlist_stats`. The TypeScript mirror is `src/types/database.ts`.
+read/write), view `waitlist_stats`.
 
-Schema changes: add a new timestamped file in `supabase/migrations/`, never edit an applied one, and
-update `src/types/database.ts` (or regenerate it with the Supabase CLI).
+Phase 1 tables (`profiles`, `connected_accounts`, `emails`, `safe_send_messages`,
+`safe_send_recipients`, `ai_check_events`, `activity_log`) are in place: users read their own rows
+through RLS, the server writes with the service role, and triggers enforce the trust rules. Details in
+the [Phase 1 plan](../phases/phase-1-safety-platform.md) (Data model).
 
-## Phase 1 additions (planned)
+Types: `src/types/supabase.gen.ts` is generated (`npm run db:types`); `src/types/database.ts`
+re-exports it with friendly row names (`EmailRow`, `Profile`…). Import from `database.ts`.
+
+Schema changes: add a new timestamped file in `supabase/migrations/`, never edit an applied one, add
+pgTAP tests in `supabase/tests/database/`, then run `npm run test:db` and `npm run db:types`.
+
+## Phase 1 additions (in progress)
 
 See [phase-1-safety-platform.md](../phases/phase-1-safety-platform.md) for the data model, routes and
-jobs. Architecturally it adds: Supabase Auth with Google, a `connected_accounts` table with tokens in
+jobs. The database is built; architecturally the rest adds: Supabase Auth with Google, a `connected_accounts` table with tokens in
 Vault, an `emails` state machine driven by pg_cron, encrypted Safe Send blobs in Storage, a public
 recipient page under `/m/[token]`, an AI check service in `src/server/ai/`, and a signed-in app area
 under `src/app/(app)/`.

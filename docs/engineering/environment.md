@@ -26,8 +26,23 @@ npm run dev                     # http://localhost:3000
 
 Node ≥ 20.9 (CI uses 22).
 
-**Supabase:** create a project, then run each file in `supabase/migrations/` in order in the SQL editor
-(or `npx supabase db push` once the CLI is linked). Copy the project URL and service-role key.
+**Local database (Docker Desktop required):**
+
+```bash
+npm run db:start     # Postgres + Auth + Storage, applies supabase/migrations/
+npm run test:db      # pgTAP tests in supabase/tests/database/
+npm run db:types     # regenerate src/types/supabase.gen.ts after a migration
+npm run db:reset     # wipe and re-apply all migrations
+npm run db:stop
+```
+
+Local ports are **547xx** (API 54721, DB 54722, Studio 54723), set in `supabase/config.toml`. They
+avoid the Supabase defaults (543xx, often used by other local projects) and the 54402-54601 range that
+Windows/Hyper-V reserves. Check reserved ranges with `netsh interface ipv4 show excludedportrange protocol=tcp`.
+
+**Hosted Supabase:** `npx supabase login`, `npx supabase link --project-ref <ref>`, then
+`npx supabase db push` applies any migrations the project hasn't run yet. Copy the project URL and
+service-role key into `.env.local`.
 
 **Tally:** add a Hidden field block named exactly `email`; remove the visible email question; publish
 and copy the form ID.

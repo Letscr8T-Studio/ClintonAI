@@ -1,39 +1,21 @@
-// Supabase schema types. Keep in step with supabase/migrations/.
-// Once the Supabase CLI is linked, regenerate with:
-//   npx supabase gen types typescript --linked > src/types/database.ts
+// Supabase schema types. The source of truth is supabase/migrations/; the types are generated
+// from the local database into supabase.gen.ts (never edit that file by hand):
+//   npm run db:start && npm run db:types
+// CI fails if the generated file drifts from the migrations.
 
-export type WaitlistRow = {
-  id: string;
-  email: string;
-  source: string | null;
-  did_survey: boolean;
-  survey_completed_at: string | null;
-  created_at: string;
-};
+import type { Database, Enums, Tables } from "./supabase.gen";
 
-export type Database = {
-  public: {
-    Tables: {
-      waitlist: {
-        Row: WaitlistRow;
-        Insert: Partial<WaitlistRow> & Pick<WaitlistRow, "email">;
-        Update: Partial<WaitlistRow>;
-        Relationships: [];
-      };
-    };
-    Views: {
-      waitlist_stats: {
-        Row: {
-          total_signups: number;
-          did_survey: number;
-          survey_rate_pct: number | null;
-          signups_last_7_days: number;
-        };
-        Relationships: [];
-      };
-    };
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
+export type { Database, Enums, Tables };
+
+export type WaitlistRow = Tables<"waitlist">;
+export type Profile = Tables<"profiles">;
+export type ConnectedAccount = Tables<"connected_accounts">;
+export type EmailRow = Tables<"emails">;
+export type SafeSendMessage = Tables<"safe_send_messages">;
+export type SafeSendRecipient = Tables<"safe_send_recipients">;
+export type AiCheckEvent = Tables<"ai_check_events">;
+export type ActivityEntry = Tables<"activity_log">;
+
+export type EmailStatus = Enums<"email_status">;
+export type AccountStatus = Enums<"account_status">;
+export type ActivityAction = Enums<"activity_action">;

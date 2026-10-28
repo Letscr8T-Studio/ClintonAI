@@ -64,6 +64,9 @@ npm run check          # typecheck + lint + format check + unit tests: run befor
 npm run test:watch     # unit/component tests in watch mode
 npm run test:e2e       # Playwright end-to-end (builds and starts the app)
 npm run build          # production build
+npm run db:start       # local Supabase in Docker (ports 547xx), applies migrations
+npm run test:db        # pgTAP database tests (RLS + trust-rule triggers)
+npm run db:types       # regenerate src/types/supabase.gen.ts after a migration
 ```
 
 ## Definition of done

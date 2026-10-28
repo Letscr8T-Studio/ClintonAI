@@ -23,21 +23,34 @@ Reading the inbox (no restricted scopes), outreach, extension, Outlook, mobile, 
 6. **Dashboard:** I see sent this month, mistakes caught, Safe Send opened, can still unsend; a table of emails with status and unsend window; a "caught before sending" list.
 7. **Onboarding tour:** three screens: AI check, Smart Delay, Safe Send. Default delay chosen during onboarding.
 
-## Data model (new migration files)
+## Data model (built: `supabase/migrations/20261028100*_phase1_*.sql`)
 
-All tables: RLS on, `user_id = auth.uid()` policies, `created_at timestamptz default now()`.
+All tables: RLS on, `user_id = auth.uid()` select policies, `created_at timestamptz default now()`.
+**Clients only read; every write goes through the server with the service role.** Column grants hide
+secrets from clients (`body_encrypted`, `vault_secret_id`, `key_ref`, `storage_path`, `token_hash`).
+Profiles are the one exception: users may update their own settings columns.
 
-| Table                  | Key columns                                                                                                                                                                                                                                                                            |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `profiles`             | `user_id` PK → auth.users, `display_name`, `avatar_url`, `default_delay_seconds` (default from testing), `open_tracking` bool, `onboarded_at`                                                                                                                                          |
-| `connected_accounts`   | `id`, `user_id`, `provider` ('google'), `email`, `scopes` text[], `vault_secret_id` (refresh token in Vault), `status` ('active','revoked','error')                                                                                                                                    |
-| `emails`               | `id`, `user_id`, `account_id`, `subject`, `to`/`cc`/`bcc` jsonb, `body_ciphertext` (only while held), `safe_send` bool default false, `status` enum ('held','sending','sent','cancelled','failed'), `send_at`, `sent_at`, `provider_message_id`, `findings_count`, `findings_accepted` |
-| `safe_send_messages`   | `id`, `email_id`, `storage_path` (encrypted blob), `key_ref`, `expires_at` (sent_at + 24 h), `withdrawn_at`, `content_deleted_at`                                                                                                                                                      |
-| `safe_send_recipients` | `id`, `message_id`, `recipient_email`, `token_hash` (sha256 of the link token), `first_opened_at`, `open_count`, `withdrawn_at`                                                                                                                                                        |
-| `ai_check_events`      | `id`, `user_id`, `email_id`, `finding_types` text[], `accepted` int, `dismissed` int. **No email text** (trust rule 7)                                                                                                                                                                 |
-| `activity_log`         | `id`, `user_id`, `email_id`, `action` ('held','sent','cancelled','withdrawn','expired'), `at`                                                                                                                                                                                          |
+Triggers enforce the trust rules in the database itself, so a server bug cannot break them:
 
-Email status machine: `held → sending → sent` · `held → cancelled` · `sending → failed` (retry ×3 with backoff, then notify).
+- `enforce_email_transition`: content is editable only while `held`; only the transitions below are allowed; the body is wiped (`null`) once an email is sent, cancelled or failed.
+- `guard_safe_send`: withdrawals are permanent; `storage_path`, `expires_at` and link `token_hash` never change (withdraw, never edit); deleted content cannot be restored; the window is at most 24 h and closed once expired.
+- `forbid_change`: `activity_log` is append-only.
+- `delete_account_secret`: disconnecting an account deletes its Vault token.
+- `handle_new_user`: a profile is created on sign-up from the Google name and avatar.
+
+Proven by the pgTAP tests in `supabase/tests/database/` (`npm run test:db`).
+
+| Table                  | Key columns                                                                                                                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles`             | `user_id` PK → auth.users, `display_name`, `avatar_url`, `default_delay_seconds` (default 300, 60-1800), `open_tracking` bool (default off), `onboarded_at`                                                                                                                           |
+| `connected_accounts`   | `id`, `user_id`, `provider` ('google'), `email`, `scopes` text[], `vault_secret_id` (refresh token in Vault), `status` ('active','revoked','error')                                                                                                                                   |
+| `emails`               | `id`, `user_id`, `account_id`, `subject`, `to`/`cc`/`bcc` jsonb, `body_encrypted` (only while held), `safe_send` bool default false, `status` enum ('held','sending','sent','cancelled','failed'), `send_at`, `sent_at`, `provider_message_id`, `findings_count`, `findings_accepted` |
+| `safe_send_messages`   | `id`, `email_id`, `storage_path` (encrypted blob), `key_ref`, `expires_at` (sent_at + 24 h), `withdrawn_at`, `content_deleted_at`                                                                                                                                                     |
+| `safe_send_recipients` | `id`, `message_id`, `recipient_email`, `token_hash` (sha256 of the link token), `first_opened_at`, `open_count`, `withdrawn_at`                                                                                                                                                       |
+| `ai_check_events`      | `id`, `user_id`, `email_id`, `finding_types` text[], `accepted` int, `dismissed` int. **No email text** (trust rule 7)                                                                                                                                                                |
+| `activity_log`         | `id`, `user_id`, `email_id`, `action` ('held','edited','sent','cancelled','failed','withdrawn','expired','opened'), append-only                                                                                                                                                       |
+
+Email status machine: `held → sending → sent` · `held → cancelled` · `sending → held` (retry) · `sending → failed` (retry ×3 with backoff, then notify).
 Safe Send: `sent → withdrawn (per recipient or all)` · `sent → expired (24 h, content deleted)`.
 
 ## Server modules
@@ -73,7 +86,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 
 ## Milestones
 
-1. [ ] Migrations + types + RLS tests (Supabase local).
+1. [x] Migrations + types + RLS tests (Supabase local). 43 pgTAP tests; CI `database` job.
 2. [ ] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour).
 3. [ ] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email.
 4. [ ] Compose UI + AI check (rules → model) + findings card.
@@ -86,7 +99,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 
 ## Open decisions
 
-- Default Smart Delay value (from beta testing).
+- Default Smart Delay value: set to 5 min for now; confirm from beta testing.
 - Supabase Auth Google provider vs a separate OAuth client for `gmail.send` offline tokens (Auth's provider token is short-lived).
 - Attachment size limit for Safe Send and storage cost.
 - Optional one-time code for very sensitive Safe Send emails: in v1 or later?

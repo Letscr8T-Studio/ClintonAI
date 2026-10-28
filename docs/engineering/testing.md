@@ -9,6 +9,7 @@
 | Components     | Vitest + Testing Library + user-event  | `src/components/**/*.test.tsx`                                                                  | Behaviour through roles and labels, the way users and screen readers see it                  |
 | Accessibility  | axe-core                               | `src/app/page.test.tsx` (jsdom), `e2e/landing.spec.ts` (real browser, includes colour contrast) | Zero violations on the landing page                                                          |
 | End-to-end     | Playwright (desktop Chrome + Pixel 7)  | `e2e/`                                                                                          | Page loads, waitlist flow (API mocked), mobile menu, security headers, console auth redirect |
+| Database       | pgTAP (`supabase test db`)             | `supabase/tests/database/*.test.sql`                                                            | RLS per user, column secrecy, trust-rule triggers, defaults, cascades                        |
 
 ## Commands
 
@@ -18,6 +19,7 @@ npm run test:watch     # watch mode
 npm run test:coverage  # coverage report in coverage/
 npm run test:e2e       # builds, starts on :3100, runs Playwright
 npx playwright install chromium   # first time only
+npm run test:db        # pgTAP; needs `npm run db:start` (Docker) first
 ```
 
 ## Rules
@@ -29,9 +31,11 @@ npx playwright install chromium   # first time only
 - Time-dependent logic takes a `now` parameter so tests pass a fixed instant.
 - Env-dependent logic: `vi.stubEnv` (auto-reset between tests by config).
 - `server-only` is aliased to a stub in `vitest.config.mts`, so server modules import cleanly in tests.
+- Every migration that adds a table, policy or trigger adds pgTAP tests: act as a real user with `set local role authenticated` plus `request.jwt.claims`, and assert both what they can and cannot do (`42501` permission, `23514` rule violation).
 - A content change that breaks `src/content/content.test.ts` is a real problem (broken anchor, duplicate, banned claim), not a test to delete.
 
 ## CI
 
 `.github/workflows/ci.yml` runs on every push and PR: typecheck, lint, format check, unit tests, build,
-then Playwright. A red CI blocks merge.
+then Playwright. A separate `database` job starts Supabase, runs the pgTAP tests and fails if
+`src/types/supabase.gen.ts` differs from what the migrations generate. A red CI blocks merge.

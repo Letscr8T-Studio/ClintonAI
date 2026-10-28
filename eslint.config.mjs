@@ -29,6 +29,8 @@ const config = [
       "playwright-report/**",
       "test-results/**",
       "next-env.d.ts",
+      // Generated from the database by `npm run db:types`.
+      "src/types/supabase.gen.ts",
     ],
   },
 ];

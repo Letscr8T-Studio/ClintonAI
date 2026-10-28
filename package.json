@@ -20,6 +20,11 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
+    "db:start": "supabase start -x edge-runtime,logflare,vector,imgproxy,mailpit,realtime,supavisor",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local --schema public > src/types/supabase.gen.ts && prettier --write src/types/supabase.gen.ts",
+    "test:db": "supabase test db",
     "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
@@ -52,6 +57,7 @@
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "sharp": "^0.35.5",
+    "supabase": "^2.122.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vitest": "^5.0.5"
