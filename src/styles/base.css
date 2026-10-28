@@ -1,0 +1,25 @@
+/* Element defaults and accessibility basics. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  input::placeholder {
+    color: var(--color-placeholder);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}

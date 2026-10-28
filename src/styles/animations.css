@@ -1,0 +1,142 @@
+/* Motion classes (anim-*). Scroll-driven where supported; reduced-motion users see the finished page. */
+/* On page load (hero) */
+.anim-load {
+  animation: us-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-word {
+  animation: us-word 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+/* Highlighter under text. Inline + clone so it follows each wrapped line. */
+.anim-ink,
+.ink-static {
+  background: linear-gradient(var(--color-brand-mist), var(--color-brand-mist)) no-repeat 0 88% / 0% 0.16em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.anim-ink {
+  animation: us-line 0.9s cubic-bezier(0.6, 0, 0.2, 1) 1.15s both;
+}
+
+/* Scroll-driven (Chrome, Edge, Safari 26+). Other browsers show the finished page. */
+@supports (animation-timeline: view()) {
+  .anim-reveal,
+  .anim-stagger > * {
+    animation: us-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+  .anim-stagger > :nth-child(2) {
+    animation-range: entry 10% cover 36%;
+  }
+  .anim-stagger > :nth-child(3) {
+    animation-range: entry 20% cover 42%;
+  }
+  .anim-stagger > :nth-child(4) {
+    animation-range: entry 30% cover 48%;
+  }
+  .anim-stagger > :nth-child(5) {
+    animation-range: entry 40% cover 54%;
+  }
+  .anim-stagger > :nth-child(6) {
+    animation-range: entry 50% cover 60%;
+  }
+
+  .anim-focus > * {
+    view-timeline-name: --us-card;
+    animation: us-focus linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 42%;
+  }
+  .anim-focus > :nth-child(2) {
+    animation-range: entry 12% cover 46%;
+  }
+  .anim-focus > :nth-child(3) {
+    animation-range: entry 24% cover 50%;
+  }
+  .anim-focus > :nth-child(4) {
+    animation-range: entry 36% cover 54%;
+  }
+  .anim-focus > :nth-child(5) {
+    animation-range: entry 48% cover 58%;
+  }
+  .anim-focus > :nth-child(6) {
+    animation-range: entry 60% cover 62%;
+  }
+  .anim-tag {
+    animation: us-tag linear both;
+    animation-timeline: --us-card;
+    animation-range: cover 44% cover 56%;
+  }
+
+  .anim-panel {
+    animation: us-panel linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+  }
+  .anim-fan-a {
+    animation: us-fan-a linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 45%;
+  }
+  .anim-fan-b {
+    animation: us-fan-b linear both;
+    animation-timeline: view();
+    animation-range: entry 25% cover 52%;
+  }
+  .anim-phone {
+    view-timeline-name: --us-phone;
+    animation: us-phone linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 45%;
+  }
+  .anim-sheet {
+    animation: us-sheet linear both;
+    animation-timeline: --us-phone;
+    animation-range: cover 30% cover 52%;
+  }
+  .anim-row {
+    animation: us-row linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 25%;
+  }
+  .anim-float-l {
+    animation: us-float-l linear both;
+    animation-timeline: scroll();
+    animation-range: 0 700px;
+  }
+  .anim-float-r {
+    animation: us-float-r linear both;
+    animation-timeline: scroll();
+    animation-range: 0 700px;
+  }
+  .anim-mark {
+    animation: us-mark linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 55%;
+  }
+  .ink-scroll {
+    animation: us-line linear both;
+    animation-timeline: view();
+    animation-range: entry 70% cover 45%;
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  .ink-scroll {
+    background-size: 100% 0.16em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="anim-"],
+  .anim-stagger > *,
+  .anim-focus > *,
+  .ink-scroll {
+    animation: none !important;
+    filter: none !important;
+  }
+  .anim-ink,
+  .ink-scroll {
+    background-size: 100% 0.16em;
+  }
+}

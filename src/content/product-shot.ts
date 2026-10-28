@@ -1,0 +1,28 @@
+export const productShot = {
+  headingId: "shot-h",
+  tags: ["Smart Delay", "AI check", "Safe Send"],
+  title: "Send without fear.",
+  body: "Your email waits a moment, gets a second look, and stays yours to take back for a full day.",
+  outbox: {
+    label: "Outbox",
+    subject: "Q3 investor update",
+    meta: "To: investors · held for 25 min",
+    actions: ["Edit", "Cancel"],
+    primaryAction: "Send now",
+  },
+  warning: "You said “attached” but nothing is attached.",
+  phone: {
+    label: "Phone showing Clinton AI catching a confidential file sent to the whole company",
+    title: "New message",
+    cancel: "Cancel",
+    to: "All Staff (214)",
+    subject: "Salaries 2026, just for you",
+    greetingName: "David",
+    body: ", here's the full salary sheet you asked for. Please keep it between us.",
+    attachment: "salaries_2026.xlsx",
+    checkTitle: "WAIT, 2 THINGS",
+    findings: ["This is going to 214 people, not just David.", "It contains salary data marked private."],
+    fix: "Fix it",
+    ignore: "Send anyway",
+  },
+};

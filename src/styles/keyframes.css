@@ -1,0 +1,155 @@
+/* Keyframes. Applied by the classes in animations.css. */
+@keyframes us-in {
+  from {
+    opacity: 0;
+    translate: 0 36px;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+@keyframes us-word {
+  from {
+    opacity: 0;
+    translate: 0 0.45em;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+@keyframes us-line {
+  to {
+    background-size: 100% 0.16em;
+  }
+}
+@keyframes us-float-l {
+  to {
+    translate: 0 90px;
+    rotate: -5deg;
+  }
+}
+@keyframes us-float-r {
+  to {
+    translate: 0 140px;
+    rotate: 6deg;
+  }
+}
+@keyframes us-panel {
+  from {
+    opacity: 0.35;
+    scale: 0.92;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes us-fan-a {
+  from {
+    opacity: 0;
+    translate: -40px 60px;
+    rotate: 6deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+@keyframes us-fan-b {
+  from {
+    opacity: 0;
+    translate: 70px 90px;
+    rotate: -8deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+@keyframes us-phone {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) rotateX(32deg) translateY(90px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) rotateX(0deg) translateY(0) scale(1);
+  }
+}
+@keyframes us-sheet {
+  from {
+    opacity: 0;
+    translate: 0 70px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes us-row {
+  from {
+    opacity: 0;
+    translate: -28px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes us-focus {
+  0% {
+    opacity: 0.18;
+    filter: blur(14px);
+    translate: 0 44px;
+    scale: 0.93;
+    rotate: -2.5deg;
+  }
+  60% {
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes us-tag {
+  0% {
+    opacity: 0;
+    scale: 1.6;
+    rotate: -6deg;
+  }
+  70% {
+    opacity: 1;
+    scale: 0.94;
+    rotate: 1deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes us-mark {
+  from {
+    opacity: 0;
+    translate: 0 45%;
+    letter-spacing: 0.08em;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    letter-spacing: -0.06em;
+  }
+}

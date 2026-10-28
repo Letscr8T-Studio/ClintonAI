@@ -1,0 +1,91 @@
+# Architecture
+
+## Principle
+
+Everything runs through **one Next.js app** on Vercel. Browsers, the (future) Chrome extension and Safe
+Send recipients all talk to it. **Only its server code touches the database, email providers, AI
+models and payment APIs.** Secrets live on the server and in Supabase Vault, never in the browser or
+the extension.
+
+```
+ Web app (any browser)   Chrome extension (Phase 3)   Recipient (Safe Send link)
+            \                     |                        /
+             v                    v                       v
+   +-----------------------------------------------------------------+
+   | Next.js on Vercel                                               |
+   |  app pages (RSC)  |  API route handlers (server only)  |  /m/*  |
+   +-----------------------------------------------------------------+
+             | reads/writes                         | sends, checks, bills
+             v                                      v
+   Supabase: Postgres + RLS, Auth,          Gmail API (gmail.send), MS Graph (later),
+   Storage (encrypted Safe Send),           Claude API (AI check + drafting),
+   Vault (OAuth tokens), pg_cron            Inngest/QStash (Phase 2), Paddle/Paystack,
+                                            Sentry
+```
+
+## Stack
+
+| Concern             | Choice                                                                                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework           | Next.js 16 App Router, React 19, TypeScript (strict)                                                                                                 |
+| Styling             | Tailwind CSS v4 with design tokens in `src/styles/tokens.css`                                                                                        |
+| Data, auth, storage | Supabase (Postgres + row-level security, Auth, Storage, Vault, pg_cron)                                                                              |
+| Validation          | zod 4 at every boundary (`src/lib/validation/`, `src/server/env.ts`)                                                                                 |
+| Email sending       | Gmail API `gmail.send` scope (Phase 1); Microsoft Graph `Mail.Send` (Phase 4)                                                                        |
+| AI                  | Claude: a Haiku-class model for fast checks, a Sonnet-class model for drafting; structured JSON output. Check current model IDs before implementing. |
+| Timed jobs          | pg_cron for Smart Delay dispatch and Safe Send expiry; Inngest or QStash for outreach (Phase 2)                                                      |
+| Payments            | Paddle (international), Paystack (naira), Phase 2                                                                                                    |
+| Monitoring          | Sentry; PostHog or Vercel Analytics                                                                                                                  |
+| Tests               | Vitest + Testing Library + axe-core; Playwright e2e                                                                                                  |
+| Hosting             | Vercel; domain tryclinton.com                                                                                                                        |
+
+## Code layers
+
+```
+app/          Routes. Thin: read params, call server/ or render components. No business logic.
+components/   UI. May import content/, config/, lib/, types/. NEVER server/.
+content/      Typed copy and sample data. No React, no logic.
+config/       Site and brand constants.
+lib/          Pure, isomorphic helpers. Safe in browser and server. No secrets, no I/O except browser.ts.
+server/       `import "server-only"`. Env, Supabase admin client, auth, rate limits, repositories.
+types/        Shared types (Database schema type, domain types).
+```
+
+Dependency direction: `app → components → (content, config, lib, types)` and `app → server → (lib, types)`.
+`server/waitlist/analytics.ts` and `csv.ts` are pure (no `server-only`) so they can be unit-tested,
+but they are still only imported from server code.
+
+## Request flows today (Phase 0)
+
+- **Join waitlist:** `WaitlistForm` → `useWaitlist` → `POST /api/waitlist` → rate limit → zod parse →
+  honeypot check → `repository.addToWaitlist` (upsert, duplicates ignored) → `{ ok: true }`.
+- **Survey done:** Tally popup `onSubmit` → `POST /api/survey-complete` → `markSurveyDone` (only flips false → true).
+- **Founders console:** `proxy.ts` checks the signed cookie for `/owner/*` and `/api/owner/*`; each page also calls `requireAdmin()`. Pages fetch via repositories and compute with pure `buildAnalytics()`. Errors render `(console)/error.tsx`.
+
+## Data model today
+
+`supabase/migrations/20261023000000_create_waitlist.sql`: table `waitlist` (id, email unique, source,
+did_survey, survey_completed_at, created_at), RLS on with **no policies** (only the service role can
+read/write), view `waitlist_stats`. The TypeScript mirror is `src/types/database.ts`.
+
+Schema changes: add a new timestamped file in `supabase/migrations/`, never edit an applied one, and
+update `src/types/database.ts` (or regenerate it with the Supabase CLI).
+
+## Phase 1 additions (planned)
+
+See [phase-1-safety-platform.md](../phases/phase-1-safety-platform.md) for the data model, routes and
+jobs. Architecturally it adds: Supabase Auth with Google, a `connected_accounts` table with tokens in
+Vault, an `emails` state machine driven by pg_cron, encrypted Safe Send blobs in Storage, a public
+recipient page under `/m/[token]`, an AI check service in `src/server/ai/`, and a signed-in app area
+under `src/app/(app)/`.
+
+### Planned folder growth
+
+```
+src/app/(marketing)/      Landing and future public pages (move page.tsx here when a 2nd public page arrives)
+src/app/(app)/            Signed-in product: dashboard, compose, outbox, sent, settings
+src/app/m/[token]/        Safe Send recipient view (public, no login)
+src/app/api/<domain>/     Route handlers per domain (emails, safe-send, check, cron)
+src/components/app/       Product UI
+src/server/<domain>/      repository.ts + service.ts per domain (emails, safe-send, ai, gmail)
+```
