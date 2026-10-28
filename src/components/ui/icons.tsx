@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { palette } from "@/config/brand";
+import { logoMark, palette } from "@/config/brand";
 
 // Inline icons. All are decorative (aria-hidden); give the surrounding control its own label.
 
@@ -25,12 +25,12 @@ function Svg({
 
 const round = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
-/** Clinton AI mark: an open "C" with a spark where the send happens. */
+/** Clinton AI mark ("Held C"): a heavy C holding the send in its mouth. Geometry: config/logo-mark.json. */
 export function ClintonMark({ size = 18, color = palette.white, className }: IconProps) {
   return (
-    <Svg size={size} viewBox="0 0 18 18" className={className}>
-      <path d="M13.6 5.2A6 6 0 1 0 13.6 12.8" stroke={color} strokeWidth={2.4} strokeLinecap="round" />
-      <path d="M14.2 7.1 15 9l1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8Z" fill={color} />
+    <Svg size={size} viewBox={logoMark.viewBox} className={className}>
+      <path d={logoMark.arc} stroke={color} strokeWidth={logoMark.strokeWidth} strokeLinecap="round" />
+      <rect {...logoMark.pill} fill={color} />
     </Svg>
   );
 }

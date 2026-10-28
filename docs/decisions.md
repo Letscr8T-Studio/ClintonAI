@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-28: New logo, the "Held C"
+
+- **Decision:** Replace the C + sparkle mark with the "Held C" (a C holding the send in its mouth) and set the wordmark as "Clinton AI" in one typeface. Chosen over a check-C and a way-back C.
+- **Why:** The sparkle is generic AI imagery and smeared at 16 px; the arrow version read as a browser reload icon. The Held C is ownable, ties to Smart Delay, and stays legible in a browser tab.
+- **Consequences:** One geometry file (`src/config/logo-mark.json`) feeds every logo surface; `npm run icons` regenerates the favicon files. A real `favicon.ico` exists again, so browsers stop showing the cached Unsend icon. See [brand.md](product/brand.md#logo).
+
 ## 2026-10-28: Rebrand to Clinton AI and production restructure
 
 - **Decision:** The product is Clinton AI (tryclinton.com). "Unsend" becomes the take-back feature name. Codebase restructured into `src/` with layers `app → components → content/config/lib/types` and `app → server`.

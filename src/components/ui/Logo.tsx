@@ -13,7 +13,7 @@ type LogoProps = {
   className?: string;
 };
 
-/** Clinton AI logo lockup: mark + "clinton" wordmark + "AI" tag. */
+/** Clinton AI lockup: the "Held C" tile + "Clinton AI" wordmark in one typeface (docs/product/brand.md). */
 export function Logo({ light = false, badge, href, className }: LogoProps) {
   const content = (
     <>
@@ -24,19 +24,10 @@ export function Logo({ light = false, badge, href, className }: LogoProps) {
           light ? "bg-white" : "bg-brand",
         )}
       >
-        <ClintonMark color={light ? palette.brand : palette.white} />
+        <ClintonMark size={22} color={light ? palette.brand : palette.white} />
       </span>
-      {/* The {" "} keeps the visible text "clinton AI" matching the accessible name (WCAG 2.5.3). */}
-      <span aria-hidden="true" className="flex items-baseline gap-1.5">
-        <span className="font-display text-[22px] font-extrabold tracking-[-0.035em]">clinton</span>{" "}
-        <span
-          className={cn(
-            "rounded-md px-1.5 py-px font-mono text-[11px] font-medium",
-            light ? "bg-white/15 text-white" : "bg-brand-tint text-brand-deep",
-          )}
-        >
-          AI
-        </span>
+      <span className="font-display text-[22px] leading-none font-extrabold tracking-[-0.04em] whitespace-nowrap">
+        {site.name}
       </span>
       {badge ? (
         <span className="rounded-md bg-ink px-1.5 py-0.5 font-mono text-[10px] font-medium tracking-wider text-white uppercase">

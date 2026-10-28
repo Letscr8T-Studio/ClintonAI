@@ -1,3 +1,13 @@
+import mark from "./logo-mark.json";
+
+/** Geometry of the "Held C" mark (24-unit grid). Edit logo-mark.json, then run `npm run icons`. */
+export const logoMark = {
+  viewBox: mark.viewBox,
+  arc: mark.arc,
+  strokeWidth: mark.strokeWidth,
+  pill: mark.pill,
+};
+
 // Brand palette as hex values, for places CSS tokens can't reach (SVG attributes,
 // the generated Open Graph image). Mirrors src/styles/tokens.css; change both together.
 

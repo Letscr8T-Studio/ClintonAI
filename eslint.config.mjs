@@ -17,6 +17,11 @@ const config = [
     rules: { "max-lines": "off" },
   },
   {
+    // CLI scripts report progress on the console.
+    files: ["scripts/**"],
+    rules: { "no-console": "off" },
+  },
+  {
     ignores: [
       ".next/**",
       "node_modules/**",

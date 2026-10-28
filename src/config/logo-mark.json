@@ -1,0 +1,7 @@
+{
+  "$comment": "The Clinton AI mark ('Held C'): a heavy C holding the send in its mouth. Single source of truth for the React logo, generated images and scripts/generate-icons.mjs. After editing, run `npm run icons`.",
+  "viewBox": "0.65 0 24 24",
+  "arc": "M17.6 7.2A7.4 7.4 0 1 0 17.6 16.8",
+  "strokeWidth": 3.6,
+  "pill": { "x": 15.3, "y": 10.2, "width": 5.4, "height": 3.6, "rx": 1.8 }
+}
