@@ -80,7 +80,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
 6. [ ] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job.
 7. [ ] Dashboard (stats, table, caught list) + activity history.
-8. [ ] Hardening: shared rate limits, CSP, Sentry, privacy policy + Limited Use page, terms.
+8. [ ] Hardening: every item in the [launch checklist](../launch-checklist.md) (shared rate limits, CSP, signed Tally webhook, real console auth, Sentry), plus privacy policy + Limited Use page and terms.
 9. [ ] Human + AI security review of auth, tokens, encryption. Deliverability tests (Gmail, Outlook, Yahoo spam folders).
 10. [ ] Google verification submission (demo video, scope justifications). Invite beta in batches.
 

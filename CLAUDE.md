@@ -28,6 +28,10 @@ Full vision: [docs/product/vision.md](docs/product/vision.md).
 
 Build **only** the current phase. Each phase opens when its gate is met. Never build ahead.
 
+**Before any user connects Gmail or sign-ups open:** every item in
+[docs/launch-checklist.md](docs/launch-checklist.md) must be done (shared rate limits, CSP, signed
+Tally webhook, real founders-console auth, Sentry, plus the security review). It is a hard gate.
+
 ## Non-negotiable product rules
 
 From [docs/product/trust-rules.md](docs/product/trust-rules.md). Code review rejects anything that breaks these:
@@ -97,4 +101,4 @@ docs/                  Product and engineering documentation
 - Product: [vision](docs/product/vision.md) · [features](docs/product/features.md) · [roadmap](docs/product/roadmap.md) · [trust rules](docs/product/trust-rules.md) · [brand](docs/product/brand.md) · [business](docs/product/business.md)
 - Engineering: [architecture](docs/engineering/architecture.md) · [conventions](docs/engineering/conventions.md) · [testing](docs/engineering/testing.md) · [security & compliance](docs/engineering/security.md) · [environment & deploy](docs/engineering/environment.md)
 - Phases: [phase 0](docs/phases/phase-0-validation.md) · [phase 1](docs/phases/phase-1-safety-platform.md)
-- [Decision log](docs/decisions.md)
+- [Launch checklist](docs/launch-checklist.md) (hard gate before users) · [Decision log](docs/decisions.md)

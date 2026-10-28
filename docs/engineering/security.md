@@ -10,13 +10,11 @@
 - **Headers** (`next.config.ts`): `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, HSTS; `X-Powered-By` removed.
 - **JSON-LD** is static and `<`-escaped.
 
-### Known gaps (fix before Phase 1 real users)
+### Known gaps (block launch)
 
-1. **Rate limits are in-memory per serverless instance.** Move to a shared store (Upstash Redis or a Supabase table) before Gmail sending goes live.
-2. **No Content-Security-Policy yet.** Add one with nonces once the Tally embed is allow-listed (`tally.so` script + frame) or replaced.
-3. **Survey completion is client-reported.** Replace with a signed Tally webhook (verify signature, read the hidden `email` field).
-4. **Shared admin password.** Replace with Supabase Auth + an `admins` table when the product's own auth lands in Phase 1.
-5. **Error tracking.** Add Sentry before the beta.
+Rate limits are per instance, there is no CSP, survey completion is client-reported, the founders
+console uses a shared password, and there is no error tracking. Each is a required item, with the fix
+spelled out, in the **[launch checklist](../launch-checklist.md)**. Track progress there, not here.
 
 ## Google verification (Phase 1 gate)
 
