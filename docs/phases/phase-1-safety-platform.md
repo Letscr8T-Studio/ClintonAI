@@ -1,6 +1,6 @@
 # Phase 1: v1 safety platform (launch product)
 
-**Status:** Next. **Opens when:** Phase 0 gate is met. **Gate to Phase 2:** Google verification
+**Status:** In progress (started 2026-10-28). **Gate to Phase 2:** Google verification
 approved and the beta is used weekly.
 
 ## Goal

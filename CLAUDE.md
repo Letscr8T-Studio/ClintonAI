@@ -20,11 +20,11 @@ Full vision: [docs/product/vision.md](docs/product/vision.md).
 
 ## Where we are now
 
-| Phase | Name                                                                | Status                                                                      |
-| ----- | ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| 0     | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                     |
-| 1     | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **Next to build**, see [phase plan](docs/phases/phase-1-safety-platform.md) |
-| 2-8   | Outreach, extension, providers, inbox AI, mobile, agent API, teams  | Planned, [roadmap](docs/product/roadmap.md)                                 |
+| Phase | Name                                                                | Status                                                                    |
+| ----- | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 0     | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                   |
+| 1     | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **In progress**, see [phase plan](docs/phases/phase-1-safety-platform.md) |
+| 2-8   | Outreach, extension, providers, inbox AI, mobile, agent API, teams  | Planned, [roadmap](docs/product/roadmap.md)                               |
 
 Build **only** the current phase. Each phase opens when its gate is met. Never build ahead.
 

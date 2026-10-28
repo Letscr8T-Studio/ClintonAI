@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-28: Phase 1 starts now; survey gate waived
+
+- **Decision:** Start building the Phase 1 safety platform now, as the product plan states ("Phase 1 is the launch product and the only one built now"). The Phase 0 "survey shows people will pay" gate does not block it.
+- **Why:** Founder decision. Survey results remain useful research for pricing and Phase 2/3 order, but the launch product is committed.
+- **Consequences:** The launch checklist (docs/launch-checklist.md) is still a hard gate before real users connect Gmail.
+
 ## 2026-10-28: New logo, the "Held C"
 
 - **Decision:** Replace the C + sparkle mark with the "Held C" (a C holding the send in its mouth) and set the wordmark as "Clinton AI" in one typeface. Chosen over a check-C and a way-back C.

@@ -1,6 +1,6 @@
 # Phase 0: Validation
 
-**Status:** Live. **Gate to Phase 1:** the survey shows people will pay (share choosing a paid option in Q11/Q12).
+**Status:** Live. **Gate to Phase 1:** waived on 2026-10-28; Phase 1 started per the product plan (see [decisions.md](../decisions.md)). Survey work continues in parallel as research, not as a blocker.
 
 ## Built
 
@@ -19,4 +19,4 @@
 - [ ] Trademark search on "Clinton AI" for software.
 - [ ] Secure social handles (@tryclinton / @clintonai).
 - [ ] Decide Phase 2 vs Phase 3 order from survey Q10.
-- [ ] Gate review: write the result (paid-option share, segments) in [decisions.md](../decisions.md) and mark Phase 1 started in [roadmap.md](../product/roadmap.md).
+- [ ] Review survey results (paid-option share, segments) to inform pricing; log them in [decisions.md](../decisions.md).
