@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-30: Smart Delay runs on pg_cron; never risk a double send
+
+- **Decision:** Held emails are claimed in Postgres (`claim_emails()`, `FOR UPDATE SKIP LOCKED`) and sent by `POST /api/cron/dispatch`, which pg_cron calls every 20 s via pg_net with a shared secret (URL and secret in Vault, set per environment). Bodies are AES-256-GCM encrypted with an app key while held and wiped by the existing trigger once sent, cancelled or failed. Temporary Gmail errors retry twice (1 min, 5 min); `invalid_grant` fails immediately and marks the account revoked. An email stuck in "sending" for 10 minutes is marked failed, not retried. Edit takes an email back to Compose (cancelling it) so it can never leave mid-edit and is re-checked on send. A clean check sends straight to the Outbox.
+- **Why:** The database is the one place that can guarantee "claimed once"; the Gmail API has no idempotency key, so a duplicate send is worse than a failure the user can see. Vercel Cron's minimum interval is too coarse for a 1-minute delay.
+- **Consequences:** An email leaves up to ~20 s after its countdown ends. Losing `EMAIL_ENCRYPTION_KEY` makes waiting emails unreadable (they fail safely). Disconnecting Gmail cancels held emails; sent history stays (`on delete set null (account_id)`).
+
 ## 2026-10-29: "Fix it" suggests, the user applies; Clinton's icon is the Held C
 
 - **Decision:** A finding can carry a suggestion that replaces exactly its quoted words. Rules supply certain fixes (right weekday in the writer's own form, recipient's name from their address, a name placeholder). The model may suggest a rewrite of the quoted words only, and must return none when the fix needs a fact it can't know (e.g. which salary is right). The panel shows before → after; nothing changes until the user taps **Fix it**. Findings without a safe fix say **Show me** and jump to the words. Separately, the AI sparkle icon was replaced everywhere by the Held C mark and removed from the icon kit.

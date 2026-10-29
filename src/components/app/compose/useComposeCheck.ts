@@ -46,8 +46,10 @@ function settle(findings: Finding[], modelUsed: boolean, notice: string | null):
 export function useComposeCheck() {
   const [state, setState] = useState<CheckState>(initial);
 
-  const check = useCallback(async (draft: DraftEmail) => {
+  /** Runs the check and returns the settled result, so a clean email can go straight out. */
+  const check = useCallback(async (draft: DraftEmail): Promise<CheckState> => {
     setState((s) => ({ ...s, status: "checking", stale: false }));
+    let next: CheckState;
     try {
       const res = await fetch("/api/check", {
         method: "POST",
@@ -55,15 +57,16 @@ export function useComposeCheck() {
         body: JSON.stringify(draft),
       });
       const json = (await res.json()) as CheckResponse;
-      if (json.ok) return setState(settle(json.findings, json.modelUsed, null));
-      if (res.status === 429) {
-        return setState(settle(toRuleFindings(runRules(draft), describeHit), false, json.error));
-      }
-      throw new Error(json.error);
+      if (json.ok) next = settle(json.findings, json.modelUsed, null);
+      else if (res.status === 429)
+        next = settle(toRuleFindings(runRules(draft), describeHit), false, json.error);
+      else throw new Error(json.error);
     } catch {
       // Offline or server trouble: the rules still run here, and the user can always send.
-      setState(settle(toRuleFindings(runRules(draft), describeHit), false, panelCopy.errorBody));
+      next = settle(toRuleFindings(runRules(draft), describeHit), false, panelCopy.errorBody);
     }
+    setState(next);
+    return next;
   }, []);
 
   const resolve = useCallback((id: string) => {

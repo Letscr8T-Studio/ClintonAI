@@ -2,39 +2,47 @@
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { GoogleMark } from "@/components/ui/GoogleMark";
-import { ClintonMark } from "@/components/ui/icons";
-import { palette } from "@/config/brand";
 import { composeCopy as copy } from "@/content/app/compose";
+import { applyFix } from "@/lib/check/apply-fix";
 import type { Finding } from "@/lib/check/types";
-import { invalidAddresses, splitAddresses } from "@/lib/validation/compose";
+import type { EmailDraft } from "@/types/emails";
 import { ClintonPanel } from "./ClintonPanel";
 import { ComposeFields, type DraftFields, type FieldErrors } from "./ComposeFields";
+import { ComposeFooter } from "./ComposeFooter";
 import { useComposeCheck } from "./useComposeCheck";
+import { DRAFT_HANDOFF_KEY, useSendEmail } from "./useSendEmail";
+import { toDraft, toFields, validateFields } from "./validate";
 
 const empty: DraftFields = { to: "", cc: "", subject: "", body: "" };
 
-function validate(values: DraftFields): FieldErrors {
-  const errors: FieldErrors = {};
-  const to = splitAddresses(values.to);
-  const badTo = invalidAddresses(to);
-  if (to.length === 0) errors.to = copy.needRecipient;
-  else if (badTo.length) errors.to = copy.invalidAddresses(badTo.join(", "));
-  const badCc = invalidAddresses(splitAddresses(values.cc));
-  if (badCc.length) errors.cc = copy.invalidAddresses(badCc.join(", "));
-  if (!values.body.trim()) errors.body = copy.needBody;
-  return errors;
+/** A draft handed over by the Outbox's Edit, if any. Client-only (see ComposeLoader). */
+function handedOverDraft(): DraftFields {
+  try {
+    const raw = window.sessionStorage.getItem(DRAFT_HANDOFF_KEY);
+    return raw ? toFields(JSON.parse(raw) as EmailDraft) : empty;
+  } catch {
+    return empty;
+  }
 }
 
-/** Compose with Clinton beside it: write, press Check & send, review what Clinton caught. */
-export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
-  const [values, setValues] = useState(empty);
+type Props = { fromEmail: string; defaultDelaySeconds: number };
+
+/** Compose with Clinton beside it: write, press Check & send, review, and send to the Outbox. */
+export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
+  const [values, setValues] = useState(handedOverDraft);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [showCc, setShowCc] = useState(false);
+  const [showCc, setShowCc] = useState(() => values.cc !== "");
+  const [delaySeconds, setDelaySeconds] = useState(defaultDelaySeconds);
+  const [fixed, setFixed] = useState(0);
   const { state, check, resolve, sendAnyway, markEdited } = useComposeCheck();
+  const { send, sending, error } = useSendEmail();
   const toRef = useRef<HTMLInputElement>(null);
   const subjectRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+
+  // The hand-off is read once; clear it so it doesn't come back on the next visit.
+  useEffect(() => window.sessionStorage.removeItem(DRAFT_HANDOFF_KEY), []);
 
   // On phones the panel sits below the form: bring the result into view.
   useEffect(() => {
@@ -49,49 +57,40 @@ export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
     markEdited();
   };
 
-  const submit = (event?: FormEvent) => {
+  const queue = (findingsCount: number) =>
+    send(toDraft(values), { delaySeconds, findingsCount, findingsAccepted: fixed });
+
+  const submit = async (event?: FormEvent) => {
     event?.preventDefault();
-    const found = validate(values);
+    const found = validateFields(values);
     setErrors(found);
     if (Object.keys(found).length) return;
-    void check({
-      to: splitAddresses(values.to),
-      cc: splitAddresses(values.cc),
-      subject: values.subject,
-      body: values.body,
-      attachments: [],
-    });
+    const result = await check({ ...toDraft(values), attachments: [] });
+    // Nothing to flag: it goes straight to the Outbox; the Smart Delay is the safety net.
+    if (result.status === "ready") await queue(0);
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) submit();
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) void submit();
   };
 
-  /**
-   * Fix it: swap in Clinton's suggestion and select it, so the change is visible and easy to undo.
-   * Show me (no suggestion, or the words have since changed): jump to the words instead.
-   */
-  const fix = ({ id, field, excerpt, suggestion }: Finding) => {
-    resolve(id);
-    const el = { to: toRef, subject: subjectRef, body: bodyRef }[field].current;
-    const current = values[field];
-    // No quoted words + a suggestion = fill an empty field (e.g. a suggested subject).
-    const fill = !excerpt && Boolean(suggestion) && !current.trim();
-    const at = fill ? 0 : excerpt ? current.indexOf(excerpt) : -1;
-    const length = fill ? current.length : (excerpt?.length ?? 0);
-    const select = (start: number, size: number) => {
+  /** Fix it applies Clinton's suggestion and selects it; Show me jumps to the words. */
+  const fix = (finding: Finding) => {
+    resolve(finding.id);
+    const el = { to: toRef, subject: subjectRef, body: bodyRef }[finding.field].current;
+    const result = applyFix(values[finding.field], finding);
+    const select = () => {
       el?.focus();
-      if (start >= 0) el?.setSelectionRange(start, start + size);
+      if (result.start >= 0) el?.setSelectionRange(result.start, result.start + result.length);
     };
-    if (at >= 0 && suggestion) {
-      // Applying Clinton's own fix is not a user edit, so the check result stays current.
-      setValues((v) => ({ ...v, [field]: current.slice(0, at) + suggestion + current.slice(at + length) }));
-      requestAnimationFrame(() => select(at, suggestion.length));
-      return;
-    }
-    select(at, length);
+    if (!result.changed) return select();
+    // Applying Clinton's own fix is not a user edit, so the check result stays current.
+    setValues((v) => ({ ...v, [finding.field]: result.value }));
+    setFixed((n) => n + 1);
+    requestAnimationFrame(select);
   };
 
+  const busy = state.status === "checking" || sending;
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <form
@@ -118,30 +117,29 @@ export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
           subjectRef={subjectRef}
           bodyRef={bodyRef}
         />
-        <div className="flex flex-col-reverse gap-3 border-t border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
-          <p className="m-0 text-xs text-muted">
-            {copy.footer}{" "}
-            <kbd className="ml-1 hidden rounded border border-line-strong px-1.5 py-0.5 font-mono text-[10px] sm:inline">
-              {copy.shortcut}
-            </kbd>
-          </p>
-          <button
-            type="submit"
-            disabled={state.status === "checking"}
-            aria-busy={state.status === "checking"}
-            className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-brand px-6 text-[15px] font-semibold text-white shadow-cta transition-[translate,background-color] hover:-translate-y-0.5 hover:bg-brand-deep disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none"
-          >
-            <ClintonMark size={14} color={palette.white} />
-            {state.status === "checking" ? copy.checking : copy.submit}
-          </button>
-        </div>
+        <ComposeFooter busy={busy} label={state.status === "checking" ? copy.checking : copy.submit} />
       </form>
       <div
         ref={panel}
         className="cl-rise scroll-mt-24 lg:sticky lg:top-24"
         style={{ animationDelay: "120ms" }}
       >
-        <ClintonPanel state={state} onFix={fix} onIgnore={resolve} onSendAnyway={sendAnyway} />
+        <ClintonPanel
+          state={state}
+          onFix={fix}
+          onIgnore={resolve}
+          onSendAnyway={() => {
+            sendAnyway();
+            void queue(state.findings.length);
+          }}
+          send={{
+            delaySeconds,
+            onDelayChange: setDelaySeconds,
+            onSend: () => void queue(state.findings.length),
+            sending,
+            error,
+          }}
+        />
       </div>
     </div>
   );

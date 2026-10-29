@@ -18,7 +18,7 @@ export function AppHeader({ name, email }: Props) {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-5 sm:px-8">
         <div className="flex min-w-0 items-center gap-3 sm:gap-6">
           <Logo href={appRoutes.home} compact />
-          <nav aria-label={copy.navLabel}>
+          <nav aria-label={copy.navLabel} className="hidden sm:block">
             <ul className="m-0 flex list-none gap-1 p-0">
               {copy.nav.map((item) => {
                 const current = pathname === item.href;

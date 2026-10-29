@@ -81,3 +81,14 @@ export async function deleteAccount(userId: string, accountId: string): Promise<
     .eq("user_id", userId);
   if (error) throw new Error(`Could not disconnect account: ${error.message}`);
 }
+
+/** For the dispatcher (no user session): the account an email is sent from. Service role. */
+export async function getAccountForSending(accountId: string): Promise<GmailAccount | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("connected_accounts")
+    .select(COLUMNS)
+    .eq("id", accountId)
+    .maybeSingle();
+  if (error) throw new Error(`Could not load account: ${error.message}`);
+  return data ? toAccount(data) : null;
+}

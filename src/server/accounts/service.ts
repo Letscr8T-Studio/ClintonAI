@@ -11,6 +11,7 @@ import {
   revokeToken,
   type GoogleTokens,
 } from "@/server/google/oauth";
+import { cancelHeldForAccount } from "@/server/emails/service";
 import * as repo from "./repository";
 
 /** Stores a freshly granted Gmail connection, if Google gave us everything we need. */
@@ -70,6 +71,8 @@ export async function sendTestEmail(
 export async function disconnectAccount(userId: string, accountId: string): Promise<boolean> {
   const account = await repo.findOwnAccount(accountId);
   if (!account) return false;
+  // Nothing waiting in the Outbox may leave from an account that is being disconnected.
+  await cancelHeldForAccount({ id: userId }, account.id);
   const refreshToken = await repo.getRefreshToken(account.id);
   if (refreshToken) await revokeToken(refreshToken);
   await repo.deleteAccount(userId, account.id);

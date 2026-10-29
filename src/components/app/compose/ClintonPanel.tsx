@@ -1,9 +1,10 @@
-import { Check, ClintonMark, Warning } from "@/components/ui/icons";
+import { ClintonMark, Warning } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { panelCopy as copy } from "@/content/app/compose";
 import type { Finding } from "@/lib/check/types";
 import { cn } from "@/lib/cn";
 import { FindingItem } from "./FindingItem";
+import { ReadyPanel, type SendControls } from "./ReadyPanel";
 import type { CheckState } from "./useComposeCheck";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
   onFix: (finding: Finding) => void;
   onIgnore: (id: string) => void;
   onSendAnyway: () => void;
+  send: SendControls;
 };
 
 const shell = "relative overflow-hidden rounded-[28px] p-6 sm:p-7";
@@ -101,38 +103,13 @@ function Review({ state, onFix, onIgnore, onSendAnyway }: Props) {
   );
 }
 
-function Ready({ state }: { state: CheckState }) {
-  const reviewed = state.findings.length > 0;
-  return (
-    <div className={cn(shell, "stage-brand text-white")}>
-      <div aria-hidden="true" className="stage-grid absolute inset-0" />
-      <div className="relative">
-        {state.stale ? <Stale /> : null}
-        <span
-          aria-hidden="true"
-          className="cl-pop inline-flex size-12 items-center justify-center rounded-full bg-white"
-        >
-          <Check size={20} color={palette.brand} />
-        </span>
-        <h2 className="mt-4 mb-0 font-display text-2xl font-bold tracking-tight">{copy.readyTitle}</h2>
-        <p className="mt-1.5 mb-0 text-sm text-on-brand">
-          {reviewed ? copy.readyAfterReview : copy.readyBody}
-        </p>
-        <p className="mt-4 mb-0 rounded-xl bg-white/10 px-3.5 py-3 text-[13px] text-on-brand">
-          {copy.readyNext}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Clinton's side of Compose: ready, checking, findings to review, or all clear. */
+/** Clinton's side of Compose: ready, checking, findings to review, or all clear (and send). */
 export function ClintonPanel(props: Props) {
   const { status } = props.state;
   return (
     <section aria-label="Clinton" aria-live="polite" aria-busy={status === "checking"}>
       {status === "review" ? <Review {...props} /> : null}
-      {status === "ready" ? <Ready state={props.state} /> : null}
+      {status === "ready" ? <ReadyPanel state={props.state} send={props.send} /> : null}
       {status === "idle" || status === "checking" ? <Idle checking={status === "checking"} /> : null}
     </section>
   );

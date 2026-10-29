@@ -15,6 +15,18 @@ test.describe("Signed-in app", () => {
     await expect(page).toHaveURL(/\/login\?next=%2Fonboarding$/);
   });
 
+  test("protects Compose and the Outbox", async ({ page }) => {
+    await page.goto("/compose");
+    await expect(page).toHaveURL(/\/login\?next=%2Fcompose$/);
+    await page.goto("/outbox");
+    await expect(page).toHaveURL(/\/login\?next=%2Foutbox$/);
+  });
+
+  test("the Smart Delay dispatcher refuses calls without the secret", async ({ request }) => {
+    const res = await request.post("/api/cron/dispatch");
+    expect(res.status()).toBe(401);
+  });
+
   test("the sign-in page offers Google and is accessible", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();

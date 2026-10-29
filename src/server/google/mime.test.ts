@@ -47,6 +47,16 @@ describe("buildPlainEmail", () => {
   });
 });
 
+describe("Cc and Bcc", () => {
+  it("adds Cc and Bcc headers only when given, with checked addresses", () => {
+    const message = decode(buildPlainEmail({ ...base, cc: ["kemi@x.co"], bcc: ["boss@x.co"] }));
+    expect(message).toContain("Cc: kemi@x.co");
+    expect(message).toContain("Bcc: boss@x.co");
+    expect(decode(buildPlainEmail(base))).not.toMatch(/^(Cc|Bcc):/m);
+    expect(() => buildPlainEmail({ ...base, cc: ["x@y.co\r\nBcc: z@z.co"] })).toThrow(MimeError);
+  });
+});
+
 describe("encodeHeader", () => {
   it("leaves printable ASCII alone", () => {
     expect(encodeHeader("Plain subject")).toBe("Plain subject");

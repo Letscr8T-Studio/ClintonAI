@@ -67,6 +67,7 @@ npm run build          # production build
 npm run db:start       # local Supabase in Docker (ports 547xx), applies migrations
 npm run test:db        # pgTAP database tests (RLS + trust-rule triggers)
 npm run db:types       # regenerate src/types/supabase.gen.ts after a migration
+npm run db:dispatcher  # point local pg_cron at the dev server's Smart Delay dispatcher
 ```
 
 ## Definition of done
@@ -85,7 +86,7 @@ src/
     marketing/    Landing page: layout/, sections/, visuals/ (illustrations)
     waitlist/     Waitlist form + hook
     owner/        Founders console UI
-    app/          Signed-in product UI (shell, sign-in, onboarding, home, gmail)
+    app/          Signed-in product UI (shell, sign-in, onboarding, home, gmail, compose, outbox)
     seo/          Structured data
   content/        All marketing copy and sample data (typed)
   config/         Brand + site config (names, URLs, palette)

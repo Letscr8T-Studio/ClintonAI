@@ -95,7 +95,7 @@ Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, mode
 2. [x] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour). Sign-in asks only for name + email.
 3. [x] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email. Own OAuth flow (`/api/google/connect` → `/api/google/callback`, PKCE + state cookie), tokens via `save_google_account` / `get_account_refresh_token` (service role only), test send from the home screen, disconnect revokes and deletes. Verified live 2026-10-29: real Gmail connected, test email received.
 4. [x] Compose UI + AI check (rules → model) + findings card. `/compose`; rules in `src/lib/check/` (attachment, greeting name, recipients, weekday/date, card/password/account, placeholders, subject), model via `src/server/ai/` (provider interface; OpenAI `gpt-5.4-mini`, strict JSON schema, 2.5 s budget, invented excerpts dropped); `POST /api/check`; findings with Fix it (previewed suggestion, user-applied) or Show me, Ignore and Send anyway; in-browser rules fallback. Sending itself arrives with milestone 5.
-5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
+5. [x] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher. Body AES-256-GCM encrypted while held (`EMAIL_ENCRYPTION_KEY`); `claim_emails()` (FOR UPDATE SKIP LOCKED, crashed sends marked failed, never retried); pg_cron every 20 s → pg_net → `POST /api/cron/dispatch` (Bearer `CRON_SECRET`, URL + secret in Vault via `configure_dispatcher()`); retries 1 min / 5 min, 3 attempts; `invalid_grant` fails at once and marks the account revoked; Edit takes the email back into Compose (cancelled, re-checked on send); disconnect cancels held emails and keeps history (`on delete set null (account_id)`). `/outbox` with live countdowns; clean emails go straight to the Outbox from Compose; phones get a bottom tab bar.
 6. [ ] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job.
 7. [ ] Dashboard (stats, table, caught list) + activity history.
 8. [ ] Hardening: every item in the [launch checklist](../launch-checklist.md) (shared rate limits, CSP, signed Tally webhook, real console auth, Sentry), plus privacy policy + Limited Use page and terms.
@@ -106,6 +106,6 @@ Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, mode
 
 - Default Smart Delay value: set to 5 min for now; confirm from beta testing.
 - ~~`gmail.send` offline tokens~~ Decided 2026-10-29: our own "Connect Gmail" OAuth step, separate from sign-in (see decisions.md).
-- Disconnecting an account that still has held emails: `emails.account_id` has no delete rule, so the delete is refused. Milestone 5 must cancel (or block on) held emails first.
+- ~~Disconnecting an account with held emails~~ Done in milestone 5: held emails are cancelled first; sent history is kept.
 - Attachment size limit for Safe Send and storage cost.
 - Optional one-time code for very sensitive Safe Send emails: in v1 or later?

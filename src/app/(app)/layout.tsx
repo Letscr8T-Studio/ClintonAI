@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app/shell/AppHeader";
+import { MobileTabBar } from "@/components/app/shell/MobileTabBar";
 import { appRoutes } from "@/config/routes";
 import { requireProfile } from "@/server/auth/user";
 
@@ -15,9 +16,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="stage-paper min-h-dvh">
       <AppHeader name={profile.display_name} email={user.email} />
-      <main id="main" className="mx-auto max-w-[1200px] px-5 pt-6 pb-16 sm:px-8 sm:pt-8">
+      <main id="main" className="mx-auto max-w-[1200px] px-5 pt-6 pb-28 sm:px-8 sm:pt-8 sm:pb-16">
         {children}
       </main>
+      <MobileTabBar />
     </div>
   );
 }

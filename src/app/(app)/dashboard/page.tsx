@@ -4,6 +4,7 @@ import { HomeHero } from "@/components/app/home/HomeHero";
 import { SetupSteps } from "@/components/app/home/SetupSteps";
 import { connectOutcome } from "@/content/app/gmail";
 import { listAccounts } from "@/server/accounts/repository";
+import { hasSentEmail } from "@/server/emails/repository";
 import { requireProfile } from "@/server/auth/user";
 
 export const metadata: Metadata = { title: "Home" };
@@ -11,9 +12,10 @@ export const metadata: Metadata = { title: "Home" };
 type Props = { searchParams: Promise<{ gmail?: string }> };
 
 export default async function HomePage({ searchParams }: Props) {
-  const [{ profile }, accounts, { gmail }] = await Promise.all([
+  const [{ profile }, accounts, hasSent, { gmail }] = await Promise.all([
     requireProfile(),
     listAccounts(),
+    hasSentEmail(),
     searchParams,
   ]);
   const connected = accounts.some((a) => a.status === "active");
@@ -24,7 +26,7 @@ export default async function HomePage({ searchParams }: Props) {
       <HomeHero firstName={firstName} delaySeconds={profile.default_delay_seconds} />
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <GmailCard accounts={accounts} outcome={connectOutcome(gmail)} />
-        <SetupSteps gmailConnected={connected} />
+        <SetupSteps gmailConnected={connected} hasSent={hasSent} />
       </div>
     </div>
   );

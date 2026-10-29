@@ -9,14 +9,15 @@ type Status = keyof typeof copy.stepStatus;
 
 const chipTone: Record<Status, ChipTone> = { done: "tint", next: "brand", soon: "neutral" };
 
-/** Where each step stands. Only Gmail can be done today; the rest arrive in later milestones. */
-export function stepStatuses(gmailConnected: boolean): Status[] {
-  return gmailConnected ? ["done", "next", "soon"] : ["next", "soon", "soon"];
+/** Where each step stands. Safe Send arrives in a later milestone. */
+export function stepStatuses(gmailConnected: boolean, hasSent: boolean): Status[] {
+  if (!gmailConnected) return ["next", "soon", "soon"];
+  return ["done", hasSent ? "done" : "next", "soon"];
 }
 
 /** The three-step "Getting started" checklist. */
-export function SetupSteps({ gmailConnected }: { gmailConnected: boolean }) {
-  const statuses = stepStatuses(gmailConnected);
+export function SetupSteps({ gmailConnected, hasSent }: { gmailConnected: boolean; hasSent: boolean }) {
+  const statuses = stepStatuses(gmailConnected, hasSent);
   const done = statuses.filter((s) => s === "done").length;
   const total = statuses.length;
   return (

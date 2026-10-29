@@ -26,6 +26,9 @@ vi.mock("@/server/google/oauth", async (importOriginal) => ({
 }));
 vi.mock("@/server/google/gmail", () => ({ sendRawMessage: google.sendRawMessage }));
 
+const cancelHeldForAccount = vi.hoisted(() => vi.fn());
+vi.mock("@/server/emails/service", () => ({ cancelHeldForAccount }));
+
 const idToken = (email: string) =>
   `h.${Buffer.from(JSON.stringify({ email, email_verified: true })).toString("base64url")}.s`;
 const account: GmailAccount = {
@@ -113,12 +116,17 @@ describe("sendTestEmail", () => {
 });
 
 describe("disconnectAccount", () => {
-  it("revokes at Google, then deletes the account", async () => {
+  it("cancels waiting emails, revokes at Google, then deletes the account", async () => {
     repo.findOwnAccount.mockResolvedValue(account);
     repo.getRefreshToken.mockResolvedValue("refresh");
     expect(await disconnectAccount("u1", "acc-1")).toBe(true);
+    expect(cancelHeldForAccount).toHaveBeenCalledWith({ id: "u1" }, "acc-1");
     expect(google.revokeToken).toHaveBeenCalledWith("refresh");
     expect(repo.deleteAccount).toHaveBeenCalledWith("u1", "acc-1");
+    // Nothing may leave from the account after it is gone.
+    expect(cancelHeldForAccount.mock.invocationCallOrder[0]!).toBeLessThan(
+      repo.deleteAccount.mock.invocationCallOrder[0]!,
+    );
   });
 
   it("does nothing for someone else's account", async () => {

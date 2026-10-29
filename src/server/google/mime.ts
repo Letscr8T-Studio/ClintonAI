@@ -7,6 +7,9 @@ import { randomBytes } from "node:crypto";
 export type PlainEmail = {
   from: { email: string; name?: string | null };
   to: string[];
+  cc?: string[];
+  /** Sent as a Bcc header; Gmail delivers it and removes the header before anyone sees it. */
+  bcc?: string[];
   subject: string;
   body: string;
 };
@@ -56,6 +59,8 @@ export function buildPlainEmail(email: PlainEmail, now = new Date()): string {
   const lines = [
     `From: ${mailbox(email.from)}`,
     `To: ${email.to.map(assertAddress).join(", ")}`,
+    ...(email.cc?.length ? [`Cc: ${email.cc.map(assertAddress).join(", ")}`] : []),
+    ...(email.bcc?.length ? [`Bcc: ${email.bcc.map(assertAddress).join(", ")}`] : []),
     `Subject: ${encodeHeader(email.subject)}`,
     `Date: ${now.toUTCString().replace("GMT", "+0000")}`,
     `Message-ID: <${randomBytes(16).toString("hex")}@${domain}>`,

@@ -91,3 +91,42 @@ export function Download({ size = 16, color = "currentColor", className }: IconP
     </Svg>
   );
 }
+
+export function HomeIcon({ size = 22, color = "currentColor", className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path
+        d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"
+        stroke={color}
+        strokeWidth={1.8}
+        {...round}
+      />
+    </Svg>
+  );
+}
+
+export function PenIcon({ size = 22, color = "currentColor", className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path
+        d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"
+        stroke={color}
+        strokeWidth={1.8}
+        {...round}
+      />
+    </Svg>
+  );
+}
+
+export function OutboxIcon({ size = 22, color = "currentColor", className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path
+        d="M4 13h4l1.5 3h5l1.5-3h4M4 13l2-8h12l2 8v6H4zM12 11V7m0 0-2 2m2-2 2 2"
+        stroke={color}
+        strokeWidth={1.8}
+        {...round}
+      />
+    </Svg>
+  );
+}

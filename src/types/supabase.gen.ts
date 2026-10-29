@@ -123,7 +123,7 @@ export type Database = {
       };
       emails: {
         Row: {
-          account_id: string;
+          account_id: string | null;
           attempt_count: number;
           bcc_recipients: NonNullable<Json>;
           body_encrypted: string | null;
@@ -145,7 +145,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
-          account_id: string;
+          account_id?: string | null;
           attempt_count?: number;
           bcc_recipients?: NonNullable<Json>;
           body_encrypted?: string | null;
@@ -166,7 +166,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
-          account_id?: string;
+          account_id?: string | null;
           attempt_count?: number;
           bcc_recipients?: NonNullable<Json>;
           body_encrypted?: string | null;
@@ -365,7 +365,39 @@ export type Database = {
       };
     };
     Functions: {
+      claim_emails: {
+        Args: { p_email_id?: string; p_limit?: number; p_user_id?: string };
+        Returns: {
+          account_id: string | null;
+          attempt_count: number;
+          bcc_recipients: NonNullable<Json>;
+          body_encrypted: string | null;
+          cc_recipients: NonNullable<Json>;
+          created_at: string;
+          failure_reason: string | null;
+          findings_accepted: number;
+          findings_count: number;
+          id: string;
+          provider_message_id: string | null;
+          safe_send: boolean;
+          send_at: string;
+          sent_at: string | null;
+          status: Database["public"]["Enums"]["email_status"];
+          subject: string;
+          to_recipients: NonNullable<Json>;
+          updated_at: string;
+          user_id: string;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "emails";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      configure_dispatcher: { Args: { p_secret: string; p_url: string }; Returns: undefined };
       get_account_refresh_token: { Args: { p_account_id: string }; Returns: string };
+      invoke_dispatcher: { Args: Record<PropertyKey, never>; Returns: undefined };
       save_google_account: {
         Args: { p_email: string; p_refresh_token: string; p_scopes: string[]; p_user_id: string };
         Returns: string;

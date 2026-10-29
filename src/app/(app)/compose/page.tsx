@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { ComposeWorkspace } from "@/components/app/compose/ComposeWorkspace";
+import { ComposeLoader } from "@/components/app/compose/ComposeLoader";
 import { ConnectButton } from "@/components/app/gmail/ConnectButton";
 import { composeCopy } from "@/content/app/compose";
 import { gmailCopy } from "@/content/app/gmail";
 import { listAccounts } from "@/server/accounts/repository";
+import { requireProfile } from "@/server/auth/user";
 
 export const metadata: Metadata = { title: "Compose" };
 
 export default async function ComposePage() {
-  const account = (await listAccounts()).find((a) => a.status === "active");
+  const [{ profile }, accounts] = await Promise.all([requireProfile(), listAccounts()]);
+  const account = accounts.find((a) => a.status === "active");
 
   if (!account) {
     return (
@@ -20,5 +22,5 @@ export default async function ComposePage() {
     );
   }
 
-  return <ComposeWorkspace fromEmail={account.email} />;
+  return <ComposeLoader fromEmail={account.email} defaultDelaySeconds={profile.default_delay_seconds} />;
 }

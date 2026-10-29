@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { delaySecondsSchema } from "./profile";
 
 // Draft validation, shared by the Compose form (inline errors) and POST /api/check.
 
@@ -34,3 +35,14 @@ export const checkRequestSchema = z.object({
 });
 
 export type CheckRequest = z.infer<typeof checkRequestSchema>;
+
+/** POST /api/emails: the checked draft, its Smart Delay, and how the AI check went (counts only). */
+export const queueRequestSchema = checkRequestSchema.omit({ attachments: true }).extend({
+  delaySeconds: delaySecondsSchema.optional(),
+  findingsCount: z.number().int().min(0).max(100).default(0),
+  findingsAccepted: z.number().int().min(0).max(100).default(0),
+});
+
+export type QueueRequest = z.infer<typeof queueRequestSchema>;
+
+export const emailIdSchema = z.uuid();

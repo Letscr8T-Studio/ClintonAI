@@ -24,7 +24,7 @@ export const homeCopy = {
     },
     { id: "safe-send", title: "Try Safe Send", body: "Send something you can take back for 24 hours." },
   ] as SetupStep[],
-  soonNote: "Sending through the Outbox and Safe Send arrive in the next beta updates.",
+  soonNote: "Safe Send arrives in the next beta update.",
   delay: {
     caption: "Smart Delay",
     body: (minutes: string) => `Every email waits ${minutes} before it leaves.`,
@@ -33,9 +33,11 @@ export const homeCopy = {
 
 export const appShellCopy = {
   navLabel: "Main",
+  tabsLabel: "Main navigation",
   nav: [
-    { label: "Home", href: appRoutes.home },
-    { label: "Compose", href: appRoutes.compose },
+    { label: "Home", href: appRoutes.home, icon: "home" },
+    { label: "Compose", href: appRoutes.compose, icon: "compose" },
+    { label: "Outbox", href: appRoutes.outbox, icon: "outbox" },
   ],
   accountMenu: "Account",
   signedInAs: "Signed in as",

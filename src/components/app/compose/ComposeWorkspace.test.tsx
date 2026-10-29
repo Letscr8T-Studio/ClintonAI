@@ -5,6 +5,10 @@ import { composeCopy, panelCopy } from "@/content/app/compose";
 import type { Finding } from "@/lib/check/types";
 import { a11yViolations } from "@/test/a11y";
 import { ComposeWorkspace } from "./ComposeWorkspace";
+import { DRAFT_HANDOFF_KEY } from "./useSendEmail";
+
+const push = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh: vi.fn() }) }));
 
 const finding: Finding = {
   id: "rule-0-greeting_mismatch",
@@ -28,11 +32,14 @@ async function write(to: string, body: string) {
 }
 const submit = () => userEvent.click(screen.getByRole("button", { name: composeCopy.submit }));
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  push.mockReset();
+});
 
 describe("ComposeWorkspace", () => {
   it("shows Clinton ready, and is accessible", async () => {
-    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     expect(screen.getByText(panelCopy.idleTitle)).toBeInTheDocument();
     expect(screen.getByText("ada@example.com")).toBeInTheDocument();
     expect(await a11yViolations(container)).toEqual([]);
@@ -40,7 +47,7 @@ describe("ComposeWorkspace", () => {
 
   it("validates before checking", async () => {
     const fetchMock = mockCheck({ ok: true, findings: [], modelUsed: true });
-    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await userEvent.type(screen.getByLabelText(composeCopy.to), "dami@x.co, not-an-email");
     await submit();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -51,7 +58,7 @@ describe("ComposeWorkspace", () => {
 
   it("sends the draft and shows what Clinton caught; Show me selects the words", async () => {
     const fetchMock = mockCheck({ ok: true, findings: [finding], modelUsed: true });
-    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Tunde, welcome.");
     await submit();
 
@@ -75,7 +82,7 @@ describe("ComposeWorkspace", () => {
 
   it("previews a suggested fix and applies it only when the user taps Fix it", async () => {
     mockCheck({ ok: true, findings: [{ ...finding, suggestion: "Dami" }], modelUsed: true });
-    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Tunde, welcome.");
     await submit();
 
@@ -101,7 +108,7 @@ describe("ComposeWorkspace", () => {
       suggestion: "Your offer from Brightlane",
     };
     mockCheck({ ok: true, findings: [subjectFinding], modelUsed: true });
-    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await userEvent.type(screen.getByLabelText(composeCopy.to), "dami@brightlane.io");
     await userEvent.type(screen.getByLabelText(composeCopy.body), "Hi Dami, welcome aboard.");
     await submit();
@@ -115,21 +122,73 @@ describe("ComposeWorkspace", () => {
 
   it("lets the user send anyway (advise, never block)", async () => {
     mockCheck({ ok: true, findings: [finding], modelUsed: true });
-    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Tunde, welcome.");
     await submit();
     await userEvent.click(await screen.findByRole("button", { name: panelCopy.sendAnyway }));
-    expect(screen.getByText(panelCopy.readyTitle)).toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/outbox?queued=1"));
   });
 
-  it("goes straight to ready when nothing is found, and notices later edits", async () => {
-    mockCheck({ ok: true, findings: [], modelUsed: true });
-    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+  it("sends a clean email straight to the Outbox with the default Smart Delay", async () => {
+    const fetchMock = mockCheck({ ok: true, findings: [], modelUsed: true });
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Dami, welcome.");
     await submit();
-    expect(await screen.findByText(panelCopy.readyBody)).toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/outbox?queued=1"));
+    const [url, init] = fetchMock.mock.calls[1]!;
+    expect(url).toBe("/api/emails");
+    expect(JSON.parse(init!.body as string)).toEqual({
+      to: ["dami@brightlane.io"],
+      cc: [],
+      subject: "Offer",
+      body: "Hi Dami, welcome.",
+      delaySeconds: 300,
+      findingsCount: 0,
+      findingsAccepted: 0,
+    });
+  });
+
+  it("after fixes, sends from the Ready panel with the delay chosen for this email", async () => {
+    const fetchMock = mockCheck({
+      ok: true,
+      findings: [{ ...finding, suggestion: "Dami" }],
+      modelUsed: true,
+    });
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    await write("dami@brightlane.io", "Hi Tunde, welcome.");
+    await submit();
+    await userEvent.click(await screen.findByRole("button", { name: panelCopy.fix }));
+    await userEvent.selectOptions(screen.getByLabelText(panelCopy.delayLabel), "60");
+    await userEvent.click(screen.getByRole("button", { name: panelCopy.send }));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[1]![1]!.body as string)).toMatchObject({
+      body: "Hi Dami, welcome.",
+      delaySeconds: 60,
+      findingsCount: 1,
+      findingsAccepted: 1,
+    });
+  });
+
+  it("notices edits made after the check", async () => {
+    mockCheck({ ok: true, findings: [{ ...finding, suggestion: "Dami" }], modelUsed: true });
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    await write("dami@brightlane.io", "Hi Tunde, welcome.");
+    await submit();
+    await userEvent.click(await screen.findByRole("button", { name: panelCopy.fix }));
     await userEvent.type(screen.getByLabelText(composeCopy.body), " More.");
     expect(screen.getByText(panelCopy.stale)).toBeInTheDocument();
+  });
+
+  it("opens with a draft handed back by the Outbox's Edit, once", () => {
+    window.sessionStorage.setItem(
+      DRAFT_HANDOFF_KEY,
+      JSON.stringify({ to: ["dami@x.co"], cc: ["kemi@x.co"], subject: "Offer", body: "Hello" }),
+    );
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    expect(screen.getByLabelText(composeCopy.to)).toHaveValue("dami@x.co");
+    expect(screen.getByLabelText(composeCopy.cc)).toHaveValue("kemi@x.co");
+    expect(screen.getByLabelText(composeCopy.body)).toHaveValue("Hello");
+    expect(window.sessionStorage.getItem(DRAFT_HANDOFF_KEY)).toBeNull();
   });
 
   it("falls back to the in-browser rules when the check can't be reached", async () => {
@@ -137,7 +196,7 @@ describe("ComposeWorkspace", () => {
       "fetch",
       vi.fn(async () => Promise.reject(new TypeError("offline"))),
     );
-    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Tunde, I've attached it.");
     await submit();
     await waitFor(() => expect(screen.getByText(panelCopy.errorBody)).toBeInTheDocument());

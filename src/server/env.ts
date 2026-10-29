@@ -78,6 +78,29 @@ export function getAiEnv(): AiEnv | null {
   };
 }
 
+// Smart Delay: the key that encrypts held email bodies, and the secret the dispatcher is called with.
+const emailCryptoSchema = z.object({
+  EMAIL_ENCRYPTION_KEY: z
+    .string()
+    .refine(
+      (v) => Buffer.from(v, "base64").length === 32,
+      "must be 32 bytes, base64 (openssl rand -base64 32)",
+    ),
+});
+const cronSchema = z.object({ CRON_SECRET: z.string().min(32) });
+
+export function getEmailCryptoEnv() {
+  const parsed = emailCryptoSchema.safeParse(process.env);
+  if (!parsed.success) throw new EnvError("Email encryption", parsed.error);
+  return { key: Buffer.from(parsed.data.EMAIL_ENCRYPTION_KEY, "base64") };
+}
+
+/** The dispatcher secret, or null when not configured (the cron route then refuses every call). */
+export function getCronSecret(): string | null {
+  const parsed = cronSchema.safeParse(process.env);
+  return parsed.success ? parsed.data.CRON_SECRET : null;
+}
+
 export function getGoogleEnv() {
   const parsed = googleSchema.safeParse(process.env);
   if (!parsed.success) throw new EnvError("Google OAuth", parsed.error);
