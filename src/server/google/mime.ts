@@ -1,7 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 
-// Minimal RFC 5322 message builder for plain-text email sent through the Gmail API.
+// Minimal RFC 5322 message builder (plain text, optionally with an HTML alternative) for the Gmail API.
 // Every header value is checked for CR/LF so user input can never inject headers.
 
 export type PlainEmail = {
@@ -12,6 +12,8 @@ export type PlainEmail = {
   bcc?: string[];
   subject: string;
   body: string;
+  /** Optional HTML version; `body` stays as the plain-text alternative. */
+  html?: string;
 };
 
 export class MimeError extends Error {}
@@ -65,10 +67,30 @@ export function buildPlainEmail(email: PlainEmail, now = new Date()): string {
     `Date: ${now.toUTCString().replace("GMT", "+0000")}`,
     `Message-ID: <${randomBytes(16).toString("hex")}@${domain}>`,
     "MIME-Version: 1.0",
-    'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: base64",
-    "",
-    base64Body(email.body),
+    ...(email.html ? alternative(email.body, email.html) : part("text/plain", email.body)),
   ];
   return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
+}
+
+function part(type: "text/plain" | "text/html", content: string): string[] {
+  return [
+    `Content-Type: ${type}; charset="UTF-8"`,
+    "Content-Transfer-Encoding: base64",
+    "",
+    base64Body(content),
+  ];
+}
+
+/** Plain text first, HTML second: clients show the richest part they support. */
+function alternative(text: string, html: string): string[] {
+  const boundary = `clinton-${randomBytes(12).toString("hex")}`;
+  return [
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    "",
+    `--${boundary}`,
+    ...part("text/plain", text),
+    `--${boundary}`,
+    ...part("text/html", html),
+    `--${boundary}--`,
+  ];
 }

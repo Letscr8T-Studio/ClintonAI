@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { DRAFT_HANDOFF_KEY } from "@/components/app/compose/useSendEmail";
 import { appRoutes } from "@/config/routes";
-import { emailActionErrors, outboxCopy as copy } from "@/content/app/outbox";
-import type { EmailDraft, OutboxEmail } from "@/types/emails";
+import { outboxCopy as copy } from "@/content/app/outbox";
+import type { OutboxEmail } from "@/types/emails";
 import { HistoryList } from "./HistoryList";
-import { WaitingCard, type OutboxAction } from "./WaitingCard";
+import { useOutboxActions } from "./useOutboxActions";
+import { WaitingCard } from "./WaitingCard";
 
 type Props = { emails: OutboxEmail[]; justQueued: boolean };
 
@@ -16,40 +14,11 @@ const sectionTitle = "m-0 mb-3 font-mono text-xs tracking-wider text-muted upper
 
 /** The Outbox: waiting emails with live countdowns, then what was sent and what wasn't. */
 export function OutboxView({ emails, justQueued }: Props) {
-  const router = useRouter();
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { busyId, error, act, withdraw } = useOutboxActions(emails);
 
   const waiting = emails.filter((e) => e.status === "held" || e.status === "sending");
   const sent = emails.filter((e) => e.status === "sent");
   const notSent = emails.filter((e) => e.status === "failed" || e.status === "cancelled");
-
-  // While anything is waiting, keep the page in step with the server (sent, retried, failed).
-  useEffect(() => {
-    if (waiting.length === 0) return;
-    const id = setInterval(() => router.refresh(), 5000);
-    return () => clearInterval(id);
-  }, [waiting.length, router]);
-
-  const act = async (email: OutboxEmail, action: OutboxAction) => {
-    setBusyId(email.id);
-    setError(null);
-    try {
-      const res = await fetch(`/api/emails/${email.id}/${action}`, { method: "POST" });
-      const json = (await res.json()) as { ok: boolean; error?: string; draft?: EmailDraft };
-      if (!json.ok) throw new Error(json.error ?? emailActionErrors.failed);
-      if (action === "edit" && json.draft) {
-        window.sessionStorage.setItem(DRAFT_HANDOFF_KEY, JSON.stringify(json.draft));
-        return router.push(appRoutes.compose);
-      }
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : emailActionErrors.failed);
-      router.refresh();
-    } finally {
-      setBusyId(null);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-10">
@@ -111,7 +80,7 @@ export function OutboxView({ emails, justQueued }: Props) {
         <h2 id="sent-h" className={sectionTitle}>
           {copy.sentTitle}
         </h2>
-        <HistoryList emails={sent} empty={copy.sentEmpty} />
+        <HistoryList emails={sent} empty={copy.sentEmpty} busyId={busyId} onWithdraw={withdraw} />
       </section>
 
       {notSent.length ? (

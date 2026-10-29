@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => router }));
 const NOW = new Date("2026-10-30T10:00:00Z").getTime();
 const email = (over: Partial<OutboxEmail>): OutboxEmail => ({
   id: "11111111-1111-4111-8111-111111111111",
+  safeSend: false,
   subject: "Q3 investor update",
   to: ["investor@fund.co"],
   cc: [],

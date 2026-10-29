@@ -1,29 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { GoogleMark } from "@/components/ui/GoogleMark";
 import { composeCopy as copy } from "@/content/app/compose";
 import { applyFix } from "@/lib/check/apply-fix";
 import type { Finding } from "@/lib/check/types";
-import type { EmailDraft } from "@/types/emails";
 import { ClintonPanel } from "./ClintonPanel";
 import { ComposeFields, type DraftFields, type FieldErrors } from "./ComposeFields";
 import { ComposeFooter } from "./ComposeFooter";
+import { ComposeHeader } from "./ComposeHeader";
 import { useComposeCheck } from "./useComposeCheck";
 import { DRAFT_HANDOFF_KEY, useSendEmail } from "./useSendEmail";
-import { toDraft, toFields, validateFields } from "./validate";
-
-const empty: DraftFields = { to: "", cc: "", subject: "", body: "" };
-
-/** A draft handed over by the Outbox's Edit, if any. Client-only (see ComposeLoader). */
-function handedOverDraft(): DraftFields {
-  try {
-    const raw = window.sessionStorage.getItem(DRAFT_HANDOFF_KEY);
-    return raw ? toFields(JSON.parse(raw) as EmailDraft) : empty;
-  } catch {
-    return empty;
-  }
-}
+import { handedOverDraft, toDraft, validateFields } from "./validate";
 
 type Props = { fromEmail: string; defaultDelaySeconds: number };
 
@@ -34,6 +21,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
   const [showCc, setShowCc] = useState(() => values.cc !== "");
   const [delaySeconds, setDelaySeconds] = useState(defaultDelaySeconds);
   const [fixed, setFixed] = useState(0);
+  const [safeSend, setSafeSend] = useState(false);
   const { state, check, resolve, sendAnyway, markEdited } = useComposeCheck();
   const { send, sending, error } = useSendEmail();
   const toRef = useRef<HTMLInputElement>(null);
@@ -58,11 +46,11 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
   };
 
   const queue = (findingsCount: number) =>
-    send(toDraft(values), { delaySeconds, findingsCount, findingsAccepted: fixed });
+    send(toDraft(values), { delaySeconds, findingsCount, findingsAccepted: fixed, safeSend });
 
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
-    const found = validateFields(values);
+    const found = validateFields(values, safeSend);
     setErrors(found);
     if (Object.keys(found).length) return;
     const result = await check({ ...toDraft(values), attachments: [] });
@@ -99,14 +87,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
         noValidate
         className="cl-rise overflow-hidden rounded-[28px] border border-line bg-white shadow-card"
       >
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-7">
-          <h1 className="m-0 font-display text-xl font-bold tracking-tight">{copy.title}</h1>
-          <p className="m-0 flex min-w-0 items-center gap-2 rounded-full bg-paper px-3 py-1.5 text-[13px] text-body">
-            <GoogleMark size={14} />
-            <span className="sr-only">{copy.from}: </span>
-            <span className="truncate">{fromEmail}</span>
-          </p>
-        </div>
+        <ComposeHeader fromEmail={fromEmail} />
         <ComposeFields
           values={values}
           errors={errors}
@@ -117,7 +98,12 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
           subjectRef={subjectRef}
           bodyRef={bodyRef}
         />
-        <ComposeFooter busy={busy} label={state.status === "checking" ? copy.checking : copy.submit} />
+        <ComposeFooter
+          busy={busy}
+          label={state.status === "checking" ? copy.checking : copy.submit}
+          safeSend={safeSend}
+          onSafeSend={setSafeSend}
+        />
       </form>
       <div
         ref={panel}
@@ -126,6 +112,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
       >
         <ClintonPanel
           state={state}
+          safeSend={{ on: safeSend, onEnable: () => setSafeSend(true) }}
           onFix={fix}
           onIgnore={resolve}
           onSendAnyway={() => {

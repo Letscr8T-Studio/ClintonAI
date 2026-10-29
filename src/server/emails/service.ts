@@ -12,6 +12,8 @@ export type QueueInput = {
   delaySeconds: number;
   findingsCount: number;
   findingsAccepted: number;
+  /** Trust rule 3: chosen per email, never on by default. */
+  safeSend: boolean;
 };
 
 /** Puts an email in the Outbox: encrypted, held until now + its Smart Delay. */
@@ -31,6 +33,7 @@ export async function queueEmail(
     to: input.draft.to,
     cc: input.draft.cc,
     bodyEncrypted: encryptBody(input.draft.body),
+    safeSend: input.safeSend,
     sendAt,
     findingsCount: input.findingsCount,
     findingsAccepted: input.findingsAccepted,

@@ -1,6 +1,7 @@
 import { ClintonMark, Warning } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { panelCopy as copy } from "@/content/app/compose";
+import { safeSendCopy } from "@/content/app/safe-send";
 import type { Finding } from "@/lib/check/types";
 import { cn } from "@/lib/cn";
 import { FindingItem } from "./FindingItem";
@@ -13,6 +14,8 @@ type Props = {
   onIgnore: (id: string) => void;
   onSendAnyway: () => void;
   send: SendControls;
+  /** Suggest Safe Send for risky emails, when it is off. */
+  safeSend: { on: boolean; onEnable: () => void };
 };
 
 const shell = "relative overflow-hidden rounded-[28px] p-6 sm:p-7";
@@ -63,7 +66,11 @@ function Idle({ checking }: { checking: boolean }) {
   );
 }
 
-function Review({ state, onFix, onIgnore, onSendAnyway }: Props) {
+/** Findings that make an email worth being able to take back. */
+const RISKY = new Set(["sensitive_data", "many_recipients"]);
+
+function Review({ state, onFix, onIgnore, onSendAnyway, safeSend }: Props) {
+  const suggest = !safeSend.on && state.findings.some((f) => RISKY.has(f.type));
   const open = state.findings.filter((f) => state.open.includes(f.id));
   return (
     <div className={cn(shell, "border border-amber-line bg-amber-bg", state.stale && "opacity-80")}>
@@ -85,6 +92,18 @@ function Review({ state, onFix, onIgnore, onSendAnyway }: Props) {
         </button>
       </div>
       {state.notice ? <p className="mt-2 mb-0 text-[13px] text-amber-ink">{state.notice}</p> : null}
+      {suggest ? (
+        <div className="mt-4 flex flex-col gap-2 rounded-2xl bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="m-0 text-[13px] text-ink">{safeSendCopy.suggest}</p>
+          <button
+            type="button"
+            onClick={safeSend.onEnable}
+            className="inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-full bg-brand px-4 text-[13px] font-semibold text-white hover:bg-brand-deep"
+          >
+            {safeSendCopy.suggestButton}
+          </button>
+        </div>
+      ) : null}
       <ul className="m-0 mt-4 flex list-none flex-col gap-2 p-0 lg:max-h-[calc(100dvh-14rem)] lg:overflow-y-auto">
         {open.map((finding, i) => (
           <FindingItem

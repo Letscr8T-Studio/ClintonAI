@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { delaySecondsSchema } from "./profile";
 
+/** Each Safe Send recipient gets their own copy and link. */
+export const SAFE_SEND_MAX_RECIPIENTS = 20;
+
 // Draft validation, shared by the Compose form (inline errors) and POST /api/check.
 
 export const LIMITS = { to: 100, cc: 50, subject: 998, body: 50_000, attachments: 20 } as const;
@@ -37,12 +40,22 @@ export const checkRequestSchema = z.object({
 export type CheckRequest = z.infer<typeof checkRequestSchema>;
 
 /** POST /api/emails: the checked draft, its Smart Delay, and how the AI check went (counts only). */
-export const queueRequestSchema = checkRequestSchema.omit({ attachments: true }).extend({
-  delaySeconds: delaySecondsSchema.optional(),
-  findingsCount: z.number().int().min(0).max(100).default(0),
-  findingsAccepted: z.number().int().min(0).max(100).default(0),
-});
+export const queueRequestSchema = checkRequestSchema
+  .omit({ attachments: true })
+  .extend({
+    delaySeconds: delaySecondsSchema.optional(),
+    findingsCount: z.number().int().min(0).max(100).default(0),
+    findingsAccepted: z.number().int().min(0).max(100).default(0),
+    safeSend: z.boolean().default(false),
+  })
+  .refine((d) => !d.safeSend || d.to.length + d.cc.length <= SAFE_SEND_MAX_RECIPIENTS, {
+    message: `Safe Send works for up to ${SAFE_SEND_MAX_RECIPIENTS} people.`,
+    path: ["to"],
+  });
 
 export type QueueRequest = z.infer<typeof queueRequestSchema>;
 
 export const emailIdSchema = z.uuid();
+
+/** POST /api/safe-send/:messageId/withdraw: everyone, or one recipient. */
+export const withdrawSchema = z.object({ recipientId: z.uuid().optional() });

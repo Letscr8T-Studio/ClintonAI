@@ -24,6 +24,17 @@ test.describe("Signed-in app", () => {
     await expect(page).toHaveURL(/\/login\?next=%2Fsettings$/);
   });
 
+  test("a Safe Send link page is public, private to search engines, and explains a bad link", async ({
+    page,
+  }) => {
+    await page.goto(`/m/${"x".repeat(43)}`);
+    await expect(page).toHaveURL(/\/m\//); // no sign-in needed
+    await expect(page.getByRole("heading", { level: 1, name: "This link isn't valid" })).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    await expect(page.locator('meta[name="referrer"]')).toHaveAttribute("content", "no-referrer");
+    expect(await axeViolations(page)).toEqual([]);
+  });
+
   test("the Smart Delay dispatcher refuses calls without the secret", async ({ request }) => {
     const res = await request.post("/api/cron/dispatch");
     expect(res.status()).toBe(401);

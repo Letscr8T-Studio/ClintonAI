@@ -73,3 +73,12 @@ export function formatClock(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds));
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }
+
+/** Time left, compactly: "18h 42m", "42m", "under a minute". */
+export function formatTimeLeft(ms: number): string {
+  if (ms < 60_000) return "under a minute";
+  const minutes = Math.floor(ms / 60_000);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}

@@ -23,6 +23,10 @@ export const palette = {
   white: "#FFFFFF",
   amberIcon: "#9A6A00",
   amberDot: "#E0A800",
+  line: "#ECEAE3",
+  body: "#3A3F4E",
+  muted: "#5B6070",
+  subtle: "#6B7080",
 } as const;
 
 /** Google's own logo colours, required unchanged by its sign-in branding guidelines. */

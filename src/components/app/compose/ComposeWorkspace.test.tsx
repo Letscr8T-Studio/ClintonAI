@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { composeCopy, panelCopy } from "@/content/app/compose";
+import { safeSendCopy } from "@/content/app/safe-send";
 import type { Finding } from "@/lib/check/types";
 import { a11yViolations } from "@/test/a11y";
 import { ComposeWorkspace } from "./ComposeWorkspace";
@@ -145,6 +146,7 @@ describe("ComposeWorkspace", () => {
       delaySeconds: 300,
       findingsCount: 0,
       findingsAccepted: 0,
+      safeSend: false,
     });
   });
 
@@ -201,5 +203,35 @@ describe("ComposeWorkspace", () => {
     await submit();
     await waitFor(() => expect(screen.getByText(panelCopy.errorBody)).toBeInTheDocument());
     expect(screen.getByText("You mention an attachment, but nothing is attached.")).toBeInTheDocument();
+  });
+
+  it("Safe Send is off by default, and the email says so when it's turned on", async () => {
+    const fetchMock = mockCheck({ ok: true, findings: [], modelUsed: true });
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    const toggle = screen.getByRole("switch", { name: /Safe Send/ });
+    expect(toggle).toHaveAttribute("aria-checked", "false"); // trust rule 3
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+    await write("dami@brightlane.io", "Hi Dami, welcome.");
+    await submit();
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[1]![1]!.body as string)).toMatchObject({ safeSend: true });
+  });
+
+  it("suggests Safe Send for a sensitive email, and turns it on in one tap", async () => {
+    const sensitive: Finding = {
+      id: "rule-0-sensitive_data",
+      source: "rules",
+      type: "sensitive_data",
+      field: "body",
+      message: "This looks like a password.",
+    };
+    mockCheck({ ok: true, findings: [sensitive], modelUsed: true });
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    await write("dami@brightlane.io", "My password is hunter2");
+    await submit();
+    await userEvent.click(await screen.findByRole("button", { name: safeSendCopy.suggestButton }));
+    expect(screen.getByRole("switch", { name: /Safe Send/ })).toHaveAttribute("aria-checked", "true");
+    expect(screen.queryByRole("button", { name: safeSendCopy.suggestButton })).toBeNull();
   });
 });

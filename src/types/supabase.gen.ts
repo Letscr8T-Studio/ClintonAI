@@ -396,11 +396,50 @@ export type Database = {
         };
       };
       configure_dispatcher: { Args: { p_secret: string; p_url: string }; Returns: undefined };
+      create_safe_send: {
+        Args: {
+          p_data_key: string;
+          p_email_id: string;
+          p_recipients: Json;
+          p_storage_path: string;
+          p_user_id: string;
+        };
+        Returns: {
+          expires_at: string;
+          message_id: string;
+        }[];
+      };
       get_account_refresh_token: { Args: { p_account_id: string }; Returns: string };
+      get_safe_send_key: { Args: { p_message_id: string }; Returns: string };
       invoke_dispatcher: { Args: Record<PropertyKey, never>; Returns: undefined };
+      open_safe_send: {
+        Args: { p_token_hash: string };
+        Returns: {
+          content_deleted_at: string;
+          expires_at: string;
+          message_id: string;
+          recipient_email: string;
+          recipient_id: string;
+          sender_email: string;
+          sender_name: string;
+          sent_at: string;
+          storage_path: string;
+          subject: string;
+          withdrawn_at: string;
+        }[];
+      };
       save_google_account: {
         Args: { p_email: string; p_refresh_token: string; p_scopes: string[]; p_user_id: string };
         Returns: string;
+      };
+      shred_safe_send: {
+        Args: { p_limit?: number; p_message_id?: string };
+        Returns: {
+          email_id: string;
+          id: string;
+          storage_path: string;
+          user_id: string;
+        }[];
       };
     };
     Enums: {

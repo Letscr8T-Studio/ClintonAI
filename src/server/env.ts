@@ -101,6 +101,12 @@ export function getCronSecret(): string | null {
   return parsed.success ? parsed.data.CRON_SECRET : null;
 }
 
+/** Base URL for links inside emails (Safe Send). APP_URL in dev (localhost), the site URL in production. */
+export function getAppUrl(): string {
+  const url = process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return url.replace(/\/+$/, "");
+}
+
 export function getGoogleEnv() {
   const parsed = googleSchema.safeParse(process.env);
   if (!parsed.success) throw new EnvError("Google OAuth", parsed.error);

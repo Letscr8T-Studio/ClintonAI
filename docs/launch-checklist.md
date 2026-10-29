@@ -19,6 +19,7 @@ deployed and verified; add the PR link next to it.
 - [ ] Deliverability tests: Safe Send emails land in the inbox, not spam, on Gmail, Outlook and Yahoo.
 - [ ] Trademark search on "Clinton AI" for software.
 - [ ] Smart Delay in production: `EMAIL_ENCRYPTION_KEY` and `CRON_SECRET` set in Vercel (key backed up in the team password manager), dispatcher registered against the hosted project with `DISPATCH_URL=https://tryclinton.com/api/cron/dispatch`, and one real email verified end to end. Gmail sending quotas understood (about 500/day on personal Gmail).
+- [ ] Safe Send in production: `APP_URL=https://tryclinton.com` in Vercel; card email deliverability tested (Gmail, Outlook, Yahoo: inbox, not spam); the recipient page checked on phones; storage bucket confirmed private.
 - [ ] AI provider data terms: the privacy policy names the AI check provider (OpenAI today) and its retention (API requests kept up to 30 days for abuse monitoring; not used for training). Request zero data retention if available, or switch provider, before real users. Our side already stores no email text.
 - [ ] Hosted sign-in configured: production redirect URI and origin on the Google client, Google provider and URL configuration in the Supabase dashboard, `NEXT_PUBLIC_SUPABASE_*` and `GOOGLE_CLIENT_*` set in Vercel, `https://tryclinton.com/api/google/callback` added as a redirect URI (see [environment.md](engineering/environment.md)). Every beta tester added as a Google test user until verification is approved.
 

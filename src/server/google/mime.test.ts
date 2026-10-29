@@ -47,6 +47,21 @@ describe("buildPlainEmail", () => {
   });
 });
 
+describe("HTML alternative", () => {
+  it("sends text and HTML as multipart/alternative, text first", () => {
+    const message = decode(buildPlainEmail({ ...base, html: "<p>Hello</p>" }));
+    const boundary = message.match(/boundary="([^"]+)"/)![1]!;
+    expect(message).toContain(`Content-Type: multipart/alternative; boundary="${boundary}"`);
+    const parts = message.split(`--${boundary}`);
+    expect(parts[1]).toContain("text/plain");
+    expect(parts[2]).toContain("text/html");
+    expect(Buffer.from(parts[2]!.split("\r\n\r\n")[1]!.replace(/\r\n/g, ""), "base64").toString()).toBe(
+      "<p>Hello</p>",
+    );
+    expect(parts[3]).toBe("--");
+  });
+});
+
 describe("Cc and Bcc", () => {
   it("adds Cc and Bcc headers only when given, with checked addresses", () => {
     const message = decode(buildPlainEmail({ ...base, cc: ["kemi@x.co"], bcc: ["boss@x.co"] }));

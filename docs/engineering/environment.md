@@ -18,6 +18,7 @@
 | `AI_PROVIDER`                          | server | optional | `openai`. Unset: the AI check runs the rules only                                                                              |
 | `OPENAI_API_KEY`                       | server | with AI  | OpenAI key (`sk-…`). Server only                                                                                               |
 | `EMAIL_ENCRYPTION_KEY`                 | server | app      | 32 bytes base64 (`openssl rand -base64 32`). Encrypts held email bodies. Back it up: losing it makes waiting emails unreadable |
+| `APP_URL`                              | server | app      | Base URL for links in emails (Safe Send). Dev `http://localhost:3000`; prod `https://tryclinton.com`                           |
 | `CRON_SECRET`                          | server | app      | 32+ chars. pg_cron sends it to `/api/cron/dispatch`; register it with `npm run db:dispatcher`                                  |
 | `OPENAI_MODEL`                         | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 2.5 s budget                                                             |
 

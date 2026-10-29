@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { formatClock, greeting, lagosDay, lagosHour, longDay, shortDay, timeAgo } from "./time";
+import {
+  formatClock,
+  formatTimeLeft,
+  greeting,
+  lagosDay,
+  lagosHour,
+  longDay,
+  shortDay,
+  timeAgo,
+} from "./time";
 
 describe("formatClock", () => {
   it.each([
@@ -45,5 +54,13 @@ describe("timeAgo", () => {
 
   it("falls back to a date after a week", () => {
     expect(timeAgo(ago(10 * 86_400_000), now)).toBe("13 Oct 2026");
+  });
+});
+
+describe("formatTimeLeft", () => {
+  it("shows hours and minutes, then minutes, then a floor", () => {
+    expect(formatTimeLeft(18 * 3_600_000 + 42 * 60_000 + 5_000)).toBe("18h 42m");
+    expect(formatTimeLeft(42 * 60_000)).toBe("42m");
+    expect(formatTimeLeft(30_000)).toBe("under a minute");
   });
 });

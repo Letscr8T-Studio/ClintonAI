@@ -8,7 +8,7 @@ import { getSupabaseAdmin } from "@/server/supabase";
 // encrypted body run with the service role, always filtered by the owner.
 
 const OUTBOX_COLUMNS =
-  "id, subject, to_recipients, cc_recipients, status, send_at, sent_at, failure_reason, created_at";
+  "id, subject, to_recipients, cc_recipients, status, safe_send, send_at, sent_at, failure_reason, created_at";
 const list = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((v) => typeof v === "string") : [];
 const fail = (what: string, message: string) => new Error(`Could not ${what}: ${message}`);
@@ -26,6 +26,7 @@ export async function listOutbox(days = 7): Promise<OutboxEmail[]> {
   if (error) throw fail("load the Outbox", error.message);
   return data.map((r) => ({
     id: r.id,
+    safeSend: r.safe_send,
     subject: r.subject,
     to: list(r.to_recipients),
     cc: list(r.cc_recipients),
@@ -54,6 +55,7 @@ export async function insertHeldEmail(row: {
   to: string[];
   cc: string[];
   bodyEncrypted: string;
+  safeSend: boolean;
   sendAt: Date;
   findingsCount: number;
   findingsAccepted: number;
@@ -67,6 +69,7 @@ export async function insertHeldEmail(row: {
       to_recipients: row.to,
       cc_recipients: row.cc,
       body_encrypted: row.bodyEncrypted,
+      safe_send: row.safeSend,
       send_at: row.sendAt.toISOString(),
       findings_count: row.findingsCount,
       findings_accepted: row.findingsAccepted,

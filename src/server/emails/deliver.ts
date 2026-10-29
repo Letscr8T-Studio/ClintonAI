@@ -1,11 +1,13 @@
 import "server-only";
 import { failureReasons as reasons } from "@/content/app/outbox";
+import { safeSendCopy } from "@/content/app/safe-send";
 import type { EmailRow } from "@/types/database";
 import { getAccountForSending, getRefreshToken, setAccountStatus } from "@/server/accounts/repository";
 import { GmailSendError, sendRawMessage } from "@/server/google/gmail";
 import { MimeError, buildPlainEmail } from "@/server/google/mime";
 import { GoogleAuthError, refreshAccessToken } from "@/server/google/oauth";
 import { getSenderName } from "@/server/profiles/repository";
+import { sendSafeSendCopies } from "@/server/safe-send/deliver";
 import { DecryptError, decryptBody } from "./crypto";
 import { recordActivity, updateEmail } from "./repository";
 
@@ -70,20 +72,30 @@ export async function deliver(email: EmailRow, now = new Date()): Promise<Delive
   }
 
   try {
-    const raw = buildPlainEmail({
-      from: { email: account.email, name: await getSenderName(email.user_id) },
-      to,
-      cc: strings(email.cc_recipients),
-      bcc: strings(email.bcc_recipients),
-      subject: email.subject,
-      body,
-    });
-    const messageId = await sendRawMessage(accessToken, raw);
+    const from = { email: account.email, name: await getSenderName(email.user_id) };
+    let messageId: string;
+    let note: string | null = null;
+    if (email.safe_send) {
+      // Each person gets a card with their own private link instead of the text.
+      const result = await sendSafeSendCopies(email, body, from, accessToken);
+      messageId = result.providerMessageId;
+      if (result.notDelivered.length) note = safeSendCopy.partialFailure(result.notDelivered.join(", "));
+    } else {
+      const raw = buildPlainEmail({
+        from,
+        to,
+        cc: strings(email.cc_recipients),
+        bcc: strings(email.bcc_recipients),
+        subject: email.subject,
+        body,
+      });
+      messageId = await sendRawMessage(accessToken, raw);
+    }
     await updateEmail(email.id, {
       status: "sent",
       sent_at: now.toISOString(),
       provider_message_id: messageId,
-      failure_reason: null,
+      failure_reason: note,
     });
     await activity("sent");
     return "sent";

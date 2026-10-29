@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "./route";
 
 const dispatchDue = vi.hoisted(() => vi.fn());
+const expireDue = vi.hoisted(() => vi.fn());
 vi.mock("@/server/emails/service", () => ({ dispatchDue }));
+vi.mock("@/server/safe-send/service", () => ({ expireDue }));
 
 const SECRET = "s".repeat(40);
 const call = (auth?: string) =>
@@ -17,6 +19,8 @@ const call = (auth?: string) =>
 beforeEach(() => {
   dispatchDue.mockReset();
   dispatchDue.mockResolvedValue({ sent: 2, retry: 0, failed: 1 });
+  expireDue.mockReset();
+  expireDue.mockResolvedValue(3);
   vi.stubEnv("CRON_SECRET", SECRET);
 });
 
@@ -24,7 +28,7 @@ describe("POST /api/cron/dispatch", () => {
   it("sends due emails when called with the secret", async () => {
     const res = await call(`Bearer ${SECRET}`);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true, sent: 2, retry: 0, failed: 1 });
+    expect(await res.json()).toEqual({ ok: true, sent: 2, retry: 0, failed: 1, expired: 3 });
   });
 
   it.each([

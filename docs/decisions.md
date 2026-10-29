@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-31: Safe Send is card-only, one link per person, crypto-shredded
+
+- **Decision:** Recipients get a card ("Ada Obi sent you a message · View message") with a private link, never the text, so withdrawing really works. Each person gets their own copy and a 256-bit link token (only its SHA-256 is stored), so one person can be withdrawn without the others; Bcc recipients are never shown to anyone. Content is AES-256-GCM encrypted with a per-message key held in Vault; withdrawing for everyone or reaching 24 hours destroys the key (and the file), so the ciphertext is unreadable forever. All database steps are service-role functions; the window is set by the database clock (exactly 24 h). Opens are counted only while readable and labelled approximate.
+- **Why:** Trust rules 1, 2, 6, 7: withdraw never edit, always visible, minimal data with a short life, honest claims. A preview in the email would stay in the inbox forever.
+- **Consequences:** Gmail keeps one sent copy per person. The subject line stays visible in the recipient's inbox (the Compose toggle says so). Safe Send is limited to 20 people. If the first copy fails, nothing is kept and normal retries apply; if a later copy fails, that person's link is withdrawn and the Outbox says who missed it.
+
 ## 2026-10-30: Smart Delay runs on pg_cron; never risk a double send
 
 - **Decision:** Held emails are claimed in Postgres (`claim_emails()`, `FOR UPDATE SKIP LOCKED`) and sent by `POST /api/cron/dispatch`, which pg_cron calls every 20 s via pg_net with a shared secret (URL and secret in Vault, set per environment). Bodies are AES-256-GCM encrypted with an app key while held and wiped by the existing trigger once sent, cancelled or failed. Temporary Gmail errors retry twice (1 min, 5 min); `invalid_grant` fails immediately and marks the account revoked. An email stuck in "sending" for 10 minutes is marked failed, not retried. Edit takes an email back to Compose (cancelling it) so it can never leave mid-edit and is re-checked on send. A clean check sends straight to the Outbox.

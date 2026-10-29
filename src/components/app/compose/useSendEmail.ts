@@ -9,7 +9,12 @@ import type { EmailDraft } from "@/types/emails";
 /** Hands a draft from the Outbox ("Edit") to Compose, once, within this browser tab. */
 export const DRAFT_HANDOFF_KEY = "clinton-compose-draft";
 
-type SendOptions = { delaySeconds: number; findingsCount: number; findingsAccepted: number };
+type SendOptions = {
+  delaySeconds: number;
+  findingsCount: number;
+  findingsAccepted: number;
+  safeSend: boolean;
+};
 
 /** Puts the email in the Outbox, then goes there to watch the countdown. */
 export function useSendEmail() {
