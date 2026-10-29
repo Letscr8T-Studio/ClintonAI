@@ -47,6 +47,15 @@ function resolveYear(month: number, day: number, year: string | undefined, now: 
   return candidate < now.getTime() - 30 * 86_400_000 ? thisYear + 1 : thisYear;
 }
 
+/** "Mon" → "Tue", "MONDAY" → "TUESDAY": the right day in the same form the writer used. */
+function sameForm(written: string, actual: number): string {
+  const full = DAY_NAMES[actual]!;
+  const word = written.length <= 4 ? full.slice(0, 3) : full;
+  if (written === written.toUpperCase()) return word.toUpperCase();
+  if (written === written.toLowerCase()) return word.toLowerCase();
+  return word;
+}
+
 function check(weekday: string, dayText: string, monthText: string, year: string | undefined, now: Date) {
   const month = MONTHS.indexOf(monthText.slice(0, 3).toLowerCase());
   const day = Number(dayText);
@@ -64,15 +73,27 @@ function check(weekday: string, dayText: string, monthText: string, year: string
   };
 }
 
+function hit(match: string, weekday: string, result: { actual: string; date: string }): RuleHit {
+  const excerpt = match.trim();
+  const actual = DAY_NAMES.indexOf(result.actual);
+  return {
+    type: "date_mismatch",
+    field: "body",
+    excerpt,
+    params: result,
+    suggestion: excerpt.replace(weekday, sameForm(weekday, actual)),
+  };
+}
+
 export function findDateMismatches(body: string, now = new Date()): RuleHit[] {
   const hits: RuleHit[] = [];
   for (const m of body.matchAll(DAY_FIRST)) {
     const result = check(m[1]!, m[2]!, m[3]!, m[4], now);
-    if (result) hits.push({ type: "date_mismatch", field: "body", excerpt: m[0].trim(), params: result });
+    if (result) hits.push(hit(m[0], m[1]!, result));
   }
   for (const m of body.matchAll(MONTH_FIRST)) {
     const result = check(m[1]!, m[3]!, m[2]!, m[4], now);
-    if (result) hits.push({ type: "date_mismatch", field: "body", excerpt: m[0].trim(), params: result });
+    if (result) hits.push(hit(m[0], m[1]!, result));
   }
   return hits;
 }

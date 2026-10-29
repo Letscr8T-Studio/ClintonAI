@@ -38,6 +38,9 @@ export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Fin
       if (excerpt && ruleExcerpts.some((r) => sameWords(r, excerpt))) return [];
       const covering = COVERED_BY_RULE[f.type];
       if (covering && ruleTypes.has(covering)) return [];
+      // A suggestion only makes sense as a swap for real, quoted words.
+      const suggestion = f.suggestion.trim();
+      const usable = excerpt !== "" && suggestion !== "" && suggestion !== excerpt;
       return [
         {
           id: `model-${i}-${f.type}`,
@@ -46,6 +49,7 @@ export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Fin
           field: inSubject ? "subject" : "body",
           message: f.message,
           ...(excerpt ? { excerpt } : {}),
+          ...(usable ? { suggestion } : {}),
         },
       ];
     })

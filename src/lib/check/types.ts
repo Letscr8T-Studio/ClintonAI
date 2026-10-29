@@ -32,6 +32,8 @@ export type RuleHit = {
   /** The exact text to highlight, when there is one. */
   excerpt?: string;
   params?: Record<string, string | number>;
+  /** Replacement for `excerpt`, when the fix is certain. */
+  suggestion?: string;
 };
 
 export type Finding = {
@@ -41,6 +43,8 @@ export type Finding = {
   field: FindingField;
   message: string;
   excerpt?: string;
+  /** Replacement for `excerpt`. Shown as a before/after; applied only when the user taps Fix it. */
+  suggestion?: string;
 };
 
 export type CheckResult = {

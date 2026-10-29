@@ -1,4 +1,4 @@
-import { Sparkle, Warning } from "@/components/ui/icons";
+import { ClintonMark, Warning } from "@/components/ui/icons";
 import { checkSample as s } from "@/content/app/tour-visuals";
 
 const at = (ms: number) => ({ animationDelay: `${ms}ms` });
@@ -34,7 +34,7 @@ export function CheckVisual() {
       >
         <div className="flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-lg bg-brand">
-            <Sparkle size={12} />
+            <ClintonMark size={12} />
           </span>
           <span className="font-mono text-[11px] tracking-wider text-navy-text uppercase">{s.caught}</span>
         </div>

@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-29: "Fix it" suggests, the user applies; Clinton's icon is the Held C
+
+- **Decision:** A finding can carry a suggestion that replaces exactly its quoted words. Rules supply certain fixes (right weekday in the writer's own form, recipient's name from their address, a name placeholder). The model may suggest a rewrite of the quoted words only, and must return none when the fix needs a fact it can't know (e.g. which salary is right). The panel shows before → after; nothing changes until the user taps **Fix it**. Findings without a safe fix say **Show me** and jump to the words. Separately, the AI sparkle icon was replaced everywhere by the Held C mark and removed from the icon kit.
+- **Why:** Pointing alone made "Fix it" over-promise; silent auto-fixes would put words in the sender's mouth (trust rules 4 and 5). Previewed, user-applied fixes keep both. The sparkle is the category's generic AI symbol and contradicted the brand doc.
+- **Consequences:** Suggestions add a little output; measured median 1.75 s, within the 2.5 s budget. Applying a fix is not treated as a user edit (the check result stays current).
+
 ## 2026-10-29: AI check = rules first, then a swappable model (OpenAI for now)
 
 - **Decision:** The check runs deterministic rules (pure, in `src/lib/check/`, also runnable in the browser as a fallback), then one model call behind a provider interface. OpenAI `gpt-5.4-mini` today (fastest current model with reliable structured output in our benchmark), chosen by env; Anthropic can be added later without touching product code. Strict JSON schema, 2.5 s budget, max 3 model findings, and any excerpt not found verbatim in the email is dropped. The email is passed as data with an instruction to ignore instructions inside it.

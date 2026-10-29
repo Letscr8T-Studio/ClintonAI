@@ -12,5 +12,6 @@ export function toRuleFindings(hits: RuleHit[], describe: (hit: RuleHit) => stri
     field: hit.field,
     message: describe(hit),
     ...(hit.excerpt ? { excerpt: hit.excerpt } : {}),
+    ...(hit.excerpt && hit.suggestion ? { suggestion: hit.suggestion } : {}),
   }));
 }

@@ -1,5 +1,6 @@
 import { DotList } from "@/components/ui/CheckList";
-import { ArrowUp, Sparkle } from "@/components/ui/icons";
+import { palette } from "@/config/brand";
+import { ArrowUp, ClintonMark } from "@/components/ui/icons";
 import { productShot } from "@/content/product-shot";
 
 const divider = "border-b border-line-soft px-[18px]";
@@ -40,7 +41,7 @@ export function PhoneMock() {
         </div>
         <div className="anim-sheet mx-2.5 mb-2.5 flex flex-col gap-2.5 rounded-3xl bg-ink p-4 text-cream">
           <div className="flex items-center gap-2">
-            <Sparkle />
+            <ClintonMark size={16} color={palette.brandSoft} />
             <span className="font-mono text-[11px] tracking-[0.04em] text-navy-text">{p.checkTitle}</span>
           </div>
           <DotList items={p.findings} dotClassName="bg-amber" className="text-[13px] leading-[1.4]" />

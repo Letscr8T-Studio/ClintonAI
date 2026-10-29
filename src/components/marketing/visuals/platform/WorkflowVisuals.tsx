@@ -1,5 +1,5 @@
 import { Chip, type ChipTone } from "@/components/ui/Chip";
-import { Sparkle } from "@/components/ui/icons";
+import { ClintonMark } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { assistantSample, inboxSample, outreachLeads, type LeadState } from "@/content/platform-samples";
 
@@ -16,7 +16,7 @@ export function AssistantVisual() {
       </span>
       <div className="flex flex-col gap-1.5 rounded-2xl rounded-bl-md bg-white p-3 text-[12.5px] leading-[1.5] text-body">
         <span className="flex items-center gap-1.5 text-[11px] font-semibold text-brand-deep">
-          <Sparkle size={11} color={palette.brand} /> Clinton drafted
+          <ClintonMark size={11} color={palette.brand} /> Clinton drafted
         </span>
         {assistantSample.draft}
       </div>

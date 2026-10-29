@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { GoogleMark } from "@/components/ui/GoogleMark";
-import { Sparkle } from "@/components/ui/icons";
+import { ClintonMark } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { composeCopy as copy } from "@/content/app/compose";
 import type { Finding } from "@/lib/check/types";
@@ -67,14 +67,29 @@ export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
     if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) submit();
   };
 
-  /** Fix it: jump to the field and select the words Clinton pointed at. */
-  const fix = (finding: Finding) => {
-    resolve(finding.id);
-    const el = { to: toRef, subject: subjectRef, body: bodyRef }[finding.field].current;
-    if (!el) return;
-    el.focus();
-    const at = finding.excerpt ? el.value.indexOf(finding.excerpt) : -1;
-    if (at >= 0) el.setSelectionRange(at, at + finding.excerpt!.length);
+  /**
+   * Fix it: swap in Clinton's suggestion and select it, so the change is visible and easy to undo.
+   * Show me (no suggestion, or the words have since changed): jump to the words instead.
+   */
+  const fix = ({ id, field, excerpt, suggestion }: Finding) => {
+    resolve(id);
+    const el = { to: toRef, subject: subjectRef, body: bodyRef }[field].current;
+    const current = values[field];
+    const at = excerpt ? current.indexOf(excerpt) : -1;
+    const select = (start: number, length: number) => {
+      el?.focus();
+      if (start >= 0) el?.setSelectionRange(start, start + length);
+    };
+    if (at >= 0 && suggestion) {
+      // Applying Clinton's own fix is not a user edit, so the check result stays current.
+      setValues((v) => ({
+        ...v,
+        [field]: current.slice(0, at) + suggestion + current.slice(at + excerpt!.length),
+      }));
+      requestAnimationFrame(() => select(at, suggestion.length));
+      return;
+    }
+    select(at, excerpt?.length ?? 0);
   };
 
   return (
@@ -116,7 +131,7 @@ export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
             aria-busy={state.status === "checking"}
             className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-brand px-6 text-[15px] font-semibold text-white shadow-cta transition-[translate,background-color] hover:-translate-y-0.5 hover:bg-brand-deep disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none"
           >
-            <Sparkle size={14} color={palette.white} />
+            <ClintonMark size={14} color={palette.white} />
             {state.status === "checking" ? copy.checking : copy.submit}
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { Chip } from "@/components/ui/Chip";
-import { Sparkle, Warning } from "@/components/ui/icons";
+import { ClintonMark, Warning } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { outreachSample as s } from "@/content/outreach";
 
@@ -14,7 +14,7 @@ export function OutreachQueue() {
         <div className="flex items-center justify-between gap-3">
           <span className="font-mono text-[12px] text-brand">{s.queueLabel}</span>
           <Chip tone="tint" size="xs">
-            <Sparkle size={11} color={palette.brand} /> {s.badge}
+            <ClintonMark size={11} color={palette.brand} /> {s.badge}
           </Chip>
         </div>
         <div className="text-[13px] text-subtle">

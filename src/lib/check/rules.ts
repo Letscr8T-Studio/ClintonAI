@@ -30,6 +30,15 @@ function localNames(address: string): string[] {
   return local.split(/[._+\-\d]+/).filter((t) => /^[a-z]{3,}$/.test(t) && !GENERIC_LOCALS.has(t));
 }
 
+const capitalise = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
+
+/** The recipient's first name, if their address makes it clear (one person, a name-like local part). */
+function recipientName({ to, cc }: DraftEmail): string | null {
+  if (to.length !== 1 || cc.length > 0) return null;
+  const first = localNames(to[0]!)[0];
+  return first ? capitalise(first) : null;
+}
+
 function greetingMismatch({ body, to, cc }: DraftEmail): RuleHit | null {
   if (to.length !== 1 || cc.length > 0) return null; // only clear-cut, one-person emails
   const firstLine = body.split("\n").find((line) => line.trim()) ?? "";
@@ -43,7 +52,13 @@ function greetingMismatch({ body, to, cc }: DraftEmail): RuleHit | null {
   const matches = tokens.some((t) => t.startsWith(lower) || lower.startsWith(t));
   return matches
     ? null
-    : { type: "greeting_mismatch", field: "body", excerpt: name, params: { name, recipient: to[0]! } };
+    : {
+        type: "greeting_mismatch",
+        field: "body",
+        excerpt: name,
+        params: { name, recipient: to[0]! },
+        suggestion: capitalise(tokens[0]!),
+      };
 }
 
 function manyRecipients({ to, cc }: DraftEmail): RuleHit | null {
@@ -51,11 +66,19 @@ function manyRecipients({ to, cc }: DraftEmail): RuleHit | null {
   return count > MANY_RECIPIENTS ? { type: "many_recipients", field: "to", params: { count } } : null;
 }
 
-function placeholder({ subject, body }: DraftEmail): RuleHit | null {
-  const inSubject = subject.match(PLACEHOLDER);
-  if (inSubject) return { type: "placeholder", field: "subject", excerpt: inSubject[0] };
-  const inBody = body.match(PLACEHOLDER);
-  return inBody ? { type: "placeholder", field: "body", excerpt: inBody[0] } : null;
+function placeholder(draft: DraftEmail): RuleHit | null {
+  const inSubject = draft.subject.match(PLACEHOLDER);
+  const inBody = inSubject ? null : draft.body.match(PLACEHOLDER);
+  const excerpt = (inSubject ?? inBody)?.[0];
+  if (!excerpt) return null;
+  // Only a name placeholder can be filled with certainty, from the recipient's address.
+  const name = /name/i.test(excerpt) ? recipientName(draft) : null;
+  return {
+    type: "placeholder",
+    field: inSubject ? "subject" : "body",
+    excerpt,
+    ...(name ? { suggestion: name } : {}),
+  };
 }
 
 function emptySubject({ subject }: DraftEmail): RuleHit | null {

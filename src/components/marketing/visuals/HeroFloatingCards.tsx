@@ -1,5 +1,5 @@
 import { Chip } from "@/components/ui/Chip";
-import { Sparkle } from "@/components/ui/icons";
+import { ClintonMark } from "@/components/ui/icons";
 import { heroCards } from "@/content/hero";
 
 const card =
@@ -35,7 +35,7 @@ export function HeroFloatingCards() {
       >
         <div className="flex items-center gap-2">
           <span className="inline-flex size-[26px] items-center justify-center rounded-lg bg-ink">
-            <Sparkle size={13} />
+            <ClintonMark size={13} />
           </span>
           <span className="text-[13px] font-semibold">{aiCheck.title}</span>
         </div>

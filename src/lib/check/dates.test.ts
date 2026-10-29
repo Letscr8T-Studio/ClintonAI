@@ -14,6 +14,17 @@ describe("findDateMismatches", () => {
     });
   });
 
+  it.each([
+    ["Monday, 3 November", "Tuesday, 3 November"],
+    ["Mon 3rd Nov", "Tue 3rd Nov"],
+    ["MONDAY 3 November", "TUESDAY 3 November"],
+    ["friday, november 6", "friday, november 6"],
+  ])("suggests the right weekday in the writer's own form: %s", (written, fixed) => {
+    const hits = findDateMismatches(`Meet ${written}?`, NOW);
+    // 6 November 2026 really is a Friday: no finding, nothing to fix.
+    expect(hits[0]?.suggestion ?? written).toBe(fixed);
+  });
+
   it("flags month-first dates with ordinals and a year", () => {
     const [hit] = findDateMismatches("See you Fri, Nov 5th, 2026.", NOW);
     expect(hit?.params).toEqual({ actual: "Thursday", date: "5 November 2026" });

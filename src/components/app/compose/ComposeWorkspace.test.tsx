@@ -49,7 +49,7 @@ describe("ComposeWorkspace", () => {
     expect(screen.getByText(composeCopy.needBody)).toBeInTheDocument();
   });
 
-  it("sends the draft and shows what Clinton caught; Fix it selects the words", async () => {
+  it("sends the draft and shows what Clinton caught; Show me selects the words", async () => {
     const fetchMock = mockCheck({ ok: true, findings: [finding], modelUsed: true });
     const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" />);
     await write("dami@brightlane.io", "Hi Tunde, welcome.");
@@ -66,11 +66,29 @@ describe("ComposeWorkspace", () => {
     expect(screen.getByText(finding.message)).toBeInTheDocument();
     expect(await a11yViolations(container)).toEqual([]);
 
-    await userEvent.click(screen.getByRole("button", { name: panelCopy.fix }));
+    await userEvent.click(screen.getByRole("button", { name: panelCopy.show }));
     const body = screen.getByLabelText(composeCopy.body) as HTMLTextAreaElement;
     expect(body).toHaveFocus();
     expect(body.value.slice(body.selectionStart, body.selectionEnd)).toBe("Tunde");
     expect(screen.getByText(panelCopy.readyTitle)).toBeInTheDocument();
+  });
+
+  it("previews a suggested fix and applies it only when the user taps Fix it", async () => {
+    mockCheck({ ok: true, findings: [{ ...finding, suggestion: "Dami" }], modelUsed: true });
+    const { container } = render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    await write("dami@brightlane.io", "Hi Tunde, welcome.");
+    await submit();
+
+    const body = screen.getByLabelText(composeCopy.body) as HTMLTextAreaElement;
+    expect(await screen.findByText("Dami")).toBeInTheDocument(); // the "after" in the preview
+    expect(body.value).toBe("Hi Tunde, welcome."); // nothing changes until the user decides
+    expect(await a11yViolations(container)).toEqual([]);
+
+    await userEvent.click(screen.getByRole("button", { name: panelCopy.fix }));
+    expect(body.value).toBe("Hi Dami, welcome.");
+    await waitFor(() => expect(body.value.slice(body.selectionStart, body.selectionEnd)).toBe("Dami"));
+    // Applying Clinton's own fix is not a user edit, so the result is not marked stale.
+    expect(screen.queryByText(panelCopy.stale)).not.toBeInTheDocument();
   });
 
   it("lets the user send anyway (advise, never block)", async () => {

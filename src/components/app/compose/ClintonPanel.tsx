@@ -1,4 +1,4 @@
-import { Check, Sparkle, Warning } from "@/components/ui/icons";
+import { Check, ClintonMark, Warning } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { panelCopy as copy } from "@/content/app/compose";
 import type { Finding } from "@/lib/check/types";
@@ -29,7 +29,7 @@ function Idle({ checking }: { checking: boolean }) {
           aria-hidden="true"
           className="inline-flex size-10 items-center justify-center rounded-xl bg-brand"
         >
-          <Sparkle size={18} color={palette.white} />
+          <ClintonMark size={18} color={palette.white} />
         </span>
         <h2 className="mt-4 mb-0 font-display text-xl font-bold tracking-tight">
           {checking ? copy.checkingTitle : copy.idleTitle}

@@ -71,6 +71,20 @@ describe("runRules", () => {
     expect(hit?.excerpt).toBe(excerpt);
   });
 
+  it("suggests the recipient's name for a wrong greeting", () => {
+    const [hit] = runRules(draft({ to: ["dami.olu@brightlane.io"], body: "Hi Tunde," }), NOW);
+    expect(hit).toMatchObject({ excerpt: "Tunde", suggestion: "Dami" });
+  });
+
+  it("fills a name placeholder from the address, but never guesses other placeholders", () => {
+    const named = runRules(draft({ body: "Dear [Name], hello." }), NOW).find((h) => h.type === "placeholder");
+    expect(named).toMatchObject({ excerpt: "[Name]", suggestion: "Dami" });
+    const company = runRules(draft({ body: "Thanks for choosing {{company}}." }), NOW).find(
+      (h) => h.type === "placeholder",
+    );
+    expect(company?.suggestion).toBeUndefined();
+  });
+
   it("flags a placeholder in the subject", () => {
     const hit = runRules(draft({ subject: "Proposal for {company}" }), NOW).find(
       (h) => h.type === "placeholder",

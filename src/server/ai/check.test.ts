@@ -40,8 +40,13 @@ describe("runCheck", () => {
       draft,
       model({
         findings: [
-          { type: "contradiction", message: "5m or 4m? The figures clash.", excerpt: "The salary is 5m" },
-          { type: "unfinished", message: "The last sentence stops mid-way.", excerpt: "" },
+          {
+            type: "contradiction",
+            message: "5m or 4m? The figures clash.",
+            excerpt: "The salary is 5m",
+            suggestion: "",
+          },
+          { type: "unfinished", message: "The last sentence stops mid-way.", excerpt: "", suggestion: "" },
         ],
       }),
       NOW,
@@ -54,13 +59,39 @@ describe("runCheck", () => {
     ]);
   });
 
+  it("keeps a model suggestion only when it swaps real, quoted words for different ones", async () => {
+    const result = await runCheck(
+      draft,
+      model({
+        findings: [
+          {
+            type: "unfinished",
+            message: "The last sentence stops mid-way.",
+            excerpt: "Looking forward to",
+            suggestion: "Looking forward to hearing from you.",
+          },
+          { type: "tone", message: "No quote.", excerpt: "", suggestion: "Something new." },
+          { type: "clarity", message: "Same words.", excerpt: "Hi Tunde", suggestion: "Hi Tunde" },
+        ],
+      }),
+      NOW,
+    );
+    const model_ = result.findings.filter((f) => f.source === "model");
+    expect(model_.map((f) => f.suggestion)).toEqual(["Looking forward to hearing from you.", undefined]);
+  });
+
+  it("gives the rule finding its certain fix", async () => {
+    const [finding] = (await runCheck(draft, null, NOW)).findings;
+    expect(finding).toMatchObject({ excerpt: "Tunde", suggestion: "Dami" });
+  });
+
   it("drops model findings that quote text not in the email, or repeat a rule", async () => {
     const result = await runCheck(
       draft,
       model({
         findings: [
-          { type: "other", message: "Invented quote.", excerpt: "text that is not there" },
-          { type: "recipient", message: "Wrong person?", excerpt: "Tunde" },
+          { type: "other", message: "Invented quote.", excerpt: "text that is not there", suggestion: "" },
+          { type: "recipient", message: "Wrong person?", excerpt: "Tunde", suggestion: "" },
         ],
       }),
       NOW,
@@ -73,12 +104,18 @@ describe("runCheck", () => {
       { ...draft, body: "Hi Tunde,\n\nI've attached it. The salary is 5m, not 4m." },
       model({
         findings: [
-          { type: "recipient", message: "Greeting names Tunde but it's going to Dami.", excerpt: "" },
-          { type: "other", message: "Same name issue.", excerpt: "Hi Tunde" },
+          {
+            type: "recipient",
+            message: "Greeting names Tunde but it's going to Dami.",
+            excerpt: "",
+            suggestion: "",
+          },
+          { type: "other", message: "Same name issue.", excerpt: "Hi Tunde", suggestion: "" },
           {
             type: "contradiction",
             message: "5m or 4m?",
             excerpt: "I've attached it. The salary is 5m, not 4m.",
+            suggestion: "",
           },
         ],
       }),

@@ -35,19 +35,6 @@ export function ClintonMark({ size = 18, color = palette.white, className }: Ico
   );
 }
 
-export function Sparkle({ size = 14, color = palette.brandSoft, className }: IconProps) {
-  return (
-    <Svg size={size} viewBox="0 0 16 16" className={className}>
-      <path
-        d="M8 1.5 L9.6 6.4 L14.5 8 L9.6 9.6 L8 14.5 L6.4 9.6 L1.5 8 L6.4 6.4 Z"
-        stroke={color}
-        strokeWidth={1.6}
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
 export function ArrowRight({ size = 14, color = palette.white, className }: IconProps) {
   return (
     <Svg size={size} viewBox="0 0 14 14" className={className}>

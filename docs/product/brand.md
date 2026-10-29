@@ -16,6 +16,9 @@ In code: `src/config/site.ts` holds names, URLs and SEO copy. Change them there,
 - **Mark: the "Held C".** A heavy, round-capped C holding a solid pill in its mouth: the email that waits a moment before it goes (Smart Delay), with the C as Clinton. It is deliberately not an AI sparkle (the category's most overused symbol) and not an arrow (reads as a browser reload button at tab size).
 - **Lockup:** the mark in a rounded brand-blue tile, then **"Clinton AI"** in Bricolage Grotesque ExtraBold, one typeface, no pill or badge. On blue backgrounds: white tile, blue mark, white wordmark.
 - **Single source:** the geometry lives in `src/config/logo-mark.json`. The React `<ClintonMark>`/`<Logo>`, the iOS icon and the social card read it; `npm run icons` regenerates `src/app/icon.svg` and `src/app/favicon.ico` (16/32/48 px, tighter tile at 16 px). Never hand-edit those two files.
+- **Clinton's symbol is the Held C, never an AI sparkle.** Wherever Clinton acts (the Check & send button, the
+  Clinton panel, "Clinton caught…" cards, marketing visuals), use `<ClintonMark>`. The generic four-point sparkle
+  was removed from the icon kit on purpose; don't add it back.
 - **Don't:** recolour the mark outside the palette, add effects or gradients to it, separate the pill from the C, or set the wordmark in another font.
 - **Motion idea (later):** the pill slides out of the C when an email sends.
 
