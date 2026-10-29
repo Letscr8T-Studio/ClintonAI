@@ -88,7 +88,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 
 1. [x] Migrations + types + RLS tests (Supabase local). 43 pgTAP tests; CI `database` job.
 2. [x] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour). Sign-in asks only for name + email.
-3. [x] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email. Own OAuth flow (`/api/google/connect` → `/api/google/callback`, PKCE + state cookie), tokens via `save_google_account` / `get_account_refresh_token` (service role only), test send from the home screen, disconnect revokes and deletes.
+3. [x] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email. Own OAuth flow (`/api/google/connect` → `/api/google/callback`, PKCE + state cookie), tokens via `save_google_account` / `get_account_refresh_token` (service role only), test send from the home screen, disconnect revokes and deletes. Verified live 2026-10-29: real Gmail connected, test email received.
 4. [ ] Compose UI + AI check (rules → model) + findings card.
 5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
 6. [ ] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job.
