@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-29: "Connect Gmail" is its own OAuth step; tokens live in Vault
+
+- **Decision:** Gmail sending is granted through our own OAuth flow, separate from sign-in, asking only for `gmail.send` (+ `openid email` to learn the address). PKCE and a state cookie bound to the signed-in user protect the round trip; `prompt=consent` guarantees a refresh token. The token is stored with `vault.create_secret` through a security-definer function only the service role can call; no one else, not even the owner, can read it. Disconnect revokes at Google (best effort) and deletes the row, and a trigger destroys the secret.
+- **Why:** Supabase Auth does not keep Google refresh tokens, and Smart Delay must send after the user has left. Least privilege: no read scopes, so no restricted-scope security assessment.
+- **Consequences:** Google's granular consent lets users untick `gmail.send`; we detect it and explain. `invalid_grant` on refresh marks the account revoked and the UI offers Reconnect. Dev must use the local Supabase for server-side writes.
+
 ## 2026-10-29: Sign-in with Supabase Auth + Google, server-side only
 
 - **Decision:** "Continue with Google" via Supabase Auth, run entirely on the server: a server action starts OAuth (PKCE verifier in a cookie), `/auth/callback` exchanges the code, `@supabase/ssr` keeps the session in httpOnly cookies, and `src/proxy.ts` refreshes it on app routes. No Supabase client code ships to the browser. Sign-in requests only `email profile`; Gmail sending is a separate, later consent.

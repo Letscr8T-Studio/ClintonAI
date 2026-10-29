@@ -365,7 +365,11 @@ export type Database = {
       };
     };
     Functions: {
-      [_ in never]: never;
+      get_account_refresh_token: { Args: { p_account_id: string }; Returns: string };
+      save_google_account: {
+        Args: { p_email: string; p_refresh_token: string; p_scopes: string[]; p_user_id: string };
+        Returns: string;
+      };
     };
     Enums: {
       account_status: "active" | "revoked" | "error";

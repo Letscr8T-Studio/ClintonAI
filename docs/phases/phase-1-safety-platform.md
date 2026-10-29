@@ -88,7 +88,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 
 1. [x] Migrations + types + RLS tests (Supabase local). 43 pgTAP tests; CI `database` job.
 2. [x] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour). Sign-in asks only for name + email.
-3. [ ] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email.
+3. [x] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email. Own OAuth flow (`/api/google/connect` → `/api/google/callback`, PKCE + state cookie), tokens via `save_google_account` / `get_account_refresh_token` (service role only), test send from the home screen, disconnect revokes and deletes.
 4. [ ] Compose UI + AI check (rules → model) + findings card.
 5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
 6. [ ] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job.
@@ -100,6 +100,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 ## Open decisions
 
 - Default Smart Delay value: set to 5 min for now; confirm from beta testing.
-- `gmail.send` offline tokens (milestone 3): Supabase Auth's Google provider handles **sign-in only**. Its provider token is short-lived and Supabase doesn't keep the refresh token, so the plan is our own "Connect Gmail" OAuth step (same Google client, `access_type=offline`, `prompt=consent`) that stores the refresh token in Vault. Confirm when building milestone 3.
+- ~~`gmail.send` offline tokens~~ Decided 2026-10-29: our own "Connect Gmail" OAuth step, separate from sign-in (see decisions.md).
+- Disconnecting an account that still has held emails: `emails.account_id` has no delete rule, so the delete is refused. Milestone 5 must cancel (or block on) held emails first.
 - Attachment size limit for Safe Send and storage cost.
 - Optional one-time code for very sensitive Safe Send emails: in v1 or later?

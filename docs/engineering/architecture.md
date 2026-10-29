@@ -55,7 +55,16 @@ Dependency direction: `app → components → (content, config, lib, types)` and
 `server/waitlist/analytics.ts` and `csv.ts` are pure (no `server-only`) so they can be unit-tested,
 but they are still only imported from server code.
 
-## Request flows today (Phase 0)
+## Request flows today
+
+- **Connect Gmail (Phase 1):** form `POST /api/google/connect` → random state + PKCE verifier in an
+  httpOnly cookie bound to the user → Google consent (`openid email gmail.send`, offline) →
+  `GET /api/google/callback` checks state and user → exchanges the code → `accounts/service`
+  checks `gmail.send` was granted and reads the verified address from the ID token →
+  `save_google_account()` stores the refresh token in Vault → `/dashboard?gmail=<outcome>`.
+- **Send (test email today, Smart Delay later):** `accounts/service` → `get_account_refresh_token()` →
+  Google token refresh (`invalid_grant` marks the account revoked) → `google/mime` builds the message
+  → `google/gmail` sends from the user's own address.
 
 - **Join waitlist:** `WaitlistForm` → `useWaitlist` → `POST /api/waitlist` → rate limit → zod parse →
   honeypot check → `repository.addToWaitlist` (upsert, duplicates ignored) → `{ ok: true }`.

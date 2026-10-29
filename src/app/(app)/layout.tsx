@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { AppHeader } from "@/components/app/AppHeader";
+import { AppHeader } from "@/components/app/shell/AppHeader";
 import { appRoutes } from "@/config/routes";
 import { requireProfile } from "@/server/auth/user";
 
@@ -13,9 +13,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   if (!profile.onboarded_at) redirect(appRoutes.onboarding);
 
   return (
-    <div className="min-h-dvh bg-paper">
+    <div className="stage-paper min-h-dvh">
       <AppHeader name={profile.display_name} email={user.email} />
-      <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <main id="main" className="mx-auto max-w-[1200px] px-5 pt-6 pb-16 sm:px-8 sm:pt-8">
         {children}
       </main>
     </div>

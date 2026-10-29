@@ -15,6 +15,12 @@ const supabaseAuthSchema = z.object({
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
 });
 
+// The same OAuth client Supabase Auth uses for sign-in; here for the separate "Connect Gmail" step.
+const googleSchema = z.object({
+  GOOGLE_CLIENT_ID: z.string().endsWith(".apps.googleusercontent.com"),
+  GOOGLE_CLIENT_SECRET: z.string().min(10),
+});
+
 const adminSchema = z.object({
   ADMIN_EMAILS: z.string().min(1),
   ADMIN_PASSWORD: z.string().min(1),
@@ -49,6 +55,12 @@ export function getSupabaseAuthEnv() {
     url: parsed.data.NEXT_PUBLIC_SUPABASE_URL,
     publishableKey: parsed.data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   };
+}
+
+export function getGoogleEnv() {
+  const parsed = googleSchema.safeParse(process.env);
+  if (!parsed.success) throw new EnvError("Google OAuth", parsed.error);
+  return { clientId: parsed.data.GOOGLE_CLIENT_ID, clientSecret: parsed.data.GOOGLE_CLIENT_SECRET };
 }
 
 /** Founders console settings, or null when they aren't configured (login is then disabled). */

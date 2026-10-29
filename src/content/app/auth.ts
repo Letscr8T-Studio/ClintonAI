@@ -1,6 +1,4 @@
-// Copy for sign-in and the signed-in shell.
-
-import { appRoutes } from "@/config/routes";
+// Copy for sign-in.
 
 export const loginCopy = {
   eyebrow: "Private beta",
@@ -48,19 +46,3 @@ export function loginErrorMessage(key: unknown): string | null {
   if (typeof key !== "string") return null;
   return Object.hasOwn(loginErrors, key) ? loginErrors[key as LoginErrorKey] : loginErrors.callback;
 }
-
-export const appShellCopy = {
-  nav: [{ label: "Dashboard", href: appRoutes.home }],
-  navLabel: "Main",
-  signOut: "Sign out",
-};
-
-export const homeCopy = {
-  greeting: (firstName: string | null) => (firstName ? `Welcome, ${firstName}` : "Welcome"),
-  body: "Your dashboard fills up once you start sending through Clinton AI.",
-  settingsTitle: "Your settings",
-  delayLabel: "Smart Delay",
-  trackingLabel: "Open tracking",
-  trackingOn: "On",
-  trackingOff: "Off",
-};

@@ -6,7 +6,7 @@ import { ArrowRight } from "@/components/ui/icons";
 import { delayOptions, onboardingCopy as copy } from "@/content/app/onboarding";
 import { SMART_DELAY } from "@/lib/validation/profile";
 import { formatClock } from "@/lib/time";
-import { DelayRing } from "./DelayRing";
+import { ProgressRing } from "@/components/app/ProgressRing";
 import { VisualStage } from "./visuals";
 import { DelayTiles } from "./DelayTiles";
 import { NavButton } from "./NavButton";
@@ -68,9 +68,9 @@ export function DelayPicker({ defaultSeconds, headingRef, onBack }: Props) {
 
       <VisualStage tone="ink" className="hidden lg:flex">
         <div className="flex flex-col items-center gap-6 text-center">
-          <DelayRing value={seconds / SMART_DELAY.max} caption={copy.delayStepLabel}>
+          <ProgressRing value={seconds / SMART_DELAY.max} caption={copy.delayStepLabel}>
             {formatClock(seconds)}
-          </DelayRing>
+          </ProgressRing>
           <p className="m-0 max-w-[320px] text-[15px] text-navy-text">
             {copy.previewCaption(selected?.minutes ?? String(Math.round(seconds / 60)))}
           </p>

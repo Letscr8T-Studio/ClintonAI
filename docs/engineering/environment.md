@@ -13,6 +13,8 @@
 | `ADMIN_EMAILS`                         | server | console  | Comma-separated founder emails                                                     |
 | `ADMIN_PASSWORD`                       | server | console  | Shared console password (long, unique)                                             |
 | `ADMIN_SESSION_SECRET`                 | server | console  | ≥32 random chars; `openssl rand -base64 32`. Rotating it logs everyone out         |
+| `GOOGLE_CLIENT_ID`                     | server | app      | Same OAuth client as sign-in; used by "Connect Gmail"                              |
+| `GOOGLE_CLIENT_SECRET`                 | server | app      | Its secret. Server only                                                            |
 
 Server vars are validated by `src/server/env.ts`. A missing Supabase var fails the request that needs it
 with a clear message; missing admin vars disable console login. Add every new var to this table,
@@ -52,7 +54,7 @@ prints the publishable key). Sign-in, profiles and every Phase 1 table live ther
 **Google sign-in (Google Cloud project "Clinton AI"):**
 
 - Google Auth Platform: External audience, **Testing** mode, test users listed under Audience.
-  Scopes so far: `openid`, `userinfo.email`, `userinfo.profile` (milestone 3 adds `gmail.send`).
+  Scopes: `openid`, `userinfo.email`, `userinfo.profile`, `gmail.send` (sensitive: needs Google verification before launch).
 - OAuth client "Clinton AI web (dev)", type Web application. Authorised origin
   `http://localhost:3000`; redirect URI `http://127.0.0.1:54721/auth/v1/callback` (local Supabase Auth).
 - Its ID and secret go in **`supabase/.env`** (git-ignored), which `supabase start` reads:
@@ -62,6 +64,12 @@ prints the publishable key). Sign-in, profiles and every Phase 1 table live ther
   `https://tryclinton.com` as an origin on the same client, then paste the ID and secret into
   Supabase dashboard → Authentication → Providers → Google. In Authentication → URL Configuration set
   Site URL `https://tryclinton.com` and allow `https://tryclinton.com/auth/callback`.
+
+**Connect Gmail** (separate consent, `gmail.send` only): the same client also needs the redirect URI
+`http://localhost:3000/api/google/callback` (and `https://tryclinton.com/api/google/callback` in
+production), and the app needs `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` in `.env.local`. In development,
+`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` must point at the **local** stack (`npx supabase status`),
+because tokens are stored through it; never point dev at the live project.
 
 Flow: `/login` → server action `signInWithGoogle` → Google → Supabase Auth → `/auth/callback`
 (exchanges the code, sets cookies) → `/dashboard`, or `/onboarding` until it is finished. `src/proxy.ts`
