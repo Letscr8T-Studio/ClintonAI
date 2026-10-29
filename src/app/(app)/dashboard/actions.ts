@@ -31,6 +31,7 @@ export async function sendTestEmailAction(
     );
     if (result.ok) return { ok: true, message: m.testSent(result.email) };
     if (result.reason === "revoked") revalidatePath(appRoutes.home);
+    revalidatePath(appRoutes.settings);
     return { ok: false, message: result.reason === "revoked" ? m.revoked : m.notFound };
   } catch (error) {
     console.error("Test send failed", error instanceof Error ? error.message : error);
@@ -49,6 +50,7 @@ export async function disconnectAction(
   try {
     const done = await disconnectAccount(user.id, parsed.data.accountId);
     revalidatePath(appRoutes.home);
+    revalidatePath(appRoutes.settings);
     return done ? { ok: true, message: m.disconnected } : { ok: false, message: m.notFound };
   } catch (error) {
     console.error("Disconnect failed", error instanceof Error ? error.message : error);

@@ -27,6 +27,8 @@ export const homeCopy = {
   soonNote: "Safe Send arrives in the next beta update.",
   delay: {
     caption: "Smart Delay",
+    change: "Change",
+    changeLabel: "Change your Smart Delay",
     body: (minutes: string) => `Every email waits ${minutes} before it leaves.`,
   },
 };
@@ -38,6 +40,7 @@ export const appShellCopy = {
     { label: "Home", href: appRoutes.home, icon: "home" },
     { label: "Compose", href: appRoutes.compose, icon: "compose" },
     { label: "Outbox", href: appRoutes.outbox, icon: "outbox" },
+    { label: "Settings", href: appRoutes.settings, icon: "settings" },
   ],
   accountMenu: "Account",
   signedInAs: "Signed in as",

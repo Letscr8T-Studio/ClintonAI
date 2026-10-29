@@ -39,6 +39,7 @@ export const config = {
     "/dashboard/:path*",
     "/compose/:path*",
     "/outbox/:path*",
+    "/settings/:path*",
     "/onboarding",
     "/login",
   ],

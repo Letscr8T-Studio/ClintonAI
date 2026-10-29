@@ -11,6 +11,14 @@ export const delaySecondsSchema = z.coerce
 
 export const onboardingSchema = z.object({ delaySeconds: delaySecondsSchema });
 
+/** The name recipients see in the From line. One plain line: no line breaks or angle brackets. */
+export const displayNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Add the name people should see.")
+  .max(80, "Keep it under 80 characters.")
+  .refine((v) => !/[\r\n<>]/.test(v), "Use letters, spaces and simple punctuation only.");
+
 /** "5 min", "1 min", "30 min". Delays are whole minutes. */
 export function formatDelay(seconds: number): string {
   return `${Math.round(seconds / 60)} min`;

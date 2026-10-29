@@ -22,6 +22,16 @@ export async function completeOnboarding(userId: string, delaySeconds: number): 
   if (error) throw new Error(`Could not save onboarding: ${error.message}`);
 }
 
+/** Settings the user can change. Column grants allow exactly these (plus onboarding). */
+export async function updateSettings(
+  userId: string,
+  patch: { default_delay_seconds?: number; display_name?: string },
+): Promise<void> {
+  const supabase = await getSupabaseForUser();
+  const { error } = await supabase.from("profiles").update(patch).eq("user_id", userId);
+  if (error) throw new Error(`Could not save settings: ${error.message}`);
+}
+
 /** For the dispatcher (no user session): the name shown in the From line. Service role. */
 export async function getSenderName(userId: string): Promise<string | null> {
   const { data, error } = await getSupabaseAdmin()

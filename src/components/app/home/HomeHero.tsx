@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { ProgressRing } from "@/components/app/ProgressRing";
+import { appRoutes } from "@/config/routes";
 import { homeCopy as copy } from "@/content/app/home";
 import { SMART_DELAY, formatDelay } from "@/lib/validation/profile";
 import { formatClock } from "@/lib/time";
@@ -49,7 +51,16 @@ export function HomeHero({ firstName, delaySeconds }: Props) {
           >
             {formatClock(delaySeconds)}
           </ProgressRing>
-          <p className="m-0 max-w-[180px] text-sm leading-snug text-on-brand">{copy.delay.body(minutes)}</p>
+          <div className="flex flex-col gap-1.5 md:items-center">
+            <p className="m-0 max-w-[180px] text-sm leading-snug text-on-brand">{copy.delay.body(minutes)}</p>
+            <Link
+              href={`${appRoutes.settings}#smart-delay`}
+              aria-label={copy.delay.changeLabel}
+              className="self-start rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white no-underline hover:bg-white/25 md:self-center"
+            >
+              {copy.delay.change}
+            </Link>
+          </div>
         </div>
       </div>
     </section>

@@ -15,11 +15,13 @@ test.describe("Signed-in app", () => {
     await expect(page).toHaveURL(/\/login\?next=%2Fonboarding$/);
   });
 
-  test("protects Compose and the Outbox", async ({ page }) => {
+  test("protects Compose, the Outbox and Settings", async ({ page }) => {
     await page.goto("/compose");
     await expect(page).toHaveURL(/\/login\?next=%2Fcompose$/);
     await page.goto("/outbox");
     await expect(page).toHaveURL(/\/login\?next=%2Foutbox$/);
+    await page.goto("/settings");
+    await expect(page).toHaveURL(/\/login\?next=%2Fsettings$/);
   });
 
   test("the Smart Delay dispatcher refuses calls without the secret", async ({ request }) => {

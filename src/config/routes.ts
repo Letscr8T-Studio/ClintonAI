@@ -5,6 +5,7 @@ export const appRoutes = {
   home: "/dashboard",
   compose: "/compose",
   outbox: "/outbox",
+  settings: "/settings",
   onboarding: "/onboarding",
   authCallback: "/auth/callback",
   signOut: "/auth/signout",
@@ -17,6 +18,7 @@ export const protectedPrefixes = [
   appRoutes.home,
   appRoutes.compose,
   appRoutes.outbox,
+  appRoutes.settings,
   appRoutes.onboarding,
 ] as const;
 

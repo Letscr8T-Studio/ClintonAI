@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
-import { HomeIcon, OutboxIcon, PenIcon } from "@/components/ui/icons";
+import { GearIcon, HomeIcon, OutboxIcon, PenIcon } from "@/components/ui/icons";
 import { appShellCopy as copy } from "@/content/app/home";
 import { cn } from "@/lib/cn";
 
@@ -11,6 +11,7 @@ const icons: Record<(typeof copy.nav)[number]["icon"], ComponentType<{ size?: nu
   home: HomeIcon,
   compose: PenIcon,
   outbox: OutboxIcon,
+  settings: GearIcon,
 };
 
 /** Phones only: the main nav as a bottom tab bar, where thumbs reach. */
@@ -21,7 +22,7 @@ export function MobileTabBar() {
       aria-label={copy.tabsLabel}
       className="fixed inset-x-0 bottom-0 z-20 border-t border-line/80 bg-white/90 pb-[max(env(safe-area-inset-bottom),8px)] backdrop-blur-xl sm:hidden"
     >
-      <ul className="m-0 grid list-none grid-cols-3 p-0">
+      <ul className="m-0 grid list-none grid-cols-4 p-0">
         {copy.nav.map((item) => {
           const Icon = icons[item.icon];
           const current = pathname === item.href;

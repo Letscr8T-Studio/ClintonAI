@@ -130,3 +130,17 @@ export function OutboxIcon({ size = 22, color = "currentColor", className }: Ico
     </Svg>
   );
 }
+
+export function GearIcon({ size = 22, color = "currentColor", className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="3" stroke={color} strokeWidth={1.8} />
+      <path
+        d="M12 3v2.5M12 18.5V21M4.2 7.5l2.2 1.3M17.6 15.2l2.2 1.3M4.2 16.5l2.2-1.3M17.6 8.8l2.2-1.3"
+        stroke={color}
+        strokeWidth={1.8}
+        {...round}
+      />
+    </Svg>
+  );
+}
