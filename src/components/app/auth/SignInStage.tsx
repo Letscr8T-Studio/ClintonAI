@@ -9,11 +9,11 @@ const at = (ms: number) => ({ animationDelay: `${ms}ms` });
 /** Brand stage beside the sign-in form: Clinton catches a mistake, then holds the email. */
 export function SignInStage() {
   return (
-    <header className="stage-brand relative flex flex-col overflow-hidden px-[clamp(24px,4vw,56px)] py-8 text-white lg:min-h-dvh lg:py-12">
+    <header className="stage-brand relative flex flex-col overflow-hidden px-[clamp(20px,4vw,56px)] pt-6 pb-14 text-white lg:min-h-dvh lg:py-12 [@media(max-height:480px)]:pb-12">
       <div aria-hidden="true" className="stage-grid absolute inset-0" />
       <Logo light href="/" className="relative" />
 
-      <p className="relative mt-10 mb-0 font-display text-[clamp(36px,4.4vw,64px)] leading-[0.98] font-bold tracking-[-0.045em] lg:mt-16">
+      <p className="relative mt-7 mb-0 font-display text-[clamp(32px,4.4vw,64px)] leading-[0.98] font-bold tracking-[-0.045em] lg:mt-16 [@media(max-height:480px)]:hidden">
         <span className="anim-word inline-block" style={at(100)}>
           {s.titleStart}
         </span>
@@ -23,7 +23,7 @@ export function SignInStage() {
         </span>
       </p>
 
-      <div aria-hidden="true" className="relative mt-10 hidden flex-1 items-center sm:flex lg:mt-6">
+      <div aria-hidden="true" className="relative mt-6 hidden flex-1 items-center lg:flex">
         <div className="cl-idle relative mx-auto flex w-full max-w-[460px] flex-col">
           <article
             className="cl-rise rounded-[22px] bg-cream p-5 pb-8 text-ink shadow-deck"
@@ -79,7 +79,7 @@ export function SignInStage() {
         </div>
       </div>
 
-      <ul className="relative m-0 mt-10 flex list-none flex-col gap-2.5 p-0 text-[15px] text-on-brand lg:mt-12">
+      <ul className="relative m-0 mt-12 hidden list-none flex-col gap-2.5 p-0 text-[15px] text-on-brand lg:flex">
         {s.trust.map((line, i) => (
           <li key={line} className="cl-rise flex items-center gap-3" style={at(600 + i * 120)}>
             <span className="inline-flex size-5 items-center justify-center rounded-full bg-white/15">

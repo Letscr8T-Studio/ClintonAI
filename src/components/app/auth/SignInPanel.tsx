@@ -17,12 +17,12 @@ export function SignInPanel({ next, error }: Props) {
         {copy.eyebrow}
       </Chip>
       <h1
-        className="cl-rise mt-5 mb-0 font-display text-[clamp(36px,4vw,48px)] leading-[1.02] font-bold tracking-[-0.04em]"
+        className="cl-rise mt-5 mb-0 font-display text-[clamp(30px,4vw,48px)] leading-[1.02] font-bold tracking-[-0.04em]"
         style={at(80)}
       >
         {copy.title}
       </h1>
-      <p className="cl-rise mt-3 mb-8 text-[17px] text-muted" style={at(160)}>
+      <p className="cl-rise mt-3 mb-6 text-base text-muted sm:mb-8 sm:text-[17px]" style={at(160)}>
         {copy.body}
       </p>
 
@@ -81,7 +81,7 @@ export function SignInPanel({ next, error }: Props) {
       </p>
       <Link
         href="/"
-        className="cl-rise mt-10 self-start text-[13px] font-medium text-muted underline-offset-4 hover:text-brand hover:underline"
+        className="cl-rise mt-8 self-start text-[13px] font-medium text-muted underline-offset-4 hover:text-brand hover:underline"
         style={at(500)}
       >
         <span aria-hidden="true">← </span>
