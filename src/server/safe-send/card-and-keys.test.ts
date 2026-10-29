@@ -14,9 +14,21 @@ describe("buildCard", () => {
   it("carries the link, the sender and who else it went to, never the message itself", () => {
     const { html, text } = buildCard(input);
     expect(html).toContain('href="https://tryclinton.com/m/abc"');
-    expect(html).toContain("Ada Obi sent you a message");
-    expect(html).toContain("Also sent to tunde@client.co");
-    expect(text).toContain("Read it here: https://tryclinton.com/m/abc");
+    expect(html).toContain("I&#39;ve sent you &quot;Pricing deck v2&quot; with Safe Send.");
+    expect(html).toContain("Ada Obi");
+    expect(html).toContain("Also sent to tunde@client.co.");
+    expect(text).toContain("You can read it here:\nhttps://tryclinton.com/m/abc");
+  });
+
+  it("reads like a personal note, not phishing: the link shows its own address, no button", () => {
+    const { html } = buildCard(input);
+    expect(html).toContain('<a href="https://tryclinton.com/m/abc" style="color:');
+    expect(html).toContain(">https://tryclinton.com/m/abc</a>");
+    expect(html).not.toMatch(/sent you a message|View message|display:inline-block/);
+  });
+
+  it("still makes sense without a subject", () => {
+    expect(buildCard({ ...input, subject: "" }).text).toContain("I've sent you a message with Safe Send.");
   });
 
   it("escapes anything hostile in the subject or name (no HTML injection)", () => {

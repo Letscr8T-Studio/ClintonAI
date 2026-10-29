@@ -5,18 +5,19 @@ import { SAFE_SEND_MAX_RECIPIENTS } from "@/lib/validation/compose";
 
 export { SAFE_SEND_MAX_RECIPIENTS };
 
-/** The email each recipient receives. Card only: nothing readable stays in their inbox. */
+/**
+ * The email each recipient receives. Card only: nothing readable stays in their inbox.
+ * Written as a short personal note in the sender's voice, with the link address visible: a branded
+ * "X sent you a message" banner with one big button reads like phishing and lands in spam.
+ */
 export const cardCopy = {
-  brand: "Clinton AI · Safe Send",
-  heading: (sender: string) => `${sender} sent you a message`,
-  button: "View message",
-  privateNote: "This link is private to you. Please don't forward it.",
-  windowNote: (sender: string) => `${sender} can withdraw this message for 24 hours after sending it.`,
-  alsoTo: (list: string) => `Also sent to ${list}`,
-  footer: "Sent with Clinton AI. Never regret an email again.",
-  footerUrl: "https://tryclinton.com",
-  textIntro: (sender: string, subject: string) => `${sender} sent you a message: "${subject}".`,
-  textLink: (url: string) => `Read it here: ${url}`,
+  greeting: "Hi,",
+  intro: (subject: string) =>
+    subject ? `I've sent you "${subject}" with Safe Send.` : "I've sent you a message with Safe Send.",
+  readHere: "You can read it here:",
+  windowNote: "The link is just for you, and I can withdraw the message for 24 hours after sending it.",
+  alsoTo: (list: string) => `Also sent to ${list}.`,
+  footer: "Sent with Clinton AI (tryclinton.com)",
 };
 
 /** The page a link opens: /m/<token>. */
