@@ -84,12 +84,17 @@ passwords, salary); external domains; unfilled merge fields `{…}`. Then the mo
 strict JSON schema. Use a fast Haiku-class model; confirm the current model ID and structured-output
 API before implementing. Timeout ~2.5 s; on timeout return rule findings only. Never block sending.
 
+Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, model `OPENAI_MODEL`, default
+`gpt-5.4-mini`, picked by benchmark: ~1.6 s, structured output). Anthropic can be added by implementing
+`CheckModel` in `src/server/ai/model.ts`. Only finding types, model name and latency are recorded
+(`ai_check_events`); the email text is never stored or logged.
+
 ## Milestones
 
 1. [x] Migrations + types + RLS tests (Supabase local). 43 pgTAP tests; CI `database` job.
 2. [x] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour). Sign-in asks only for name + email.
 3. [x] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email. Own OAuth flow (`/api/google/connect` → `/api/google/callback`, PKCE + state cookie), tokens via `save_google_account` / `get_account_refresh_token` (service role only), test send from the home screen, disconnect revokes and deletes. Verified live 2026-10-29: real Gmail connected, test email received.
-4. [ ] Compose UI + AI check (rules → model) + findings card.
+4. [x] Compose UI + AI check (rules → model) + findings card. `/compose`; rules in `src/lib/check/` (attachment, greeting name, recipients, weekday/date, card/password/account, placeholders, subject), model via `src/server/ai/` (provider interface; OpenAI `gpt-5.4-mini`, strict JSON schema, 2.5 s budget, invented excerpts dropped); `POST /api/check`; findings with Fix it / Ignore / Send anyway; in-browser rules fallback. Sending itself arrives with milestone 5.
 5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
 6. [ ] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job.
 7. [ ] Dashboard (stats, table, caught list) + activity history.

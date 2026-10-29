@@ -16,8 +16,8 @@ export function AppHeader({ name, email }: Props) {
   return (
     <header className="sticky top-0 z-20 border-b border-line/70 bg-paper/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-5 sm:px-8">
-        <div className="flex items-center gap-6">
-          <Logo href={appRoutes.home} />
+        <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+          <Logo href={appRoutes.home} compact />
           <nav aria-label={copy.navLabel}>
             <ul className="m-0 flex list-none gap-1 p-0">
               {copy.nav.map((item) => {

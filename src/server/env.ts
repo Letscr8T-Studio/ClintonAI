@@ -57,6 +57,27 @@ export function getSupabaseAuthEnv() {
   };
 }
 
+// The deeper AI check. Optional: without it, Clinton runs the deterministic rules only.
+const aiSchema = z.object({
+  AI_PROVIDER: z.literal("openai"),
+  OPENAI_API_KEY: z.string().startsWith("sk-"),
+  OPENAI_MODEL: z.string().min(1).default("gpt-5.4-mini"),
+});
+
+export type AiEnv = { provider: "openai"; apiKey: string; model: string };
+
+/** The configured model provider, or null when the AI check is not set up (rules only). */
+export function getAiEnv(): AiEnv | null {
+  if (!process.env.AI_PROVIDER) return null;
+  const parsed = aiSchema.safeParse(process.env);
+  if (!parsed.success) throw new EnvError("AI check", parsed.error);
+  return {
+    provider: parsed.data.AI_PROVIDER,
+    apiKey: parsed.data.OPENAI_API_KEY,
+    model: parsed.data.OPENAI_MODEL,
+  };
+}
+
 export function getGoogleEnv() {
   const parsed = googleSchema.safeParse(process.env);
   if (!parsed.success) throw new EnvError("Google OAuth", parsed.error);

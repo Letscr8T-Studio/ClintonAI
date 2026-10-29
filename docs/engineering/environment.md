@@ -15,6 +15,9 @@
 | `ADMIN_SESSION_SECRET`                 | server | console  | ≥32 random chars; `openssl rand -base64 32`. Rotating it logs everyone out         |
 | `GOOGLE_CLIENT_ID`                     | server | app      | Same OAuth client as sign-in; used by "Connect Gmail"                              |
 | `GOOGLE_CLIENT_SECRET`                 | server | app      | Its secret. Server only                                                            |
+| `AI_PROVIDER`                          | server | optional | `openai`. Unset: the AI check runs the rules only                                  |
+| `OPENAI_API_KEY`                       | server | with AI  | OpenAI key (`sk-…`). Server only                                                   |
+| `OPENAI_MODEL`                         | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 2.5 s budget                 |
 
 Server vars are validated by `src/server/env.ts`. A missing Supabase var fails the request that needs it
 with a clear message; missing admin vars disable console login. Add every new var to this table,

@@ -33,5 +33,12 @@ function guardOwner(request: NextRequest) {
 
 export const config = {
   // Static list (Next.js requirement). Add new signed-in routes here and in src/config/routes.ts.
-  matcher: ["/owner/:path*", "/api/owner/:path*", "/dashboard/:path*", "/onboarding", "/login"],
+  matcher: [
+    "/owner/:path*",
+    "/api/owner/:path*",
+    "/dashboard/:path*",
+    "/compose/:path*",
+    "/onboarding",
+    "/login",
+  ],
 };

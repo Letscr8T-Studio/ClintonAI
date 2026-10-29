@@ -3,6 +3,7 @@
 import { appRoutes } from "@/config/routes";
 
 export type SetupStepId = "connect" | "send" | "safe-send";
+export type SetupStep = { id: SetupStepId; title: string; body: string; href?: string };
 
 export const homeCopy = {
   eyebrow: (firstName: string | null) => (firstName ? `Welcome, ${firstName}` : "Welcome"),
@@ -19,10 +20,11 @@ export const homeCopy = {
       id: "send",
       title: "Send your first email",
       body: "Write it here. Clinton checks it, then holds it for your Smart Delay.",
+      href: appRoutes.compose,
     },
     { id: "safe-send", title: "Try Safe Send", body: "Send something you can take back for 24 hours." },
-  ] satisfies { id: SetupStepId; title: string; body: string }[],
-  soonNote: "Compose and Safe Send arrive in the next beta update.",
+  ] as SetupStep[],
+  soonNote: "Sending through the Outbox and Safe Send arrive in the next beta updates.",
   delay: {
     caption: "Smart Delay",
     body: (minutes: string) => `Every email waits ${minutes} before it leaves.`,
@@ -31,7 +33,10 @@ export const homeCopy = {
 
 export const appShellCopy = {
   navLabel: "Main",
-  nav: [{ label: "Home", href: appRoutes.home }],
+  nav: [
+    { label: "Home", href: appRoutes.home },
+    { label: "Compose", href: appRoutes.compose },
+  ],
   accountMenu: "Account",
   signedInAs: "Signed in as",
   signOut: "Sign out",

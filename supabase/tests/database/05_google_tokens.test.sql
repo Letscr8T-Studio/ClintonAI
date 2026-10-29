@@ -5,6 +5,10 @@ select plan(10);
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'ada@example.com');
 
+-- Baseline, so the test also passes on a database that already holds real connections.
+create temporary table baseline as
+  select count(*)::int as n from vault.secrets where description like 'Google refresh token%';
+
 -- First connect stores the token and creates the account.
 create temporary table first_connect as
   select public.save_google_account(
@@ -36,7 +40,8 @@ select is(
   (select status::text from public.connected_accounts where id = (select id from first_connect)),
   'active', 'reconnecting reactivates the account'
 );
-select is((select count(*)::int from vault.secrets where description like 'Google refresh token%'), 1,
+select is((select count(*)::int from vault.secrets where description like 'Google refresh token%'),
+  (select n + 1 from baseline),
   'rotation does not leave old secrets behind');
 
 select throws_ok(

@@ -120,6 +120,25 @@
   transition: stroke-dashoffset 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* A soft band of light sweeping down while Clinton reads the email. */
+@keyframes cl-scan {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 400%;
+  }
+}
+.cl-scan {
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in oklab, var(--color-brand-light) 35%, transparent),
+    transparent
+  );
+  animation: cl-scan 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [class*="cl-"] {
     animation: none !important;

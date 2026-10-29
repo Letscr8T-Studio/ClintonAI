@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-29: AI check = rules first, then a swappable model (OpenAI for now)
+
+- **Decision:** The check runs deterministic rules (pure, in `src/lib/check/`, also runnable in the browser as a fallback), then one model call behind a provider interface. OpenAI `gpt-5.4-mini` today (fastest current model with reliable structured output in our benchmark), chosen by env; Anthropic can be added later without touching product code. Strict JSON schema, 2.5 s budget, max 3 model findings, and any excerpt not found verbatim in the email is dropped. The email is passed as data with an instruction to ignore instructions inside it.
+- **Why:** Advise, never block (rule 4): rules are instant and explainable; the model adds tone/contradiction checks but can never delay or stop a send. The founder has OpenAI keys now, not Anthropic.
+- **Consequences:** Only finding types, model name and latency are recorded. The provider's own retention must be disclosed before launch (launch checklist).
+
 ## 2026-10-29: "Connect Gmail" is its own OAuth step; tokens live in Vault
 
 - **Decision:** Gmail sending is granted through our own OAuth flow, separate from sign-in, asking only for `gmail.send` (+ `openid email` to learn the address). PKCE and a state cookie bound to the signed-in user protect the round trip; `prompt=consent` guarantees a refresh token. The token is stored with `vault.create_secret` through a security-definer function only the service role can call; no one else, not even the owner, can read it. Disconnect revokes at Google (best effort) and deletes the row, and a trigger destroys the secret.

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isProtectedPath } from "./routes";
 
 describe("isProtectedPath", () => {
-  it.each(["/dashboard", "/dashboard/emails", "/onboarding"])("protects %s", (path) => {
+  it.each(["/dashboard", "/dashboard/emails", "/compose", "/onboarding"])("protects %s", (path) => {
     expect(isProtectedPath(path)).toBe(true);
   });
 

@@ -8,13 +8,15 @@ type LogoProps = {
   light?: boolean;
   /** Small label after the wordmark, e.g. "Founders". */
   badge?: string;
+  /** Mark only on small screens (the wordmark returns from `sm`). Needs `href` or the label stays. */
+  compact?: boolean;
   /** Wraps the logo in a link. Omit for a static logo. */
   href?: string;
   className?: string;
 };
 
 /** Clinton AI lockup: the "Held C" tile + "Clinton AI" wordmark in one typeface (docs/product/brand.md). */
-export function Logo({ light = false, badge, href, className }: LogoProps) {
+export function Logo({ light = false, badge, href, compact = false, className }: LogoProps) {
   const content = (
     <>
       <span
@@ -26,7 +28,12 @@ export function Logo({ light = false, badge, href, className }: LogoProps) {
       >
         <ClintonMark size={22} color={light ? palette.brand : palette.white} />
       </span>
-      <span className="font-display text-[22px] leading-none font-extrabold tracking-[-0.04em] whitespace-nowrap">
+      <span
+        className={cn(
+          "font-display text-[22px] leading-none font-extrabold tracking-[-0.04em] whitespace-nowrap",
+          compact && "hidden sm:inline",
+        )}
+      >
         {site.name}
       </span>
       {badge ? (

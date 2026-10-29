@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { Check } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
@@ -68,7 +69,16 @@ export function SetupSteps({ gmailConnected }: { gmailConnected: boolean }) {
                       status === "soon" ? "text-muted" : "text-ink",
                     )}
                   >
-                    {step.title}
+                    {status === "next" && step.href ? (
+                      <Link
+                        href={step.href}
+                        className="text-ink underline decoration-brand-mist decoration-2 underline-offset-4 hover:text-brand"
+                      >
+                        {step.title}
+                      </Link>
+                    ) : (
+                      step.title
+                    )}
                   </h3>
                   <Chip tone={chipTone[status]} size="xs">
                     {copy.stepStatus[status]}
