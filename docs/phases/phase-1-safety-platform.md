@@ -87,7 +87,7 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 ## Milestones
 
 1. [x] Migrations + types + RLS tests (Supabase local). 43 pgTAP tests; CI `database` job.
-2. [ ] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour).
+2. [x] Supabase Auth with Google; `(app)` layout; onboarding (default delay, tour). Sign-in asks only for name + email.
 3. [ ] Gmail connect (`gmail.send`, offline) + Vault token storage + send a plain email.
 4. [ ] Compose UI + AI check (rules → model) + findings card.
 5. [ ] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher.
@@ -100,6 +100,6 @@ API before implementing. Timeout ~2.5 s; on timeout return rule findings only. N
 ## Open decisions
 
 - Default Smart Delay value: set to 5 min for now; confirm from beta testing.
-- Supabase Auth Google provider vs a separate OAuth client for `gmail.send` offline tokens (Auth's provider token is short-lived).
+- `gmail.send` offline tokens (milestone 3): Supabase Auth's Google provider handles **sign-in only**. Its provider token is short-lived and Supabase doesn't keep the refresh token, so the plan is our own "Connect Gmail" OAuth step (same Google client, `access_type=offline`, `prompt=consent`) that stores the refresh token in Vault. Confirm when building milestone 3.
 - Attachment size limit for Safe Send and storage cost.
 - Optional one-time code for very sensitive Safe Send emails: in v1 or later?

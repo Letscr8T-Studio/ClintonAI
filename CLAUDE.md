@@ -85,6 +85,7 @@ src/
     marketing/    Landing page: layout/, sections/, visuals/ (illustrations)
     waitlist/     Waitlist form + hook
     owner/        Founders console UI
+    app/          Signed-in product UI (header, sign-in, onboarding)
     seo/          Structured data
   content/        All marketing copy and sample data (typed)
   config/         Brand + site config (names, URLs, palette)

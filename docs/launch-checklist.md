@@ -18,6 +18,7 @@ deployed and verified; add the PR link next to it.
 - [ ] Privacy policy (with Google's Limited Use disclosure) and terms of service live on tryclinton.com.
 - [ ] Deliverability tests: Safe Send emails land in the inbox, not spam, on Gmail, Outlook and Yahoo.
 - [ ] Trademark search on "Clinton AI" for software.
+- [ ] Hosted sign-in configured: production redirect URI and origin on the Google client, Google provider and URL configuration in the Supabase dashboard, `NEXT_PUBLIC_SUPABASE_*` set in Vercel (see [environment.md](engineering/environment.md)). Every beta tester added as a Google test user until verification is approved.
 
 ## When this list is done
 

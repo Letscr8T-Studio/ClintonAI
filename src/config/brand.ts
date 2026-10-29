@@ -24,3 +24,11 @@ export const palette = {
   amberIcon: "#9A6A00",
   amberDot: "#E0A800",
 } as const;
+
+/** Google's own logo colours, required unchanged by its sign-in branding guidelines. */
+export const googleColors = {
+  blue: "#4285F4",
+  green: "#34A853",
+  yellow: "#FBBC05",
+  red: "#EA4335",
+} as const;

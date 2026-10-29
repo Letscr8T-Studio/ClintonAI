@@ -2,15 +2,17 @@
 
 ## Environment variables
 
-| Variable                    | Scope  | Required | Purpose                                                                    |
-| --------------------------- | ------ | -------- | -------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`      | public | prod     | Canonical URL, sitemap, social cards. Default `https://tryclinton.com`     |
-| `NEXT_PUBLIC_TALLY_FORM_ID` | public | yes      | Tally survey form ID (`tally.so/r/XXXXXX`)                                 |
-| `SUPABASE_URL`              | server | yes      | Supabase project URL                                                       |
-| `SUPABASE_SERVICE_ROLE_KEY` | server | yes      | Service-role key. **Never** prefix with `NEXT_PUBLIC_`                     |
-| `ADMIN_EMAILS`              | server | console  | Comma-separated founder emails                                             |
-| `ADMIN_PASSWORD`            | server | console  | Shared console password (long, unique)                                     |
-| `ADMIN_SESSION_SECRET`      | server | console  | ≥32 random chars; `openssl rand -base64 32`. Rotating it logs everyone out |
+| Variable                               | Scope  | Required | Purpose                                                                            |
+| -------------------------------------- | ------ | -------- | ---------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | public | prod     | Canonical URL, sitemap, social cards. Default `https://tryclinton.com`             |
+| `NEXT_PUBLIC_TALLY_FORM_ID`            | public | yes      | Tally survey form ID (`tally.so/r/XXXXXX`)                                         |
+| `NEXT_PUBLIC_SUPABASE_URL`             | public | app      | Supabase URL for user sign-in. Local: `http://127.0.0.1:54721`                     |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public | app      | Publishable key (`sb_publishable_…`); RLS protects the data. Set at **build** time |
+| `SUPABASE_URL`                         | server | yes      | Supabase project URL                                                               |
+| `SUPABASE_SERVICE_ROLE_KEY`            | server | yes      | Service-role key. **Never** prefix with `NEXT_PUBLIC_`                             |
+| `ADMIN_EMAILS`                         | server | console  | Comma-separated founder emails                                                     |
+| `ADMIN_PASSWORD`                       | server | console  | Shared console password (long, unique)                                             |
+| `ADMIN_SESSION_SECRET`                 | server | console  | ≥32 random chars; `openssl rand -base64 32`. Rotating it logs everyone out         |
 
 Server vars are validated by `src/server/env.ts`. A missing Supabase var fails the request that needs it
 with a clear message; missing admin vars disable console login. Add every new var to this table,
@@ -43,6 +45,27 @@ Windows/Hyper-V reserves. Check reserved ranges with `netsh interface ipv4 show 
 **Hosted Supabase:** `npx supabase login`, `npx supabase link --project-ref <ref>`, then
 `npx supabase db push` applies any migrations the project hasn't run yet. Copy the project URL and
 service-role key into `.env.local`.
+
+For local development point `NEXT_PUBLIC_SUPABASE_*` at the local stack (`npx supabase status`
+prints the publishable key). Sign-in, profiles and every Phase 1 table live there.
+
+**Google sign-in (Google Cloud project "Clinton AI"):**
+
+- Google Auth Platform: External audience, **Testing** mode, test users listed under Audience.
+  Scopes so far: `openid`, `userinfo.email`, `userinfo.profile` (milestone 3 adds `gmail.send`).
+- OAuth client "Clinton AI web (dev)", type Web application. Authorised origin
+  `http://localhost:3000`; redirect URI `http://127.0.0.1:54721/auth/v1/callback` (local Supabase Auth).
+- Its ID and secret go in **`supabase/.env`** (git-ignored), which `supabase start` reads:
+  `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`.
+  Restart with `npm run db:stop && npm run db:start` after changing them.
+- Hosted: add `https://<project-ref>.supabase.co/auth/v1/callback` as a redirect URI and
+  `https://tryclinton.com` as an origin on the same client, then paste the ID and secret into
+  Supabase dashboard → Authentication → Providers → Google. In Authentication → URL Configuration set
+  Site URL `https://tryclinton.com` and allow `https://tryclinton.com/auth/callback`.
+
+Flow: `/login` → server action `signInWithGoogle` → Google → Supabase Auth → `/auth/callback`
+(exchanges the code, sets cookies) → `/dashboard`, or `/onboarding` until it is finished. `src/proxy.ts`
+refreshes the session on app routes.
 
 **Tally:** add a Hidden field block named exactly `email`; remove the visible email question; publish
 and copy the form ID.

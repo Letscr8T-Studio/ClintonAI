@@ -29,6 +29,10 @@ jobs:
   database:
     name: Database (migrations + pgTAP)
     runs-on: ubuntu-latest
+    env:
+      # config.toml enables Google sign-in; the tests never call Google, so placeholders suffice.
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ci-placeholder.apps.googleusercontent.com
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET: ci-placeholder
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

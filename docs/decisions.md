@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-10-29: Sign-in with Supabase Auth + Google, server-side only
+
+- **Decision:** "Continue with Google" via Supabase Auth, run entirely on the server: a server action starts OAuth (PKCE verifier in a cookie), `/auth/callback` exchanges the code, `@supabase/ssr` keeps the session in httpOnly cookies, and `src/proxy.ts` refreshes it on app routes. No Supabase client code ships to the browser. Sign-in requests only `email profile`; Gmail sending is a separate, later consent.
+- **Why:** Least privilege and a smaller attack surface; users understand "sign in" and "let Clinton send" as different asks. Server-side PKCE avoids tokens in client JS.
+- **Consequences:** User-facing reads go through `getSupabaseForUser()` (RLS applies). The `next` parameter is always passed through `safeNextPath` (no open redirects). Google credentials live in `supabase/.env` locally and in the Supabase dashboard when hosted, never in the app env.
+
 ## 2026-10-28: Phase 1 database: clients read, server writes, triggers guard the trust rules
 
 - **Decision:** Signed-in users only SELECT their own rows (RLS + column grants that hide ciphertext, token references and link hashes). All writes go through server routes with the service role, after zod validation. The trust rules that can be expressed in data (withdraw never edit, permanent withdrawals, 24 h window, email lifecycle, body wiped after send, append-only history, no AI-check text column) are enforced by triggers and constraints, and proven by pgTAP tests.

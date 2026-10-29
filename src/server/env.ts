@@ -9,6 +9,12 @@ const supabaseSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 });
 
+// Public by design: the publishable key only grants what row-level security allows.
+const supabaseAuthSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.url(),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+});
+
 const adminSchema = z.object({
   ADMIN_EMAILS: z.string().min(1),
   ADMIN_PASSWORD: z.string().min(1),
@@ -29,6 +35,20 @@ export function getSupabaseEnv() {
   const parsed = supabaseSchema.safeParse(process.env);
   if (!parsed.success) throw new EnvError("Supabase", parsed.error);
   return { url: parsed.data.SUPABASE_URL, serviceRoleKey: parsed.data.SUPABASE_SERVICE_ROLE_KEY };
+}
+
+/** For user sessions (sign-in with Google); every query runs as the signed-in user under RLS. */
+export function getSupabaseAuthEnv() {
+  const parsed = supabaseAuthSchema.safeParse({
+    // Referenced explicitly so Next.js inlines them at build time.
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  });
+  if (!parsed.success) throw new EnvError("Supabase Auth", parsed.error);
+  return {
+    url: parsed.data.NEXT_PUBLIC_SUPABASE_URL,
+    publishableKey: parsed.data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  };
 }
 
 /** Founders console settings, or null when they aren't configured (login is then disabled). */
