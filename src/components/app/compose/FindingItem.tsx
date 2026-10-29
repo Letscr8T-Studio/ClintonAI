@@ -7,16 +7,25 @@ type Props = { finding: Finding; index: number; onFix: () => void; onIgnore: () 
 const action =
   "inline-flex min-h-8 cursor-pointer items-center rounded-full px-3.5 text-[13px] font-semibold transition-colors";
 
-/** Before → after for a suggested fix. Nothing changes until the user taps Fix it. */
-function Change({ from, to }: { from: string; to: string }) {
+/**
+ * Before → after for a suggested fix; or, for an empty field, just the suggestion.
+ * Nothing changes until the user taps Fix it.
+ */
+function Change({ from, to }: { from?: string; to: string }) {
   return (
     <p className="mt-3 mb-0 rounded-xl bg-paper px-3 py-2.5 text-[13px] leading-relaxed">
-      <span className="sr-only">{copy.replace} </span>
-      <del className="text-muted decoration-danger/50">{from}</del>
-      <span aria-hidden="true" className="mx-1.5 text-muted">
-        →
-      </span>
-      <span className="sr-only"> {copy.with} </span>
+      {from ? (
+        <>
+          <span className="sr-only">{copy.replace} </span>
+          <del className="text-muted decoration-danger/50">{from}</del>
+          <span aria-hidden="true" className="mx-1.5 text-muted">
+            →
+          </span>
+          <span className="sr-only"> {copy.with} </span>
+        </>
+      ) : (
+        <span className="mr-1.5 text-muted">{copy.suggested}</span>
+      )}
       <ins className="rounded bg-brand-tint px-1 py-0.5 text-brand-deep no-underline">{to}</ins>
     </p>
   );
@@ -28,7 +37,7 @@ function Change({ from, to }: { from: string; to: string }) {
  */
 export function FindingItem({ finding, index, onFix, onIgnore }: Props) {
   const quote = finding.excerpt && finding.type !== "sensitive_data" ? finding.excerpt : null;
-  const fixable = Boolean(finding.excerpt && finding.suggestion);
+  const fixable = Boolean(finding.suggestion);
   return (
     <li
       className="cl-slide rounded-2xl border border-amber-line bg-white px-4 py-3.5"
@@ -43,7 +52,7 @@ export function FindingItem({ finding, index, onFix, onIgnore }: Props) {
         ) : null}
       </div>
       <p className="mt-2 mb-0 text-[14px] leading-snug text-ink">{finding.message}</p>
-      {fixable ? <Change from={finding.excerpt!} to={finding.suggestion!} /> : null}
+      {fixable ? <Change from={finding.excerpt} to={finding.suggestion!} /> : null}
       <div className="mt-3 flex items-center gap-2">
         <p className="m-0 min-w-0 flex-1 truncate text-[12px] text-body">
           {quote && !fixable ? <span className="rounded bg-highlight px-1 py-0.5">{quote}</span> : null}

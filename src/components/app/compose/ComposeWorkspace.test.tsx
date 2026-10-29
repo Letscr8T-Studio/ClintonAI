@@ -91,6 +91,28 @@ describe("ComposeWorkspace", () => {
     expect(screen.queryByText(panelCopy.stale)).not.toBeInTheDocument();
   });
 
+  it("fills an empty subject with Clinton's suggestion when the user taps Fix it", async () => {
+    const subjectFinding: Finding = {
+      id: "rule-0-empty_subject",
+      source: "rules",
+      type: "empty_subject",
+      field: "subject",
+      message: "There's no subject. Emails without one are easy to miss.",
+      suggestion: "Your offer from Brightlane",
+    };
+    mockCheck({ ok: true, findings: [subjectFinding], modelUsed: true });
+    render(<ComposeWorkspace fromEmail="ada@example.com" />);
+    await userEvent.type(screen.getByLabelText(composeCopy.to), "dami@brightlane.io");
+    await userEvent.type(screen.getByLabelText(composeCopy.body), "Hi Dami, welcome aboard.");
+    await submit();
+
+    expect(await screen.findByText(panelCopy.suggested)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: panelCopy.fix }));
+    const subject = screen.getByLabelText(composeCopy.subject) as HTMLInputElement;
+    expect(subject.value).toBe("Your offer from Brightlane");
+    await waitFor(() => expect(subject).toHaveFocus());
+  });
+
   it("lets the user send anyway (advise, never block)", async () => {
     mockCheck({ ok: true, findings: [finding], modelUsed: true });
     render(<ComposeWorkspace fromEmail="ada@example.com" />);

@@ -42,6 +42,7 @@ export const panelCopy = {
   show: "Show me",
   replace: "Replace",
   with: "with",
+  suggested: "Suggested:",
   ignore: "Ignore",
   sendAnyway: "Send anyway",
   readyTitle: "Ready to send",

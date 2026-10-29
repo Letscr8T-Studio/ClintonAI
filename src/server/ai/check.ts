@@ -56,6 +56,16 @@ export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Fin
     .slice(0, MAX_MODEL_FINDINGS);
 }
 
+/**
+ * Attaches the model's subject line to the "no subject" finding, so Fix it can fill the empty field.
+ * Only for a genuinely empty subject, and only a single plain line of sensible length.
+ */
+export function withSubjectSuggestion(findings: Finding[], draft: DraftEmail, subject: string): Finding[] {
+  const line = subject.trim().replace(/^["'“”]+|["'“”]+$/g, "");
+  if (draft.subject.trim() || !line || line.length > 120 || /[\r\n]/.test(line)) return findings;
+  return findings.map((f) => (f.type === "empty_subject" ? { ...f, suggestion: line } : f));
+}
+
 export type CheckRun = CheckResult & { modelName: string | null; latencyMs: number };
 
 export async function runCheck(
@@ -72,7 +82,10 @@ export async function runCheck(
   try {
     const answer = await model.check(draft, controller.signal);
     return {
-      findings: [...rules, ...modelFindings(answer, draft, rules)],
+      findings: [
+        ...withSubjectSuggestion(rules, draft, answer.subject),
+        ...modelFindings(answer, draft, rules),
+      ],
       modelUsed: true,
       modelName: model.name,
       latencyMs: Date.now() - started,

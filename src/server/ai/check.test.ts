@@ -14,9 +14,11 @@ const draft: DraftEmail = {
   attachments: [],
 };
 
-const model = (answer: ModelAnswer | (() => Promise<ModelAnswer>)): CheckModel => ({
+type Answer = Omit<ModelAnswer, "subject"> & { subject?: string };
+
+const model = (answer: Answer | (() => Promise<ModelAnswer>)): CheckModel => ({
   name: "test/model",
-  check: typeof answer === "function" ? answer : async () => answer,
+  check: typeof answer === "function" ? answer : async () => ({ subject: "", ...answer }),
 });
 
 afterEach(() => vi.useRealTimers());
@@ -78,6 +80,28 @@ describe("runCheck", () => {
     );
     const model_ = result.findings.filter((f) => f.source === "model");
     expect(model_.map((f) => f.suggestion)).toEqual(["Looking forward to hearing from you.", undefined]);
+  });
+
+  it("offers the model's subject line for an empty subject", async () => {
+    const empty = { ...draft, subject: "" };
+    const result = await runCheck(
+      empty,
+      model({ subject: "“Your offer from Brightlane”", findings: [] }),
+      NOW,
+    );
+    expect(result.findings.find((f) => f.type === "empty_subject")).toMatchObject({
+      field: "subject",
+      suggestion: "Your offer from Brightlane", // quotes stripped
+    });
+  });
+
+  it("never suggests a subject when there already is one, or when the line is unusable", async () => {
+    const withSubject = await runCheck(draft, model({ subject: "Something else", findings: [] }), NOW);
+    expect(withSubject.findings.some((f) => f.type === "empty_subject")).toBe(false);
+
+    const empty = { ...draft, subject: " " };
+    const multiLine = await runCheck(empty, model({ subject: "Line one\nBcc: x@y.z", findings: [] }), NOW);
+    expect(multiLine.findings.find((f) => f.type === "empty_subject")?.suggestion).toBeUndefined();
   });
 
   it("gives the rule finding its certain fix", async () => {

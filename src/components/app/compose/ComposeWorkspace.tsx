@@ -75,21 +75,21 @@ export function ComposeWorkspace({ fromEmail }: { fromEmail: string }) {
     resolve(id);
     const el = { to: toRef, subject: subjectRef, body: bodyRef }[field].current;
     const current = values[field];
-    const at = excerpt ? current.indexOf(excerpt) : -1;
-    const select = (start: number, length: number) => {
+    // No quoted words + a suggestion = fill an empty field (e.g. a suggested subject).
+    const fill = !excerpt && Boolean(suggestion) && !current.trim();
+    const at = fill ? 0 : excerpt ? current.indexOf(excerpt) : -1;
+    const length = fill ? current.length : (excerpt?.length ?? 0);
+    const select = (start: number, size: number) => {
       el?.focus();
-      if (start >= 0) el?.setSelectionRange(start, start + length);
+      if (start >= 0) el?.setSelectionRange(start, start + size);
     };
     if (at >= 0 && suggestion) {
       // Applying Clinton's own fix is not a user edit, so the check result stays current.
-      setValues((v) => ({
-        ...v,
-        [field]: current.slice(0, at) + suggestion + current.slice(at + excerpt!.length),
-      }));
+      setValues((v) => ({ ...v, [field]: current.slice(0, at) + suggestion + current.slice(at + length) }));
       requestAnimationFrame(() => select(at, suggestion.length));
       return;
     }
-    select(at, excerpt?.length ?? 0);
+    select(at, length);
   };
 
   return (
