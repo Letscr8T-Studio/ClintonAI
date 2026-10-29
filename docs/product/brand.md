@@ -38,6 +38,16 @@ for SVG and generated images are in `src/config/brand.ts`; keep the two in sync.
 Bricolage Grotesque for headings (`font-display`), Inter for body (`font-sans`), JetBrains Mono for
 labels and timers (`font-mono`). All self-hosted via `@fontsource-variable`; no Google Fonts requests.
 
+## Product surfaces (sign-in, onboarding, app)
+
+The product should feel as crafted as the landing page, never like a generic form.
+
+- **Stages.** Illustrations sit on one of three panels (`src/styles/app.css`, `VisualStage`): `stage-brand` (deep blue with a faint grid and a light bloom), `bg-ink` (navy, for timers and focus), `bg-brand-wash` (light). Pages use `stage-paper` (warm paper with a brand glow).
+- **Show, don't list.** Every feature is explained by a live mock of the product doing it: the highlighter sweeping a risky phrase, the amber finding popping in, the Smart Delay ring counting down, the recipient page reading "withdrawn". Sample data lives in `src/content/app/`.
+- **Type scale.** Big Bricolage headlines (up to 72px, tight tracking) with the second line in brand blue; mono uppercase for eyebrows, step numbers and timers.
+- **Motion.** `cl-rise`, `cl-pop`, `cl-slide`, `cl-mark`, `cl-ring` choreograph a page on load (staggered with `animationDelay`). All motion stops for `prefers-reduced-motion`; the final frame always reads on its own.
+- **Controls.** Primary actions are large (56-64px), rounded-2xl, with a lift on hover. Choices are tiles, not bare radio buttons, but always native inputs underneath.
+
 ## Voice
 
 Calm, reassuring, plain words, a little human warmth. Lead with relief ("Send without fear", "Never

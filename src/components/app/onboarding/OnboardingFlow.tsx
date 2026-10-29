@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { buttonStyles } from "@/components/ui/Button";
+import { ArrowRight } from "@/components/ui/icons";
 import { onboardingCopy as copy, tourSteps } from "@/content/app/onboarding";
-import { cn } from "@/lib/cn";
 import { DelayPicker } from "./DelayPicker";
+import { NavButton } from "./NavButton";
+import { OnboardingTopBar } from "./OnboardingTopBar";
 import { TourSlide } from "./TourSlide";
+import { TourVisualStage } from "./visuals";
 
-const TOTAL = tourSteps.length + 1; // tour screens + the delay picker
+const labels = [...tourSteps.map((s) => s.label), copy.delayStepLabel];
+const DELAY_STEP = tourSteps.length;
 
-/** Three tour screens, then the Smart Delay choice. Focus moves to each new heading. */
+/** Full-screen tour: three feature screens, then the Smart Delay choice. Focus follows each heading. */
 export function OnboardingFlow({ defaultDelaySeconds }: { defaultDelaySeconds: number }) {
   const [index, setIndex] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -23,59 +26,52 @@ export function OnboardingFlow({ defaultDelaySeconds }: { defaultDelaySeconds: n
   const go = (next: number) => {
     moved.current = true;
     setIndex(next);
+    window.scrollTo({ top: 0 });
   };
 
-  const tourStep = tourSteps[index];
+  const step = tourSteps[index];
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-muted" aria-live="polite">
-          {copy.progress(index + 1, TOTAL)}
-        </p>
-        <ol className="flex gap-1.5" aria-hidden="true">
-          {Array.from({ length: TOTAL }, (_, i) => (
-            <li
-              key={i}
-              className={cn("h-1.5 w-6 rounded-full", i <= index ? "bg-brand" : "bg-line-strong")}
-            />
-          ))}
-        </ol>
-      </div>
+    <div className="stage-paper min-h-dvh">
+      <div className="mx-auto flex min-h-dvh max-w-[1240px] flex-col px-5 sm:px-8">
+        <OnboardingTopBar labels={labels} index={index} onSkip={step ? () => go(DELAY_STEP) : undefined} />
 
-      {tourStep ? (
-        <>
-          <TourSlide step={tourStep} headingRef={headingRef} />
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-            {index === 0 ? (
-              <button
-                type="button"
-                onClick={() => go(tourSteps.length)}
-                className={buttonStyles({ variant: "secondary", shape: "soft" })}
-              >
-                {copy.skip}
-              </button>
+        <main id="main" className="flex flex-1 items-center py-8 lg:py-12">
+          {/* key replays the entrance choreography on every step */}
+          <div key={index} className="w-full">
+            {step ? (
+              <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className="flex flex-col">
+                  <TourSlide
+                    step={step}
+                    number={index + 1}
+                    total={tourSteps.length}
+                    headingRef={headingRef}
+                  />
+                  <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+                    {index > 0 ? (
+                      <NavButton variant="ghost" onClick={() => go(index - 1)}>
+                        {copy.back}
+                      </NavButton>
+                    ) : null}
+                    <NavButton onClick={() => go(index + 1)}>
+                      {copy.next}
+                      <ArrowRight size={16} />
+                    </NavButton>
+                  </div>
+                </div>
+                <TourVisualStage visual={step.id} className="order-first lg:order-none" />
+              </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => go(index - 1)}
-                className={buttonStyles({ variant: "secondary", shape: "soft" })}
-              >
-                {copy.back}
-              </button>
+              <DelayPicker
+                defaultSeconds={defaultDelaySeconds}
+                headingRef={headingRef}
+                onBack={() => go(DELAY_STEP - 1)}
+              />
             )}
-            <button type="button" onClick={() => go(index + 1)} className={buttonStyles({ shape: "soft" })}>
-              {copy.next}
-            </button>
           </div>
-        </>
-      ) : (
-        <DelayPicker
-          defaultSeconds={defaultDelaySeconds}
-          headingRef={headingRef}
-          onBack={() => go(tourSteps.length - 1)}
-        />
-      )}
+        </main>
+      </div>
     </div>
   );
 }

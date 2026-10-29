@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { SignInForm } from "@/components/app/auth/SignInForm";
-import { CenteredCard } from "@/components/app/CenteredCard";
+import { SignInPanel } from "@/components/app/auth/SignInPanel";
+import { SignInStage } from "@/components/app/auth/SignInStage";
 import { appRoutes } from "@/config/routes";
-import { loginCopy, loginErrorMessage } from "@/content/app/auth";
+import { loginErrorMessage } from "@/content/app/auth";
 import { safeNextPath } from "@/lib/redirect";
 import { getCurrentUser } from "@/server/auth/user";
 
@@ -16,22 +16,12 @@ export default async function LoginPage({ searchParams }: Props) {
   const next = safeNextPath(params.next, appRoutes.home);
   if (await getCurrentUser()) redirect(next);
 
-  const error = loginErrorMessage(params.error);
-
   return (
-    <CenteredCard>
-      <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">{loginCopy.title}</h1>
-      <p className="mt-3 mb-6 text-body">{loginCopy.body}</p>
-      {error ? (
-        <p
-          role="alert"
-          className="mb-4 rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-ink"
-        >
-          {error}
-        </p>
-      ) : null}
-      <SignInForm next={next} />
-      <p className="mt-4 text-sm text-muted">{loginCopy.privacy}</p>
-    </CenteredCard>
+    <div className="grid min-h-dvh bg-paper lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <SignInStage />
+      <main id="main" className="stage-paper flex items-center px-5 py-12 sm:px-10 lg:py-16">
+        <SignInPanel next={next} error={loginErrorMessage(params.error)} />
+      </main>
+    </div>
   );
 }

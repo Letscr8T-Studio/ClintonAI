@@ -1,76 +1,81 @@
 "use client";
 
-import { useActionState, useId, type Ref } from "react";
+import { useActionState, useId, useState, type Ref } from "react";
 import { finishOnboarding, type OnboardingState } from "@/app/onboarding/actions";
-import { buttonStyles } from "@/components/ui/Button";
+import { ArrowRight } from "@/components/ui/icons";
 import { delayOptions, onboardingCopy as copy } from "@/content/app/onboarding";
-import { cn } from "@/lib/cn";
+import { SMART_DELAY } from "@/lib/validation/profile";
+import { formatClock } from "@/lib/time";
+import { DelayRing } from "./DelayRing";
+import { VisualStage } from "./visuals";
+import { DelayTiles } from "./DelayTiles";
+import { NavButton } from "./NavButton";
 
 type Props = { defaultSeconds: number; headingRef: Ref<HTMLHeadingElement>; onBack: () => void };
 
-/** Last onboarding step: pick the default Smart Delay and finish. */
+/** Last step: pick the default Smart Delay, with a live preview, and finish. */
 export function DelayPicker({ defaultSeconds, headingRef, onBack }: Props) {
   const [state, action, pending] = useActionState<OnboardingState, FormData>(finishOnboarding, {});
+  const [seconds, setSeconds] = useState(defaultSeconds);
+  const selected = delayOptions.find((o) => o.seconds === seconds);
   const headingId = useId();
   const errorId = useId();
+  const moodId = useId();
 
   return (
-    <form action={action} aria-labelledby={headingId}>
-      <h1
-        id={headingId}
-        ref={headingRef}
-        tabIndex={-1}
-        className="font-display text-2xl font-bold tracking-tight outline-none sm:text-3xl"
-      >
-        {copy.delayTitle}
-      </h1>
-      <p className="mt-3 text-body">{copy.delayBody}</p>
-
-      <fieldset className="mt-6" aria-describedby={state.error ? errorId : undefined}>
-        <legend className="mb-3 text-sm font-medium text-body">{copy.delayLegend}</legend>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-          {delayOptions.map((option) => (
-            <label
-              key={option.seconds}
-              className="flex cursor-pointer flex-col rounded-xl border border-line-strong px-4 py-3 has-checked:border-brand has-checked:bg-brand-wash has-focus-visible:outline-2 has-focus-visible:outline-brand"
-            >
-              <input
-                type="radio"
-                name="delaySeconds"
-                value={option.seconds}
-                defaultChecked={option.seconds === defaultSeconds}
-                className="sr-only"
-              />
-              <span className="font-semibold text-ink">{option.label}</span>
-              {option.hint ? <span className="text-xs text-muted">{option.hint}</span> : null}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {state.error ? (
-        <p id={errorId} role="alert" className="mt-4 text-sm font-medium text-danger">
-          {state.error}
+    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <form action={action} aria-labelledby={headingId} className="flex flex-col">
+        <h1
+          id={headingId}
+          ref={headingRef}
+          tabIndex={-1}
+          className="cl-rise m-0 font-display text-[clamp(40px,5.2vw,72px)] leading-[0.98] font-bold tracking-[-0.045em] outline-none"
+        >
+          {copy.delayTitle} <span className="block text-brand">{copy.delayAccent}</span>
+        </h1>
+        <p
+          className="cl-rise mt-6 mb-8 max-w-[520px] text-[clamp(16px,1.4vw,19px)] leading-relaxed text-muted"
+          style={{ animationDelay: "80ms" }}
+        >
+          {copy.delayBody}
         </p>
-      ) : null}
 
-      <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className={buttonStyles({ variant: "secondary", shape: "soft" })}
-        >
-          {copy.back}
-        </button>
-        <button
-          type="submit"
-          disabled={pending}
-          aria-busy={pending}
-          className={cn(buttonStyles({ shape: "soft" }), "sm:min-w-56")}
-        >
-          {pending ? copy.finishing : copy.finish}
-        </button>
-      </div>
-    </form>
+        <DelayTiles
+          value={seconds}
+          onChange={setSeconds}
+          describedBy={state.error ? `${moodId} ${errorId}` : moodId}
+        />
+        <p id={moodId} className="mt-4 mb-0 min-h-6 text-[15px] text-ink" aria-live="polite">
+          {selected?.mood}
+        </p>
+
+        {state.error ? (
+          <p id={errorId} role="alert" className="mt-3 mb-0 text-sm font-medium text-danger">
+            {state.error}
+          </p>
+        ) : null}
+
+        <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+          <NavButton variant="ghost" onClick={onBack}>
+            {copy.back}
+          </NavButton>
+          <NavButton type="submit" disabled={pending} aria-busy={pending}>
+            {pending ? copy.finishing : copy.finish}
+            <ArrowRight size={16} />
+          </NavButton>
+        </div>
+      </form>
+
+      <VisualStage tone="ink" className="hidden lg:flex">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <DelayRing value={seconds / SMART_DELAY.max} caption={copy.delayStepLabel}>
+            {formatClock(seconds)}
+          </DelayRing>
+          <p className="m-0 max-w-[320px] text-[15px] text-navy-text">
+            {copy.previewCaption(selected?.minutes ?? String(Math.round(seconds / 60)))}
+          </p>
+        </div>
+      </VisualStage>
+    </div>
   );
 }
