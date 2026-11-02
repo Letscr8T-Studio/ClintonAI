@@ -57,7 +57,7 @@ export function SignInStage() {
             </div>
             <p className="mt-2 mb-3 text-sm leading-snug text-amber-ink">{s.finding.text}</p>
             <div className="flex gap-2 text-xs">
-              <span className="rounded-full bg-ink px-3 py-1.5 font-semibold text-white">{s.fix}</span>
+              <span className="rounded-full bg-night px-3 py-1.5 font-semibold text-white">{s.fix}</span>
               <span className="rounded-full border border-amber-line px-3 py-1.5 text-amber-ink">
                 {s.ignore}
               </span>
@@ -65,7 +65,7 @@ export function SignInStage() {
           </div>
 
           <div
-            className="cl-slide relative -mt-4 ml-[2%] flex items-center gap-3 self-start rounded-full bg-ink py-2 pr-4 pl-2 shadow-deck"
+            className="cl-slide relative -mt-4 ml-[2%] flex items-center gap-3 self-start rounded-full bg-night py-2 pr-4 pl-2 shadow-deck"
             style={at(2900)}
           >
             <span className="inline-flex size-8 items-center justify-center rounded-full bg-brand">

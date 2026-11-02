@@ -36,7 +36,7 @@ export function DelaySetting({ initialSeconds }: { initialSeconds: number }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-[28px] border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center sm:p-7">
+    <div className="flex flex-col gap-6 rounded-[28px] border border-line bg-surface p-5 shadow-card sm:flex-row sm:items-center sm:p-7">
       <div className="flex shrink-0 justify-center">
         <ProgressRing
           tone="light"

@@ -4,6 +4,7 @@ import type { ModelType, RuleHit, RuleType } from "@/lib/check/types";
 
 export const composeCopy = {
   title: "New email",
+  close: "Close and go Home",
   from: "From",
   to: "To",
   cc: "Cc",
@@ -61,6 +62,25 @@ export const panelCopy = {
   errorTitle: "Clinton couldn't finish the check",
   errorBody: "Here's what the quick check found. You can always send.",
   rateLimited: "You've run a lot of checks. Wait a minute and try again.",
+  close: "Close",
+  inlineHint: "Highlighted in your email: tap a word to see Clinton's note.",
+  inlineLabel: (label: string) => `Clinton: ${label}`,
+  inlineAnnounce: (label: string, message: string) => `${label}. ${message}`,
+};
+
+/** The bar that appears after sending, Gmail-style, with Undo while the email still waits. */
+export const sentToastCopy = {
+  label: "Email sent to your Outbox",
+  leavingIn: "Sending in",
+  sent: "Sent",
+  sentNote: "It's on its way from your Gmail.",
+  leavesAt: (time: string) => `In your Outbox. It leaves at ${time}. You can undo until then.`,
+  undo: "Undo",
+  undoing: "Taking it back…",
+  view: "View",
+  viewLabel: "View in Outbox",
+  dismiss: "Dismiss",
+  undone: "Taken back. It's here for you to edit.",
 };
 
 /** Short chip label per finding type. */

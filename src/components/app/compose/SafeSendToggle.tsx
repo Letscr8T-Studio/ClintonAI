@@ -23,7 +23,7 @@ export function SafeSendToggle({ on, onChange, helpId }: Props) {
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-card transition-transform motion-reduce:transition-none",
+            "absolute top-0.5 left-0.5 size-5 rounded-full bg-surface shadow-card transition-transform motion-reduce:transition-none",
             on && "translate-x-4",
           )}
         />

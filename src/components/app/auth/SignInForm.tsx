@@ -13,7 +13,7 @@ function SubmitButton() {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="group flex min-h-[64px] w-full cursor-pointer items-center gap-4 rounded-2xl border border-line-strong bg-white py-2 pr-2 pl-5 text-left text-base font-semibold text-ink shadow-field transition-[translate,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-brand-mist hover:shadow-float disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="group flex min-h-[64px] w-full cursor-pointer items-center gap-4 rounded-2xl border border-line-strong bg-surface py-2 pr-2 pl-5 text-left text-base font-semibold text-ink shadow-field transition-[translate,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-brand-mist hover:shadow-float disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <GoogleMark size={22} />
       <span className="flex-1">{pending ? loginCopy.pending : loginCopy.button}</span>

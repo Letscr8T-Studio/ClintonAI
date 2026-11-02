@@ -6,16 +6,29 @@ import { safeSendCopy } from "@/content/app/safe-send";
 import { cn } from "@/lib/cn";
 import { SafeSendToggle } from "./SafeSendToggle";
 
-type Props = { busy: boolean; label: string; safeSend: boolean; onSafeSend: (on: boolean) => void };
+type Props = {
+  busy: boolean;
+  label: string;
+  safeSend: boolean;
+  onSafeSend: (on: boolean) => void;
+  /** Phones: pin Check & send to the bottom of the screen, where thumbs are (not once it's ready). */
+  docked: boolean;
+};
 
-/** The form's footer: Safe Send for this email (and what it means), the shortcut, and Check & send. */
-export function ComposeFooter({ busy, label, safeSend, onSafeSend }: Props) {
+const dock =
+  "max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-30 max-sm:border-t max-sm:border-line max-sm:bg-surface/95 max-sm:px-4 max-sm:pt-3 max-sm:pb-[max(env(safe-area-inset-bottom),12px)] max-sm:backdrop-blur-xl";
+
+/**
+ * The form's footer: Safe Send for this email (and what it means), the shortcut, and Check & send.
+ * On phones the button docks to the bottom of the screen while there is something to check.
+ */
+export function ComposeFooter({ busy, label, safeSend, onSafeSend, docked }: Props) {
   const helpId = useId();
   return (
     <div className="flex flex-col gap-3 border-t border-line px-5 py-4 sm:px-7">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SafeSendToggle on={safeSend} onChange={onSafeSend} helpId={helpId} />
-        <div className="flex items-center justify-end gap-3">
+        <div className={cn("flex items-center justify-end gap-3", docked && dock)}>
           <kbd className="hidden rounded border border-line-strong px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap text-muted sm:inline">
             {copy.shortcut}
           </kbd>
@@ -33,7 +46,7 @@ export function ComposeFooter({ busy, label, safeSend, onSafeSend }: Props) {
       <p
         id={helpId}
         className={cn(
-          "m-0 rounded-xl bg-brand-wash px-3.5 py-2.5 text-xs leading-relaxed text-brand-deep",
+          "m-0 rounded-xl bg-brand-wash px-3.5 py-2.5 text-xs leading-relaxed text-brand-ink",
           !safeSend && "sr-only",
         )}
       >

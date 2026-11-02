@@ -44,7 +44,7 @@ export function SignInPanel({ next, error }: Props) {
         className="cl-rise mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line"
         style={at(340)}
       >
-        <div className="bg-white p-4">
+        <div className="bg-surface p-4">
           <h2 className="m-0 font-mono text-[11px] font-medium tracking-wider text-muted uppercase">
             {copy.sharesTitle}
           </h2>
@@ -59,7 +59,7 @@ export function SignInPanel({ next, error }: Props) {
             ))}
           </ul>
         </div>
-        <div className="bg-white p-4">
+        <div className="bg-surface p-4">
           <h2 className="m-0 font-mono text-[11px] font-medium tracking-wider text-muted uppercase">
             {copy.neverTitle}
           </h2>
@@ -81,7 +81,7 @@ export function SignInPanel({ next, error }: Props) {
       </p>
       <Link
         href="/"
-        className="cl-rise mt-8 self-start text-[13px] font-medium text-muted underline-offset-4 hover:text-brand hover:underline"
+        className="cl-rise mt-8 self-start text-[13px] font-medium text-muted underline-offset-4 hover:text-brand-ink hover:underline"
         style={at(500)}
       >
         <span aria-hidden="true">← </span>

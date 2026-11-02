@@ -28,7 +28,7 @@ export function SafeSendPanel({ info, busy, onWithdraw }: Props) {
           <Chip tone="brand" size="xs">
             {copy.label}
           </Chip>
-          <span className="text-[13px] font-medium text-brand-deep">
+          <span className="text-[13px] font-medium text-brand-ink">
             {status ?? (left === null ? "" : copy.timeLeft(formatTimeLeft(left)))}
           </span>
         </div>
@@ -37,7 +37,7 @@ export function SafeSendPanel({ info, busy, onWithdraw }: Props) {
             type="button"
             disabled={busy}
             onClick={() => setConfirming(true)}
-            className={cn(button, "bg-ink text-white hover:bg-brand-deep")}
+            className={cn(button, "bg-night text-white hover:bg-brand-deep")}
           >
             {busy ? copy.withdrawing : copy.withdrawAll}
           </button>
@@ -45,7 +45,7 @@ export function SafeSendPanel({ info, busy, onWithdraw }: Props) {
       </div>
 
       {confirming ? (
-        <div className="mt-3 flex flex-col gap-2 rounded-xl bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-3 flex flex-col gap-2 rounded-xl bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="m-0 text-[13px] text-ink">{copy.withdrawAllConfirm}</p>
           <div className="flex shrink-0 gap-2">
             <button
@@ -86,7 +86,7 @@ export function SafeSendPanel({ info, busy, onWithdraw }: Props) {
                     aria-label={`${copy.withdrawOne} ${r.email}`}
                     className={cn(
                       button,
-                      "min-h-8 border border-line-strong bg-white text-ink hover:border-danger hover:text-danger",
+                      "min-h-8 border border-line-strong bg-surface text-ink hover:border-danger hover:text-danger-ink",
                     )}
                   >
                     {copy.withdrawOne}

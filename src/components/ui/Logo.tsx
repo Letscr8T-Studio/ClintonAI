@@ -37,7 +37,7 @@ export function Logo({ light = false, badge, href, compact = false, className }:
         {site.name}
       </span>
       {badge ? (
-        <span className="rounded-md bg-ink px-1.5 py-0.5 font-mono text-[10px] font-medium tracking-wider text-white uppercase">
+        <span className="rounded-md bg-night px-1.5 py-0.5 font-mono text-[10px] font-medium tracking-wider text-white uppercase">
           {badge}
         </span>
       ) : null}

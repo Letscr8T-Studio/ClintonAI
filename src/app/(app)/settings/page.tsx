@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GmailCard } from "@/components/app/gmail/GmailCard";
+import { AppearanceSetting } from "@/components/app/settings/AppearanceSetting";
 import { DelaySetting } from "@/components/app/settings/DelaySetting";
 import { NameSetting } from "@/components/app/settings/NameSetting";
 import { PrivacySummary } from "@/components/app/settings/PrivacySummary";
@@ -7,11 +8,16 @@ import { SettingsSection } from "@/components/app/settings/SettingsSection";
 import { settingsCopy as copy } from "@/content/app/settings";
 import { listAccounts } from "@/server/accounts/repository";
 import { requireProfile } from "@/server/auth/user";
+import { getTheme } from "@/server/theme";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  const [{ user, profile }, accounts] = await Promise.all([requireProfile(), listAccounts()]);
+  const [{ user, profile }, accounts, theme] = await Promise.all([
+    requireProfile(),
+    listAccounts(),
+    getTheme(),
+  ]);
   const sender = accounts.find((a) => a.status === "active")?.email ?? user.email;
 
   return (
@@ -29,6 +35,15 @@ export default async function SettingsPage() {
 
       <SettingsSection id={copy.name.id} title={copy.name.title} body={copy.name.body} delay={120}>
         <NameSetting initialName={profile.display_name ?? ""} email={sender} />
+      </SettingsSection>
+
+      <SettingsSection
+        id={copy.appearance.id}
+        title={copy.appearance.title}
+        body={copy.appearance.body}
+        delay={150}
+      >
+        <AppearanceSetting initialTheme={theme} />
       </SettingsSection>
 
       <SettingsSection id={copy.gmail.id} title={copy.gmail.title} delay={180}>

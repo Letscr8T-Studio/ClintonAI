@@ -4,6 +4,7 @@ import { CaughtList } from "@/components/app/dashboard/CaughtList";
 import { RecentEmails } from "@/components/app/dashboard/RecentEmails";
 import { StatTiles } from "@/components/app/dashboard/StatTiles";
 import { GmailCard } from "@/components/app/gmail/GmailCard";
+import { HomeHeader } from "@/components/app/home/HomeHeader";
 import { HomeHero } from "@/components/app/home/HomeHero";
 import { SetupSteps } from "@/components/app/home/SetupSteps";
 import { DASHBOARD_DAYS } from "@/content/app/dashboard";
@@ -20,7 +21,10 @@ type Props = { searchParams: Promise<{ gmail?: string }> };
 
 const RECENT_ROWS = 8;
 
-/** Home: getting started until the first send, then the dashboard (numbers, emails, catches, history). */
+/**
+ * Home: the brand banner and getting started until the first send; then a compact header and the
+ * dashboard (numbers, emails, catches, history).
+ */
 export default async function HomePage({ searchParams }: Props) {
   const [{ profile }, accounts, hasSent, triedSafeSend, { gmail }] = await Promise.all([
     requireProfile(),
@@ -44,11 +48,15 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <HomeHero
-        firstName={firstName}
-        delaySeconds={profile.default_delay_seconds}
-        connected={gmailConnected}
-      />
+      {hasSent ? (
+        <HomeHeader firstName={firstName} delaySeconds={profile.default_delay_seconds} />
+      ) : (
+        <HomeHero
+          firstName={firstName}
+          delaySeconds={profile.default_delay_seconds}
+          connected={gmailConnected}
+        />
+      )}
       {dashboard ? (
         <>
           <StatTiles stats={dashboard[0]} />

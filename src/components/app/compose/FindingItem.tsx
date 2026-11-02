@@ -11,9 +11,9 @@ const action =
  * Before → after for a suggested fix; or, for an empty field, just the suggestion.
  * Nothing changes until the user taps Fix it.
  */
-function Change({ from, to }: { from?: string; to: string }) {
+export function Change({ from, to }: { from?: string; to: string }) {
   return (
-    <p className="mt-3 mb-0 rounded-xl bg-paper px-3 py-2.5 text-[13px] leading-relaxed">
+    <p className="mt-3 mb-0 rounded-xl border border-line bg-surface px-3 py-2.5 text-[13px] leading-relaxed">
       {from ? (
         <>
           <span className="sr-only">{copy.replace} </span>
@@ -26,7 +26,7 @@ function Change({ from, to }: { from?: string; to: string }) {
       ) : (
         <span className="mr-1.5 text-muted">{copy.suggested}</span>
       )}
-      <ins className="rounded bg-brand-tint px-1 py-0.5 text-brand-deep no-underline">{to}</ins>
+      <ins className="rounded bg-brand-tint px-1 py-0.5 text-brand-ink no-underline">{to}</ins>
     </p>
   );
 }
@@ -40,7 +40,7 @@ export function FindingItem({ finding, index, onFix, onIgnore }: Props) {
   const fixable = Boolean(finding.suggestion);
   return (
     <li
-      className="cl-slide rounded-2xl border border-amber-line bg-white px-4 py-3.5"
+      className="cl-slide rounded-2xl border border-line bg-paper px-4 py-3.5"
       style={{ animationDelay: `${index * 90}ms` }}
     >
       <div className="flex items-center gap-2">
@@ -57,7 +57,11 @@ export function FindingItem({ finding, index, onFix, onIgnore }: Props) {
         <p className="m-0 min-w-0 flex-1 truncate text-[12px] text-body">
           {quote && !fixable ? <span className="rounded bg-highlight px-1 py-0.5">{quote}</span> : null}
         </p>
-        <button type="button" onClick={onFix} className={cn(action, "bg-ink text-white hover:bg-brand-deep")}>
+        <button
+          type="button"
+          onClick={onFix}
+          className={cn(action, "bg-night text-white hover:bg-brand-deep")}
+        >
           {fixable ? copy.fix : copy.show}
         </button>
         <button

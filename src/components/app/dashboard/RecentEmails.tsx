@@ -84,14 +84,12 @@ export function RecentEmails({ emails }: { emails: OutboxEmail[] }) {
                     </p>
                     <p className="m-0 mt-2 flex flex-wrap items-center gap-2 text-[12.5px] md:hidden">
                       {chip}
-                      <span className={open ? "font-semibold text-brand-deep" : "text-muted"}>
-                        {takeBack}
-                      </span>
+                      <span className={open ? "font-semibold text-brand-ink" : "text-muted"}>{takeBack}</span>
                     </p>
                   </td>
                   <td className="hidden px-3 py-3.5 align-top whitespace-nowrap md:table-cell">{chip}</td>
                   <td
-                    className={`hidden px-3 py-3.5 align-top whitespace-nowrap tabular-nums md:table-cell ${open ? "font-semibold text-brand-deep" : "text-muted"}`}
+                    className={`hidden px-3 py-3.5 align-top whitespace-nowrap tabular-nums md:table-cell ${open ? "font-semibold text-brand-ink" : "text-muted"}`}
                   >
                     {takeBack ??
                       (state ? (

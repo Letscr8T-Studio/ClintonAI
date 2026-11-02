@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { describeHit, panelCopy } from "@/content/app/compose";
 import { toRuleFindings } from "@/lib/check/findings";
 import { runRules } from "@/lib/check/rules";
@@ -103,5 +103,20 @@ export function useComposeCheck() {
     [],
   );
 
-  return { state, check, resolve, sendAnyway, markEdited, checkHistory };
+  /** A new email: forget this one's result and history. */
+  const reset = useCallback(() => {
+    history.current = { checkIds: [], seen: new Set() };
+    setState(initial);
+  }, []);
+
+  /** Open findings on the message while the review shows: highlighted in the text itself. */
+  const flagged = useMemo(
+    () =>
+      state.status === "review"
+        ? state.findings.filter((f) => f.field === "body" && state.open.includes(f.id))
+        : [],
+    [state],
+  );
+
+  return { state, flagged, check, resolve, sendAnyway, markEdited, checkHistory, reset };
 }

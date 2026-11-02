@@ -11,7 +11,7 @@ export function SaveStatus({ state, savingText }: { state: SaveState; savingText
       role={state.kind === "error" ? "alert" : "status"}
       className={cn(
         "m-0 min-h-5 text-sm font-medium",
-        state.kind === "error" ? "text-danger" : state.kind === "saved" ? "text-brand-deep" : "text-muted",
+        state.kind === "error" ? "text-danger-ink" : state.kind === "saved" ? "text-brand-ink" : "text-muted",
       )}
     >
       {text}

@@ -46,7 +46,7 @@ export function AccountMenu({ name, email }: Props) {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="flex cursor-pointer items-center gap-2.5 rounded-full border border-line bg-white py-1 pr-3 pl-1 transition-colors hover:border-brand-mist"
+        className="flex cursor-pointer items-center gap-2.5 rounded-full border border-line bg-surface py-1 pr-3 pl-1 transition-colors hover:border-brand-mist"
       >
         <span
           aria-hidden="true"
@@ -78,7 +78,7 @@ export function AccountMenu({ name, email }: Props) {
       <div
         id={panelId}
         hidden={!open}
-        className="cl-pop absolute right-0 z-30 mt-2 w-[min(280px,calc(100vw-40px))] origin-top-right rounded-2xl border border-line bg-white p-2 shadow-mock"
+        className="cl-pop absolute right-0 z-30 mt-2 w-[min(280px,calc(100vw-40px))] origin-top-right rounded-2xl border border-line bg-surface p-2 shadow-mock"
       >
         <div className="px-3 pt-2 pb-3">
           <p className="m-0 font-mono text-[10px] tracking-wider text-muted uppercase">{copy.signedInAs}</p>

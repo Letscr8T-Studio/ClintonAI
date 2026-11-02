@@ -24,7 +24,7 @@ export function WaitingCard({ email, busy, onAction }: Props) {
   const leaving = email.status === "sending" || left === 0;
 
   return (
-    <li className="cl-rise relative flex flex-col gap-5 overflow-hidden rounded-[28px] bg-ink p-5 text-white sm:flex-row sm:items-center sm:p-6">
+    <li className="cl-rise relative flex flex-col gap-5 overflow-hidden rounded-[28px] bg-night p-5 text-white sm:flex-row sm:items-center sm:p-6">
       <div aria-hidden="true" className="stage-grid absolute inset-0" />
       <ProgressRing
         value={left === null ? 1 : left / total}

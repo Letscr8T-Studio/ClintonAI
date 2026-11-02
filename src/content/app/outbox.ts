@@ -25,7 +25,6 @@ export const outboxCopy = {
   cancelYes: "Yes, cancel",
   cancelNo: "Keep it",
   compose: "Write an email",
-  queued: "Sent to your Outbox. It leaves when the countdown ends.",
 };
 
 /** Why an email could not be sent; stored with the email and shown in the Outbox. */

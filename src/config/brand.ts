@@ -27,6 +27,9 @@ export const palette = {
   body: "#3A3F4E",
   muted: "#5B6070",
   subtle: "#6B7080",
+  /** Dark theme paper and line (tokens.css light-dark values). */
+  darkPaper: "#0D0F14",
+  darkLine: "#2E3343",
 } as const;
 
 /** Google's own logo colours, required unchanged by its sign-in branding guidelines. */

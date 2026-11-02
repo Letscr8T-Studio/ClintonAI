@@ -8,13 +8,14 @@ import { ClintonPanel } from "./ClintonPanel";
 import { ComposeFields, type DraftFields, type FieldErrors } from "./ComposeFields";
 import { ComposeFooter } from "./ComposeFooter";
 import { ComposeHeader } from "./ComposeHeader";
+import { SentToast } from "./SentToast";
 import { useComposeCheck } from "./useComposeCheck";
 import { DRAFT_HANDOFF_KEY, useSendEmail } from "./useSendEmail";
-import { handedOverDraft, toDraft, validateFields } from "./validate";
+import { emptyDraft, handedOverDraft, toDraft, toFields, validateFields } from "./validate";
 
 type Props = { fromEmail: string; defaultDelaySeconds: number };
 
-/** Compose with Clinton beside it: write, press Check & send, review, and send to the Outbox. */
+/** Compose with Clinton beside it: write, press Check & send, review, send, and Undo if needed. */
 export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
   const [values, setValues] = useState(handedOverDraft);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -22,8 +23,8 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
   const [delaySeconds, setDelaySeconds] = useState(defaultDelaySeconds);
   const [fixed, setFixed] = useState(0);
   const [safeSend, setSafeSend] = useState(false);
-  const { state, check, resolve, sendAnyway, markEdited, checkHistory } = useComposeCheck();
-  const { send, sending, error } = useSendEmail();
+  const { state, flagged, check, resolve, sendAnyway, markEdited, checkHistory, reset } = useComposeCheck();
+  const sender = useSendEmail();
   const toRef = useRef<HTMLInputElement>(null);
   const subjectRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -45,15 +46,28 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
     markEdited();
   };
 
-  const queue = () => {
+  /** A fresh Compose: after sending (empty), or after Undo (the email back, to edit). */
+  const startOver = (next: DraftFields = emptyDraft, withSafeSend = false) => {
+    setValues(next);
+    setErrors({});
+    setShowCc(next.cc !== "");
+    setFixed(0);
+    setSafeSend(withSafeSend);
+    setDelaySeconds(defaultDelaySeconds);
+    reset();
+  };
+
+  const queue = async () => {
     const { checkIds, caught } = checkHistory();
-    return send(toDraft(values), {
-      delaySeconds,
-      findingsCount: caught,
-      findingsAccepted: Math.min(fixed, caught),
-      safeSend,
-      checkIds,
-    });
+    const options = { delaySeconds, findingsCount: caught, findingsAccepted: Math.min(fixed, caught) };
+    if (await sender.send(toDraft(values), { ...options, safeSend, checkIds })) startOver();
+  };
+
+  const undo = async () => {
+    const draft = await sender.undo();
+    if (!draft) return;
+    startOver(toFields(draft), draft.safeSend);
+    requestAnimationFrame(() => bodyRef.current?.focus());
   };
 
   const submit = async (event?: FormEvent) => {
@@ -86,14 +100,14 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
     requestAnimationFrame(select);
   };
 
-  const busy = state.status === "checking" || sending;
+  const busy = state.status === "checking" || sender.sending;
   return (
     <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <form
         onSubmit={submit}
         onKeyDown={onKeyDown}
         noValidate
-        className="cl-rise overflow-hidden rounded-[28px] border border-line bg-white shadow-card"
+        className="rounded-[28px] border border-line bg-surface shadow-card"
       >
         <ComposeHeader fromEmail={fromEmail} />
         <ComposeFields
@@ -105,12 +119,14 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
           toRef={toRef}
           subjectRef={subjectRef}
           bodyRef={bodyRef}
+          flags={{ findings: flagged, onFix: fix, onIgnore: resolve }}
         />
         <ComposeFooter
           busy={busy}
           label={state.status === "checking" ? copy.checking : copy.submit}
           safeSend={safeSend}
           onSafeSend={setSafeSend}
+          docked={state.status !== "ready" || state.stale}
         />
       </form>
       <div
@@ -131,11 +147,20 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
             delaySeconds,
             onDelayChange: setDelaySeconds,
             onSend: () => void queue(),
-            sending,
-            error,
+            sending: sender.sending,
+            error: sender.error,
           }}
         />
       </div>
+      {sender.sent ? (
+        <SentToast
+          email={sender.sent}
+          onUndo={() => void undo()}
+          undoing={sender.undoing}
+          error={sender.undoError}
+          onDismiss={sender.dismiss}
+        />
+      ) : null}
     </div>
   );
 }

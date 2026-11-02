@@ -1,15 +1,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { composeCopy, panelCopy } from "@/content/app/compose";
+import { composeCopy, panelCopy, sentToastCopy } from "@/content/app/compose";
 import { safeSendCopy } from "@/content/app/safe-send";
 import type { Finding } from "@/lib/check/types";
 import { a11yViolations } from "@/test/a11y";
 import { ComposeWorkspace } from "./ComposeWorkspace";
 import { DRAFT_HANDOFF_KEY } from "./useSendEmail";
-
-const push = vi.hoisted(() => vi.fn());
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh: vi.fn() }) }));
 
 const finding: Finding = {
   id: "rule-0-greeting_mismatch",
@@ -20,8 +17,15 @@ const finding: Finding = {
   excerpt: "Tunde",
 };
 
+const SENT = { ok: true, id: "00000000-0000-4000-8000-0000000000aa", sendAt: "2026-11-02T17:15:00Z" };
+
+/** The check answers `response`; queueing answers like the real /api/emails. */
 function mockCheck(response: unknown, status = 200) {
-  const fetchMock = vi.fn<typeof fetch>(async () => new Response(JSON.stringify(response), { status }));
+  const fetchMock = vi.fn<typeof fetch>(async (url) =>
+    url === "/api/emails"
+      ? new Response(JSON.stringify(SENT))
+      : new Response(JSON.stringify(response), { status }),
+  );
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
 }
@@ -32,10 +36,10 @@ async function write(to: string, body: string) {
   await userEvent.type(screen.getByLabelText(composeCopy.body), body);
 }
 const submit = () => userEvent.click(screen.getByRole("button", { name: composeCopy.submit }));
+const sentBar = () => screen.findByRole("region", { name: sentToastCopy.label });
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  push.mockReset();
 });
 
 describe("ComposeWorkspace", () => {
@@ -129,7 +133,7 @@ describe("ComposeWorkspace", () => {
     await write("dami@brightlane.io", "Hi Tunde, welcome.");
     await submit();
     await userEvent.click(await screen.findByRole("button", { name: panelCopy.sendAnyway }));
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/outbox?queued=1"));
+    await sentBar();
   });
 
   it("sends a clean email straight to the Outbox with the default Smart Delay", async () => {
@@ -137,7 +141,7 @@ describe("ComposeWorkspace", () => {
     render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
     await write("dami@brightlane.io", "Hi Dami, welcome.");
     await submit();
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/outbox?queued=1"));
+    await sentBar();
     const [url, init] = fetchMock.mock.calls[1]!;
     expect(url).toBe("/api/emails");
     expect(JSON.parse(init!.body as string)).toEqual({
@@ -158,9 +162,7 @@ describe("ComposeWorkspace", () => {
     let n = 0;
     const fetchMock = vi.fn<typeof fetch>(async (url) => {
       const body =
-        url === "/api/check"
-          ? { ok: true, findings: [finding], modelUsed: true, checkId: ids[n++] }
-          : { ok: true };
+        url === "/api/check" ? { ok: true, findings: [finding], modelUsed: true, checkId: ids[n++] } : SENT;
       return new Response(JSON.stringify(body));
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -171,7 +173,7 @@ describe("ComposeWorkspace", () => {
     await submit();
     await waitFor(() => expect(n).toBe(2));
     await userEvent.click(await screen.findByRole("button", { name: panelCopy.sendAnyway }));
-    await waitFor(() => expect(push).toHaveBeenCalled());
+    await sentBar();
     expect(JSON.parse(fetchMock.mock.calls[2]![1]!.body as string)).toMatchObject({
       findingsCount: 1,
       findingsAccepted: 0,
@@ -191,7 +193,7 @@ describe("ComposeWorkspace", () => {
     await userEvent.click(await screen.findByRole("button", { name: panelCopy.fix }));
     await userEvent.selectOptions(screen.getByLabelText(panelCopy.delayLabel), "60");
     await userEvent.click(screen.getByRole("button", { name: panelCopy.send }));
-    await waitFor(() => expect(push).toHaveBeenCalled());
+    await sentBar();
     expect(JSON.parse(fetchMock.mock.calls[1]![1]!.body as string)).toMatchObject({
       body: "Hi Dami, welcome.",
       delaySeconds: 60,
@@ -243,7 +245,7 @@ describe("ComposeWorkspace", () => {
     expect(toggle).toHaveAttribute("aria-checked", "true");
     await write("dami@brightlane.io", "Hi Dami, welcome.");
     await submit();
-    await waitFor(() => expect(push).toHaveBeenCalled());
+    await sentBar();
     expect(JSON.parse(fetchMock.mock.calls[1]![1]!.body as string)).toMatchObject({ safeSend: true });
   });
 

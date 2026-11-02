@@ -6,7 +6,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "
 const variants = {
   primary:
     "bg-brand px-7 text-white shadow-cta hover:-translate-y-0.5 hover:bg-brand-deep disabled:cursor-wait disabled:opacity-70",
-  ghost: "px-5 text-muted hover:bg-white hover:text-ink",
+  ghost: "px-5 text-muted hover:bg-surface hover:text-ink",
 };
 
 /** Large tour navigation button (Next, Back, Finish). */

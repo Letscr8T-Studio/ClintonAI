@@ -22,7 +22,9 @@ export function ReadyPanel({ state, send }: { state: CheckState; send: SendContr
       <div aria-hidden="true" className="stage-grid absolute inset-0" />
       <div className="relative">
         {state.stale ? (
-          <p className="m-0 mb-4 rounded-xl bg-white/90 px-3.5 py-2.5 text-[13px] text-body">{copy.stale}</p>
+          <p className="m-0 mb-4 rounded-xl bg-surface/90 px-3.5 py-2.5 text-[13px] text-body">
+            {copy.stale}
+          </p>
         ) : null}
         <span
           aria-hidden="true"
@@ -59,7 +61,7 @@ export function ReadyPanel({ state, send }: { state: CheckState; send: SendContr
         {send.error ? (
           <p
             role="alert"
-            className="mt-4 mb-0 rounded-xl bg-white px-3.5 py-2.5 text-sm font-medium text-danger-ink"
+            className="mt-4 mb-0 rounded-xl bg-surface px-3.5 py-2.5 text-sm font-medium text-danger-ink"
           >
             {send.error}
           </p>

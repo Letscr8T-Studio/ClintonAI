@@ -21,12 +21,14 @@ type Props = {
 const shell = "relative overflow-hidden rounded-[28px] p-6 sm:p-7";
 
 function Stale() {
-  return <p className="m-0 mb-4 rounded-xl bg-white/90 px-3.5 py-2.5 text-[13px] text-body">{copy.stale}</p>;
+  return (
+    <p className="m-0 mb-4 rounded-xl bg-surface/90 px-3.5 py-2.5 text-[13px] text-body">{copy.stale}</p>
+  );
 }
 
 function Idle({ checking }: { checking: boolean }) {
   return (
-    <div className={cn(shell, "bg-ink text-white")}>
+    <div className={cn(shell, "bg-night text-white")}>
       <div aria-hidden="true" className="stage-grid absolute inset-0" />
       {checking ? <div aria-hidden="true" className="cl-scan absolute inset-x-0 top-0 h-24" /> : null}
       <div className="relative">
@@ -72,13 +74,14 @@ const RISKY = new Set(["sensitive_data", "many_recipients"]);
 function Review({ state, onFix, onIgnore, onSendAnyway, safeSend }: Props) {
   const suggest = !safeSend.on && state.findings.some((f) => RISKY.has(f.type));
   const open = state.findings.filter((f) => state.open.includes(f.id));
+  const inline = open.some((f) => f.field === "body" && f.excerpt);
   return (
-    <div className={cn(shell, "border border-amber-line bg-amber-bg", state.stale && "opacity-80")}>
+    <div className={cn(shell, "border border-line bg-surface shadow-card", state.stale && "opacity-80")}>
       {state.stale ? <Stale /> : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Warning size={20} />
-          <h2 className="m-0 font-display text-lg font-bold tracking-tight text-amber-ink">
+          <h2 className="m-0 font-display text-lg font-bold tracking-tight text-ink">
             {copy.caught(open.length)}
           </h2>
         </div>
@@ -86,14 +89,15 @@ function Review({ state, onFix, onIgnore, onSendAnyway, safeSend }: Props) {
         <button
           type="button"
           onClick={onSendAnyway}
-          className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-amber-line bg-white px-4 text-sm font-semibold text-ink hover:bg-paper"
+          className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink hover:bg-paper"
         >
           {copy.sendAnyway}
         </button>
       </div>
       {state.notice ? <p className="mt-2 mb-0 text-[13px] text-amber-ink">{state.notice}</p> : null}
+      {inline ? <p className="mt-2 mb-0 text-[13px] text-muted">{copy.inlineHint}</p> : null}
       {suggest ? (
-        <div className="mt-4 flex flex-col gap-2 rounded-2xl bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-2 rounded-2xl bg-brand-wash p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="m-0 text-[13px] text-ink">{safeSendCopy.suggest}</p>
           <button
             type="button"
@@ -116,7 +120,7 @@ function Review({ state, onFix, onIgnore, onSendAnyway, safeSend }: Props) {
         ))}
       </ul>
       {!state.modelUsed && !state.notice ? (
-        <p className="mt-4 mb-0 text-xs text-amber-ink">{copy.modelSkipped}</p>
+        <p className="mt-4 mb-0 text-xs text-muted">{copy.modelSkipped}</p>
       ) : null}
     </div>
   );

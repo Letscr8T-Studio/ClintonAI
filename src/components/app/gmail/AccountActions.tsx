@@ -14,7 +14,7 @@ function Result({ state }: { state: AccountActionState }) {
   return (
     <p
       role={state.ok ? "status" : "alert"}
-      className={cn("m-0 mt-3 text-sm font-medium", state.ok ? "text-brand-deep" : "text-danger")}
+      className={cn("m-0 mt-3 text-sm font-medium", state.ok ? "text-brand-ink" : "text-danger-ink")}
     >
       {state.message}
     </p>
@@ -36,7 +36,7 @@ export function TestSend({ accountId }: { accountId: string }) {
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className={cn(ghost, "shrink-0 justify-center bg-ink text-white hover:bg-brand-deep")}
+          className={cn(ghost, "shrink-0 justify-center bg-night text-white hover:bg-brand-deep")}
         >
           {pending ? copy.testing : copy.testButton}
         </button>
@@ -57,7 +57,7 @@ export function Disconnect({ accountId }: { accountId: string }) {
         <button
           type="button"
           onClick={() => setAsking(true)}
-          className={cn(ghost, "-ml-4 text-muted hover:text-danger")}
+          className={cn(ghost, "-ml-4 text-muted hover:text-danger-ink")}
         >
           {copy.disconnect}
         </button>
@@ -74,11 +74,11 @@ export function Disconnect({ accountId }: { accountId: string }) {
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className={cn(ghost, "bg-danger text-white hover:bg-danger-ink")}
+          className={cn(ghost, "bg-danger text-white hover:brightness-110")}
         >
           {pending ? copy.disconnecting : copy.disconnectYes}
         </button>
-        <button type="button" onClick={() => setAsking(false)} className={cn(ghost, "bg-white text-ink")}>
+        <button type="button" onClick={() => setAsking(false)} className={cn(ghost, "bg-surface text-ink")}>
           {copy.disconnectNo}
         </button>
       </div>

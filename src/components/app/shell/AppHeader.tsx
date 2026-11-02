@@ -7,10 +7,11 @@ import { appRoutes } from "@/config/routes";
 import { appShellCopy as copy } from "@/content/app/home";
 import { cn } from "@/lib/cn";
 import { AccountMenu } from "./AccountMenu";
+import { CommandButton } from "./CommandButton";
 
 type Props = { name: string | null; email: string | null };
 
-/** Sticky, frosted header: logo, main nav (current page marked), account menu. */
+/** Sticky, frosted header: logo, main nav (current page marked), the command menu, account menu. */
 export function AppHeader({ name, email }: Props) {
   const pathname = usePathname();
   return (
@@ -29,7 +30,7 @@ export function AppHeader({ name, email }: Props) {
                       aria-current={current ? "page" : undefined}
                       className={cn(
                         "rounded-full px-3.5 py-2 text-sm font-medium no-underline transition-colors",
-                        current ? "bg-ink text-white" : "text-body hover:bg-white hover:text-ink",
+                        current ? "bg-night text-white" : "text-body hover:bg-surface hover:text-ink",
                       )}
                     >
                       {item.label}
@@ -40,7 +41,10 @@ export function AppHeader({ name, email }: Props) {
             </ul>
           </nav>
         </div>
-        <AccountMenu name={name} email={email} />
+        <div className="flex items-center gap-2">
+          <CommandButton />
+          <AccountMenu name={name} email={email} />
+        </div>
       </div>
     </header>
   );

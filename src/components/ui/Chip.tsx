@@ -5,8 +5,8 @@ export type ChipTone = "brand" | "tint" | "ink" | "neutral" | "amber" | "sand" |
 
 const tones: Record<ChipTone, { chip: string; dot: string }> = {
   brand: { chip: "bg-brand text-white", dot: "bg-white" },
-  tint: { chip: "bg-brand-tint text-brand-deep", dot: "bg-brand" },
-  ink: { chip: "bg-ink text-white", dot: "bg-white" },
+  tint: { chip: "bg-brand-tint text-brand-ink", dot: "bg-brand" },
+  ink: { chip: "bg-night text-white", dot: "bg-white" },
   neutral: { chip: "bg-line-soft text-body", dot: "bg-subtle" },
   amber: { chip: "bg-amber-bg text-amber-ink", dot: "bg-amber-dot" },
   sand: { chip: "bg-sand text-ink", dot: "bg-amber-dot" },

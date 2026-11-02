@@ -10,7 +10,7 @@
     ),
     radial-gradient(
       70% 60% at 0% 100%,
-      color-mix(in oklab, var(--color-ink) 45%, transparent),
+      color-mix(in oklab, var(--color-night) 45%, transparent),
       transparent 70%
     ),
     linear-gradient(160deg, var(--color-brand) 0%, var(--color-brand-deep) 100%);

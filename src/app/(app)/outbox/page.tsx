@@ -5,9 +5,7 @@ import { attachSafeSend } from "@/server/safe-send/service";
 
 export const metadata: Metadata = { title: "Outbox" };
 
-type Props = { searchParams: Promise<{ queued?: string }> };
-
-export default async function OutboxPage({ searchParams }: Props) {
-  const [emails, { queued }] = await Promise.all([listOutbox().then(attachSafeSend), searchParams]);
-  return <OutboxView emails={emails} justQueued={queued === "1"} />;
+export default async function OutboxPage() {
+  const emails = await listOutbox().then(attachSafeSend);
+  return <OutboxView emails={emails} />;
 }

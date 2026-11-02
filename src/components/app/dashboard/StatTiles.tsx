@@ -67,7 +67,7 @@ export function StatTiles({ stats }: { stats: DashboardStats }) {
             key={t.id}
             className={cn(
               "relative flex flex-col gap-1 rounded-[22px] border p-4 sm:p-5",
-              t.accent ? "border-brand bg-brand text-white shadow-cta" : "border-line bg-white shadow-card",
+              t.accent ? "border-brand bg-brand text-white shadow-cta" : "border-line bg-surface shadow-card",
             )}
           >
             <p className={cn("m-0 text-[13px] font-semibold", t.accent ? "text-on-brand" : "text-muted")}>

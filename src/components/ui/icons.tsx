@@ -5,7 +5,7 @@ import { logoMark, palette } from "@/config/brand";
 
 type IconProps = { size?: number; color?: string; className?: string };
 
-function Svg({
+export function Svg({
   size,
   viewBox,
   className,
@@ -23,7 +23,7 @@ function Svg({
   );
 }
 
-const round = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
+export const round = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
 /** Clinton AI mark ("Held C"): a heavy C holding the send in its mouth. Geometry: config/logo-mark.json. */
 export function ClintonMark({ size = 18, color = palette.white, className }: IconProps) {

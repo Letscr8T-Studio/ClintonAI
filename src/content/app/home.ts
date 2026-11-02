@@ -40,6 +40,21 @@ export const homeCopy = {
   },
 };
 
+/** Home once the user has sent an email: a compact header, so the numbers come first. */
+export const returningCopy = {
+  greeting: {
+    morning: "Good morning",
+    afternoon: "Good afternoon",
+    evening: "Good evening",
+    neutral: "Welcome back",
+  },
+  title: (greeting: string, firstName: string | null) => (firstName ? `${greeting}, ${firstName}` : greeting),
+  delay: (clock: string) => `Smart Delay ${clock}`,
+  delayOff: "Smart Delay off",
+  delayLabel: "Change your Smart Delay",
+  write: "Write an email",
+};
+
 export const appShellCopy = {
   navLabel: "Main",
   tabsLabel: "Main navigation",

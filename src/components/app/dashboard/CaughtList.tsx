@@ -35,7 +35,7 @@ export function CaughtList({ items }: { items: CaughtEmail[] }) {
                 </ul>
               ) : null}
               <p className="m-0 mt-2 text-[13px] text-muted">
-                <span className={item.fixed ? "font-semibold text-brand-deep" : undefined}>
+                <span className={item.fixed ? "font-semibold text-brand-ink" : undefined}>
                   {copy.outcome(item.fixed, item.caught)}
                 </span>
                 {" · "}

@@ -17,7 +17,7 @@ export function DelayTiles({ value, onChange, describedBy }: Props) {
         {delayOptions.map((option) => (
           <label
             key={option.seconds}
-            className="group relative flex cursor-pointer flex-col items-center rounded-2xl border border-line-strong bg-white px-2 pt-4 pb-3 transition-[translate,background-color,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-brand-mist has-checked:-translate-y-1 has-checked:border-brand has-checked:bg-brand has-checked:shadow-cta has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-brand motion-reduce:transition-none"
+            className="group relative flex cursor-pointer flex-col items-center rounded-2xl border border-line-strong bg-surface px-2 pt-4 pb-3 transition-[translate,background-color,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-brand-mist has-checked:-translate-y-1 has-checked:border-brand has-checked:bg-brand has-checked:shadow-cta has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-brand motion-reduce:transition-none"
           >
             <input
               type="radio"
@@ -43,7 +43,7 @@ export function DelayTiles({ value, onChange, describedBy }: Props) {
             {option.recommended ? (
               <span
                 aria-hidden="true"
-                className="absolute -top-2.5 rounded-full bg-amber px-2 py-0.5 font-mono text-[9px] font-medium tracking-wider text-amber-ink uppercase"
+                className="absolute -top-2.5 rounded-full bg-amber px-2 py-0.5 font-mono text-[9px] font-medium tracking-wider text-night uppercase"
               >
                 {copy.recommended}
               </span>

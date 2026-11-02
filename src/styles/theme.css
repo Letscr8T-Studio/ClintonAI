@@ -1,0 +1,35 @@
+/*
+ * Light and dark for the signed-in app. The app root carries data-theme="system|light|dark"
+ * (from the Appearance setting); the page's color-scheme follows it, and every token's
+ * light-dark() value follows the color-scheme. Pages without it (marketing) stay light.
+ */
+/* Required, not just a default: the CSS build turns light-dark() into variables that only a
+   color-scheme declaration sets. Without this, pages outside the app get no colours at all. */
+:root {
+  color-scheme: light;
+}
+:root:has([data-theme="system"]) {
+  color-scheme: light dark;
+}
+:root:has([data-theme="light"]) {
+  color-scheme: light;
+}
+:root:has([data-theme="dark"]) {
+  color-scheme: dark;
+}
+
+/* Inline highlight behind a word Clinton flagged in the message (see FlaggedText). */
+.cl-flag {
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--color-highlight) 70%, transparent);
+  box-shadow: inset 0 -2px 0 var(--color-amber-dot);
+  color: transparent;
+}
+.cl-flag[data-active] {
+  background: var(--color-highlight);
+}
+@media (forced-colors: active) {
+  .cl-flag {
+    background: Mark;
+  }
+}

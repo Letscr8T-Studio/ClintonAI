@@ -1,38 +1,48 @@
-/* Brand tokens: colours, shadows and fonts. Values come from docs/product/brand.md. */
+/*
+ * Brand tokens: colours, shadows and fonts. Values come from docs/product/brand.md.
+ * Colours are light-dark(light, dark). The marketing site is always light; the signed-in app
+ * opts into dark through color-scheme (see theme.css).
+ */
 @theme {
-  --color-ink: #11131a;
-  --color-body: #3a3f4e;
-  --color-muted: #5b6070;
-  --color-subtle: #6b7080;
-  --color-paper: #fbfbf9;
-  --color-line: #eceae3;
-  --color-line-strong: #e6e3da;
+  --color-ink: light-dark(#11131a, #eceef4);
+  --color-body: light-dark(#3a3f4e, #c5c9d6);
+  --color-muted: light-dark(#5b6070, #a0a6b8);
+  --color-subtle: light-dark(#6b7080, #8a90a3);
+  --color-paper: light-dark(#fbfbf9, #0d0f14);
+  /* Cards and fields: white in light, a raised grey in dark. */
+  --color-surface: light-dark(#ffffff, #161922);
+  /* Dark panels that stay dark in both themes (Clinton's panel, the waiting card). */
+  --color-night: light-dark(#11131a, #1f2333);
+  --color-line: light-dark(#eceae3, #242836);
+  --color-line-strong: light-dark(#e6e3da, #2e3343);
   --color-brand: #2e4cf6;
   --color-brand-deep: #2236c4;
+  /* Brand-coloured text: readable on paper and surface in either theme. */
+  --color-brand-ink: light-dark(#2236c4, #a3b3ff);
   --color-brand-light: #6a82ff;
   --color-brand-soft: #8ea0ff;
-  --color-brand-tint: #e8ecff;
-  --color-brand-mist: #dce3ff;
-  --color-brand-wash: #f5f7ff;
+  --color-brand-tint: light-dark(#e8ecff, #1f2a5c);
+  --color-brand-mist: light-dark(#dce3ff, #27346f);
+  --color-brand-wash: light-dark(#f5f7ff, #141a33);
   --color-navy-line: #3b4260;
   --color-navy-text: #aeb6d6;
   --color-on-brand: #e3e8ff;
   --color-amber: #ffc83d;
   --color-amber-dot: #e0a800;
-  --color-amber-bg: #fff3d6;
-  --color-amber-line: #f2d58c;
-  --color-amber-ink: #5a3b00;
-  --color-amber-icon: #9a6a00;
-  --color-highlight: #ffe3a3;
-  --color-line-soft: #f1efe9;
-  --color-card-line: #e6e9f5;
-  --color-cream: #fffefb;
-  --color-sand: #f5f3ec;
+  --color-amber-bg: light-dark(#fff3d6, #2b2210);
+  --color-amber-line: light-dark(#f2d58c, #5a4512);
+  --color-amber-ink: light-dark(#5a3b00, #ffd98a);
+  --color-amber-icon: light-dark(#9a6a00, #e8b53a);
+  --color-highlight: light-dark(#ffe3a3, #5c4513);
+  --color-line-soft: light-dark(#f1efe9, #1b1e28);
+  --color-card-line: light-dark(#e6e9f5, #272c3c);
+  --color-cream: light-dark(#fffefb, #12151c);
+  --color-sand: light-dark(#f5f3ec, #1b1e27);
   --color-brand-line: #4562f7;
-  --color-danger: #b42318;
-  --color-danger-bg: #fde7e4;
-  --color-danger-ink: #8a1a14;
-  --color-placeholder: #8a8e9b;
+  --color-danger: light-dark(#b42318, #c93128);
+  --color-danger-bg: light-dark(#fde7e4, #3a1714);
+  --color-danger-ink: light-dark(#8a1a14, #ff9f94);
+  --color-placeholder: light-dark(#8a8e9b, #7d8396);
 
   --shadow-card: 0 1px 2px rgba(17, 19, 26, 0.04);
   --shadow-float: 0 30px 60px -30px rgba(46, 76, 246, 0.35);
@@ -41,6 +51,7 @@
   --shadow-tile: 0 20px 40px -24px rgba(17, 19, 26, 0.3);
   --shadow-mock: 0 40px 90px -40px rgba(17, 19, 26, 0.45);
   --shadow-deck: 0 34px 80px rgba(10, 20, 90, 0.38);
+  --shadow-pop: 0 18px 40px -16px rgba(10, 12, 20, 0.45);
 
   --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;

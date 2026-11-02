@@ -15,7 +15,7 @@ The goal: any engineer or AI agent can open any file and understand it in one re
 | ------------------------------------ | -------------------------------------------------------------------- |
 | Copy, labels, sample data, nav items | `src/content/<area>.ts` (typed, `satisfies` where useful)            |
 | Brand names, URLs, SEO text          | `src/config/site.ts`                                                 |
-| Colours, shadows, fonts              | `src/styles/tokens.css` (+ `src/config/brand.ts` hex mirror)         |
+| Colours, shadows, fonts              | `src/styles/tokens.css` (`light-dark()` pairs; `theme.css` for dark) |
 | Reusable UI                          | `src/components/ui/`                                                 |
 | Feature UI                           | `src/components/<feature>/`                                          |
 | Client state + side effects          | a `useX` hook beside the component                                   |

@@ -30,7 +30,7 @@ export function NameSetting({ initialName, email }: Props) {
   };
 
   return (
-    <form onSubmit={submit} className="rounded-[28px] border border-line bg-white p-5 shadow-card sm:p-7">
+    <form onSubmit={submit} className="rounded-[28px] border border-line bg-surface p-5 shadow-card sm:p-7">
       <label htmlFor={inputId} className="mb-2 block text-sm font-medium text-body">
         {copy.label}
       </label>
@@ -41,12 +41,12 @@ export function NameSetting({ initialName, email }: Props) {
           onChange={(e) => setName(e.target.value)}
           maxLength={80}
           autoComplete="name"
-          className="min-h-12 min-w-0 flex-1 rounded-2xl border border-line-strong bg-white px-4 text-[15px] text-ink outline-none focus:border-brand"
+          className="min-h-12 min-w-0 flex-1 rounded-2xl border border-line-strong bg-surface px-4 text-[15px] text-ink outline-none focus:border-brand"
         />
         <button
           type="submit"
           disabled={pending || trimmed === saved || trimmed === ""}
-          className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl bg-ink px-5 text-sm font-semibold text-white hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl bg-night px-5 text-sm font-semibold text-white hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-40"
         >
           {pending ? copy.saving : copy.save}
         </button>

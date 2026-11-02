@@ -17,7 +17,7 @@ export function SafeSendVisual() {
           <Chip tone="tint" size="sm" dot>
             {s.senderLabel}
           </Chip>
-          <span className="font-mono text-[13px] text-brand">{s.remaining}</span>
+          <span className="font-mono text-[13px] text-brand-ink">{s.remaining}</span>
         </div>
         <p className="mt-3 mb-3 font-display text-lg font-bold tracking-tight">{s.subject}</p>
         <div className="h-1.5 overflow-hidden rounded-full bg-brand-tint">
@@ -30,13 +30,13 @@ export function SafeSendVisual() {
           {s.recipients.map((r) => (
             <li
               key={r.email}
-              className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2.5 text-[13px]"
+              className="flex items-center justify-between gap-3 rounded-xl bg-surface px-3 py-2.5 text-[13px]"
             >
               <span className="truncate font-medium">{r.email}</span>
               {r.action ? (
                 <span className="flex items-center gap-2">
                   <span className="text-muted">{r.status}</span>
-                  <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
+                  <span className="rounded-full bg-night px-3 py-1 text-xs font-semibold text-white">
                     {r.action}
                   </span>
                 </span>
@@ -51,7 +51,7 @@ export function SafeSendVisual() {
       </article>
 
       <article
-        className="cl-pop absolute right-[-3%] bottom-0 flex w-[min(86%,320px)] items-center gap-3 rounded-[18px] bg-white p-4 shadow-deck"
+        className="cl-pop absolute right-[-3%] bottom-0 flex w-[min(86%,320px)] items-center gap-3 rounded-[18px] bg-surface p-4 shadow-deck"
         style={{ ...at(900), rotate: "2.5deg" }}
       >
         <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand">

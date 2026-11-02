@@ -99,6 +99,11 @@ Vault, an `emails` state machine driven by pg_cron, encrypted Safe Send blobs in
 recipient page under `/m/[token]`, an AI check service in `src/server/ai/`, and a signed-in app area
 under `src/app/(app)/`.
 
+The app shell (`src/app/(app)/layout.tsx`) sets `data-theme` from the `clinton-theme` cookie
+(`src/server/theme.ts`) and mounts the command menu (`components/app/shell/CommandMenu.tsx`, keys in
+`content/app/commands.ts`, matching in `lib/shortcuts.ts`). Colour tokens are `light-dark()` pairs,
+so light and dark need no per-component code (see the decision log, 2 Nov 2026).
+
 ### Planned folder growth
 
 ```

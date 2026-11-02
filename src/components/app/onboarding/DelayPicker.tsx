@@ -30,7 +30,7 @@ export function DelayPicker({ defaultSeconds, headingRef, onBack }: Props) {
           tabIndex={-1}
           className="cl-rise m-0 font-display text-[clamp(40px,5.2vw,72px)] leading-[0.98] font-bold tracking-[-0.045em] outline-none"
         >
-          {copy.delayTitle} <span className="block text-brand">{copy.delayAccent}</span>
+          {copy.delayTitle} <span className="block text-brand-ink">{copy.delayAccent}</span>
         </h1>
         <p
           className="cl-rise mt-6 mb-8 max-w-[520px] text-[clamp(16px,1.4vw,19px)] leading-relaxed text-muted"
@@ -49,7 +49,7 @@ export function DelayPicker({ defaultSeconds, headingRef, onBack }: Props) {
         </p>
 
         {state.error ? (
-          <p id={errorId} role="alert" className="mt-3 mb-0 text-sm font-medium text-danger">
+          <p id={errorId} role="alert" className="mt-3 mb-0 text-sm font-medium text-danger-ink">
             {state.error}
           </p>
         ) : null}

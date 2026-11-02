@@ -7,12 +7,12 @@ const at = (ms: number) => ({ animationDelay: `${ms}ms` });
 export function CheckVisual() {
   return (
     <div className="relative w-full max-w-[440px] pb-6">
-      <article className="cl-rise rounded-[22px] bg-white p-5 shadow-mock" style={{ rotate: "-1.5deg" }}>
+      <article className="cl-rise rounded-[22px] bg-surface p-5 shadow-mock" style={{ rotate: "-1.5deg" }}>
         <div className="flex items-center justify-between border-b border-line pb-3 text-[13px] text-muted">
           <span>
             To <span className="font-medium text-ink">{s.to}</span>
           </span>
-          <span className="font-mono text-[11px] text-brand">DRAFT</span>
+          <span className="font-mono text-[11px] text-brand-ink">DRAFT</span>
         </div>
         <p className="mt-3 mb-2 font-display text-lg font-bold tracking-tight">{s.subject}</p>
         <p className="m-0 text-[14px] leading-[1.7] text-body">
@@ -29,7 +29,7 @@ export function CheckVisual() {
       </article>
 
       <div
-        className="cl-pop relative -mt-4 ml-[8%] rounded-[20px] bg-ink p-4 text-white shadow-deck"
+        className="cl-pop relative -mt-4 ml-[8%] rounded-[20px] bg-night p-4 text-white shadow-deck"
         style={{ ...at(1400), rotate: "1.5deg" }}
       >
         <div className="flex items-center gap-2">

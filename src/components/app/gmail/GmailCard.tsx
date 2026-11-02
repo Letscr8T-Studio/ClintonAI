@@ -11,7 +11,7 @@ import { ConnectButton } from "./ConnectButton";
 type Outcome = (typeof connectOutcomes)[keyof typeof connectOutcomes];
 type Props = { accounts: GmailAccount[]; outcome: Outcome | null };
 
-const card = "rounded-[28px] border border-line bg-white p-6 shadow-card sm:p-8";
+const card = "rounded-[28px] border border-line bg-surface p-6 shadow-card sm:p-8";
 const connectedOn = (iso: string) =>
   new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
@@ -27,7 +27,7 @@ function Banner({ outcome }: { outcome: Outcome }) {
       role={success ? "status" : "alert"}
       className={cn(
         "cl-rise m-0 mb-6 rounded-2xl px-4 py-3 text-sm font-medium",
-        success ? "bg-brand-tint text-brand-deep" : "bg-danger-bg text-danger-ink",
+        success ? "bg-brand-tint text-brand-ink" : "bg-danger-bg text-danger-ink",
       )}
     >
       {outcome.text}
@@ -39,7 +39,7 @@ function Mark() {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-line bg-white shadow-tile"
+      className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-line bg-surface shadow-tile"
     >
       <GoogleMark size={24} />
     </span>

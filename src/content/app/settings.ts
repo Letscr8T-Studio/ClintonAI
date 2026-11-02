@@ -23,6 +23,18 @@ export const settingsCopy = {
     saving: "Saving…",
     saved: "Saved.",
   },
+  appearance: {
+    id: "appearance",
+    title: "Appearance",
+    body: "Light, dark, or whatever this device is set to. Saved on this device only.",
+    legend: "Theme",
+    options: {
+      system: { label: "Device", hint: "Follows this device" },
+      light: { label: "Light", hint: "Paper white" },
+      dark: { label: "Dark", hint: "Easy at night" },
+    },
+    saved: "Saved on this device.",
+  },
   gmail: { id: "gmail", title: "Gmail account" },
   privacy: {
     id: "privacy",

@@ -26,7 +26,7 @@ export function SetupSteps(progress: Progress) {
   return (
     <section
       aria-labelledby="steps-h"
-      className="cl-rise rounded-[28px] border border-line bg-white p-6 shadow-card sm:p-7"
+      className="cl-rise rounded-[28px] border border-line bg-surface p-6 shadow-card sm:p-7"
       style={{ animationDelay: "200ms" }}
     >
       <div className="flex items-baseline justify-between gap-4">
@@ -59,7 +59,7 @@ export function SetupSteps(progress: Progress) {
                 className={cn(
                   "mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-medium",
                   status === "done" && "bg-brand",
-                  status === "next" && "border-2 border-brand text-brand",
+                  status === "next" && "border-2 border-brand text-brand-ink",
                   status === "soon" && "bg-line-soft text-muted",
                 )}
               >
@@ -76,7 +76,7 @@ export function SetupSteps(progress: Progress) {
                     {status === "next" && step.href ? (
                       <Link
                         href={step.href}
-                        className="text-ink underline decoration-brand-mist decoration-2 underline-offset-4 hover:text-brand"
+                        className="text-ink underline decoration-brand-mist decoration-2 underline-offset-4 hover:text-brand-ink"
                       >
                         {step.title}
                       </Link>

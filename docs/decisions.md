@@ -3,6 +3,23 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-02: Premium app pass: dark mode, inline highlights, Undo bar, command menu
+
+- **Decision:** The signed-in app gets:
+  - **Dark mode.** Every colour token is `light-dark(light, dark)`; the app root carries `data-theme` (system, light or dark) from a per-device `clinton-theme` cookie, read on the server so nothing flashes. Marketing stays light.
+  - **Inline highlights in Compose.** Clinton's findings are highlighted in the message itself; a popover offers Fix it or Ignore. The panel still lists everything.
+  - **The Undo bar.** Compose stays put after sending and shows "Sending in 4:59 · Undo · View"; Undo uses the Outbox's Edit.
+  - **Speed.** A Ctrl/Cmd + K command menu and shortcuts (C, G then H/O/S, ?).
+  - **Home.** Returning users get a compact header instead of the banner.
+  - **Phones.** A floating Write button and a full-screen Compose with a docked Check & send.
+- **Why:** These close the gap with premium mail apps (Superhuman, Gmail) where it matters to us: sending.
+- **Consequences:**
+  - New tokens: `surface` (cards, was `bg-white`), `night` (panels that stay dark in both themes, was `bg-ink`) and `brand-ink` / `danger-ink` for coloured text. Use them in app UI; `bg-white` is only for white-on-brand details.
+  - `:root { color-scheme: light }` in `theme.css` is required: LightningCSS compiles `light-dark()` into variables that only a `color-scheme` declaration sets. Removing it leaves pages outside the app without colours.
+  - For the same reason, tokens can't be re-themed per element (an inline `color-scheme` does nothing). The Appearance previews use the hex mirror in `brand.ts`.
+  - The highlight mirror must use exactly the textarea's padding and font (`MessageField.tsx`).
+  - The Outbox's `?queued=1` banner is gone.
+
 ## 2026-11-02: Smart Delay can be Off; the check knows the time and has 6 s
 
 - **Decision:** Smart Delay accepts Off (0) as well as 1 to 30 minutes, in Settings, onboarding and per email. Off emails are sent straight away by the queue route (the dispatcher retries if that fails). The default stays 5 minutes. The AI check now gets the writer's local date, time and time zone ("Written: …"), reports times that have already passed (`timing`, never rewritten: only the sender knows the new time), obvious typos (`spelling`) and greetings left without a name. The model budget went from 2.5 s to 6 s, and up to 4 model findings.

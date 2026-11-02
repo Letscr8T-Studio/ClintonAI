@@ -9,7 +9,7 @@ export type StageTone = "wash" | "ink" | "brand";
 
 const tones: Record<StageTone, string> = {
   wash: "bg-brand-wash border border-brand-mist",
-  ink: "bg-ink",
+  ink: "bg-night",
   brand: "stage-brand",
 };
 

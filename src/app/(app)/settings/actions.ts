@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { appRoutes } from "@/config/routes";
 import { settingsCopy as copy } from "@/content/app/settings";
 import { delaySecondsSchema, displayNameSchema } from "@/lib/validation/profile";
+import { themeSchema } from "@/lib/validation/theme";
 import { requireUser } from "@/server/auth/user";
 import { updateSettings } from "@/server/profiles/repository";
+import { setThemeCookie } from "@/server/theme";
 
 export type SettingResult = { ok: true } | { ok: false; error: string };
 
@@ -27,6 +29,15 @@ export async function saveDefaultDelay(seconds: number): Promise<SettingResult> 
   const parsed = delaySecondsSchema.safeParse(seconds);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? copy.saveFailed };
   return save({ default_delay_seconds: parsed.data });
+}
+
+/** Appearance is per device, so it lives in a cookie rather than the profile. */
+export async function saveTheme(theme: string): Promise<SettingResult> {
+  await requireUser();
+  const parsed = themeSchema.safeParse(theme);
+  if (!parsed.success) return { ok: false, error: copy.saveFailed };
+  await setThemeCookie(parsed.data);
+  return { ok: true };
 }
 
 export async function saveDisplayName(name: string): Promise<SettingResult> {

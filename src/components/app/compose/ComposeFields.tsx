@@ -1,6 +1,8 @@
-import type { Ref } from "react";
+import type { Ref, RefObject } from "react";
 import { composeCopy as copy } from "@/content/app/compose";
+import type { Finding } from "@/lib/check/types";
 import { cn } from "@/lib/cn";
+import { MessageField } from "./MessageField";
 
 export type DraftFields = { to: string; cc: string; subject: string; body: string };
 export type FieldErrors = Partial<Record<"to" | "cc" | "body", string>>;
@@ -13,7 +15,9 @@ type Props = {
   onChange: (field: keyof DraftFields, value: string) => void;
   toRef: Ref<HTMLInputElement>;
   subjectRef: Ref<HTMLInputElement>;
-  bodyRef: Ref<HTMLTextAreaElement>;
+  bodyRef: RefObject<HTMLTextAreaElement | null>;
+  /** Clinton's open findings on the message, highlighted in the text. */
+  flags: { findings: Finding[]; onFix: (finding: Finding) => void; onIgnore: (id: string) => void };
 };
 
 const row = "flex items-center gap-3 border-b border-line px-5 sm:px-7";
@@ -43,6 +47,7 @@ export function ComposeFields({
   toRef,
   subjectRef,
   bodyRef,
+  flags,
 }: Props) {
   return (
     <>
@@ -113,15 +118,14 @@ export function ComposeFields({
       <label htmlFor="compose-body" className="sr-only">
         {copy.body}
       </label>
-      <textarea
-        id="compose-body"
-        ref={bodyRef}
+      <MessageField
         value={values.body}
-        onChange={(e) => onChange("body", e.target.value)}
+        onChange={(v) => onChange("body", v)}
         placeholder={copy.bodyPlaceholder}
-        aria-invalid={Boolean(errors.body)}
-        aria-describedby={errors.body ? "compose-body-error" : undefined}
-        className="block [field-sizing:content] min-h-[320px] w-full resize-none bg-transparent px-5 py-5 text-[15px] leading-relaxed text-ink outline-none placeholder:text-placeholder sm:px-7"
+        invalid={Boolean(errors.body)}
+        describedBy={errors.body ? "compose-body-error" : undefined}
+        fieldRef={bodyRef}
+        {...flags}
       />
       <FieldError id="compose-body-error" message={errors.body} />
     </>

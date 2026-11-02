@@ -28,7 +28,7 @@ export function HistoryList({ emails, empty, busyId = null, onWithdraw }: Props)
   const now = useNow();
   if (emails.length === 0) return <p className="m-0 text-sm text-muted">{empty}</p>;
   return (
-    <ul className="m-0 flex list-none flex-col divide-y divide-line overflow-hidden rounded-[24px] border border-line bg-white p-0">
+    <ul className="m-0 flex list-none flex-col divide-y divide-line overflow-hidden rounded-[24px] border border-line bg-surface p-0">
       {emails.map((email) => (
         <li key={email.id} className="px-5 py-4">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">

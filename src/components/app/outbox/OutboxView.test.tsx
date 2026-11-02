@@ -57,9 +57,8 @@ afterEach(() => {
 
 describe("OutboxView", () => {
   it("shows the countdown, the history and the reason something wasn't sent; accessible", async () => {
-    const { container } = render(<OutboxView emails={[waiting, sent, failed]} justQueued />);
+    const { container } = render(<OutboxView emails={[waiting, sent, failed]} />);
     expect(screen.getByText("04:59")).toBeInTheDocument();
-    expect(screen.getByText(copy.queued)).toBeInTheDocument();
     expect(screen.getByText("Lunch")).toBeInTheDocument();
     expect(screen.getByText(failureReasons.revoked)).toBeInTheDocument();
     expect(await a11yViolations(container)).toEqual([]);
@@ -67,7 +66,7 @@ describe("OutboxView", () => {
 
   it("sends now", async () => {
     const fetchMock = mockFetch();
-    render(<OutboxView emails={[waiting]} justQueued={false} />);
+    render(<OutboxView emails={[waiting]} />);
     await userEvent.click(screen.getByRole("button", { name: copy.sendNow }));
     expect(fetchMock).toHaveBeenCalledWith(`/api/emails/${waiting.id}/send-now`, { method: "POST" });
     await waitFor(() => expect(router.refresh).toHaveBeenCalled());
@@ -75,7 +74,7 @@ describe("OutboxView", () => {
 
   it("asks before cancelling", async () => {
     const fetchMock = mockFetch();
-    render(<OutboxView emails={[waiting]} justQueued={false} />);
+    render(<OutboxView emails={[waiting]} />);
     await userEvent.click(screen.getByRole("button", { name: copy.cancel }));
     expect(fetchMock).not.toHaveBeenCalled();
     expect(screen.getByText(copy.cancelConfirm)).toBeInTheDocument();
@@ -86,7 +85,7 @@ describe("OutboxView", () => {
   it("takes an email back into Compose to edit", async () => {
     const draft = { to: ["investor@fund.co"], cc: [], subject: "Q3", body: "Hi" };
     mockFetch({ ok: true, draft });
-    render(<OutboxView emails={[waiting]} justQueued={false} />);
+    render(<OutboxView emails={[waiting]} />);
     await userEvent.click(screen.getByRole("button", { name: copy.edit }));
     await waitFor(() => expect(router.push).toHaveBeenCalledWith("/compose"));
     expect(JSON.parse(window.sessionStorage.getItem(DRAFT_HANDOFF_KEY)!)).toEqual(draft);
@@ -94,13 +93,13 @@ describe("OutboxView", () => {
 
   it("shows an error if the email already left", async () => {
     mockFetch({ ok: false, error: "This email has already left, or was cancelled." });
-    render(<OutboxView emails={[waiting]} justQueued={false} />);
+    render(<OutboxView emails={[waiting]} />);
     await userEvent.click(screen.getByRole("button", { name: copy.sendNow }));
     expect(await screen.findByRole("alert")).toHaveTextContent("already left");
   });
 
   it("offers no actions while an email is leaving", () => {
-    render(<OutboxView emails={[email({ status: "sending" })]} justQueued={false} />);
+    render(<OutboxView emails={[email({ status: "sending" })]} />);
     expect(screen.getByText(copy.leaving)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: copy.sendNow })).not.toBeInTheDocument();
   });

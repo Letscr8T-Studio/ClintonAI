@@ -8,12 +8,12 @@ import { HistoryList } from "./HistoryList";
 import { useOutboxActions } from "./useOutboxActions";
 import { WaitingCard } from "./WaitingCard";
 
-type Props = { emails: OutboxEmail[]; justQueued: boolean };
+type Props = { emails: OutboxEmail[] };
 
 const sectionTitle = "m-0 mb-3 font-mono text-xs tracking-wider text-muted uppercase";
 
 /** The Outbox: waiting emails with live countdowns, then what was sent and what wasn't. */
-export function OutboxView({ emails, justQueued }: Props) {
+export function OutboxView({ emails }: Props) {
   const { busyId, error, act, withdraw } = useOutboxActions(emails);
 
   const waiting = emails.filter((e) => e.status === "held" || e.status === "sending");
@@ -31,20 +31,12 @@ export function OutboxView({ emails, justQueued }: Props) {
         </div>
         <Link
           href={appRoutes.compose}
-          className="inline-flex min-h-11 items-center rounded-2xl bg-brand px-5 text-sm font-semibold text-white no-underline shadow-cta hover:bg-brand-deep"
+          className="hidden min-h-11 items-center rounded-2xl bg-brand px-5 text-sm font-semibold text-white no-underline shadow-cta hover:bg-brand-deep sm:inline-flex"
         >
           {copy.compose}
         </Link>
       </header>
 
-      {justQueued && waiting.length > 0 ? (
-        <p
-          role="status"
-          className="cl-rise m-0 rounded-2xl bg-brand-tint px-4 py-3 text-sm font-medium text-brand-deep"
-        >
-          {copy.queued}
-        </p>
-      ) : null}
       {error ? (
         <p
           role="alert"
