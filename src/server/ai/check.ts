@@ -23,13 +23,18 @@ function sameWords(rule: string, model: string): boolean {
   return r.includes(m) || (m.includes(r) && m.length - r.length <= 12);
 }
 
+const overlaps = (a: string, b: string) => a.includes(b) || b.includes(a);
+
 /**
  * Keeps model findings that point at real text (or none), drops those that repeat a rule
- * finding, and caps the count. Excerpts the model invented never reach the user.
+ * finding, and caps the count. Excerpts the model invented never reach the user. A fix whose
+ * words overlap a fix already shown is dropped too: applying one would break the other
+ * ("Dear Kemi, i mizz you" next to "Kemi → Tunde" and "mizz → miss").
  */
 export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Finding[]): Finding[] {
   const ruleExcerpts = rules.flatMap((f) => (f.excerpt ? [f.excerpt] : []));
   const ruleTypes = new Set(rules.map((f) => f.type));
+  const fixes = rules.flatMap((f) => (f.excerpt && f.suggestion ? [f.excerpt] : []));
   return answer.findings
     .flatMap((f, i): Finding[] => {
       const excerpt = f.excerpt.trim();
@@ -42,6 +47,8 @@ export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Fin
       const suggestion = f.suggestion.trim();
       // A passed time has no right answer Clinton can know: point at it, never rewrite it.
       const usable = f.type !== "timing" && excerpt !== "" && suggestion !== "" && suggestion !== excerpt;
+      if (usable && fixes.some((x) => overlaps(x, excerpt))) return [];
+      if (usable) fixes.push(excerpt);
       return [
         {
           id: `model-${i}-${f.type}`,

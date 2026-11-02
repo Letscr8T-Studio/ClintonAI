@@ -88,7 +88,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
 
   const busy = state.status === "checking" || sending;
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <form
         onSubmit={submit}
         onKeyDown={onKeyDown}

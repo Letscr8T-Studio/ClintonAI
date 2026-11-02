@@ -214,6 +214,26 @@ describe("runCheck", () => {
     expect(timing).not.toHaveProperty("suggestion");
   });
 
+  it("drops a fix whose words overlap a fix already shown (one would break the other)", async () => {
+    const typo = { ...draft, body: "Dear Tunde,\n\ni mizz you so much." };
+    const result = await runCheck(
+      typo,
+      model({
+        findings: [
+          { type: "spelling", message: "Typo.", excerpt: "mizz", suggestion: "miss" },
+          {
+            type: "clarity",
+            message: "Name and greeting don't match.",
+            excerpt: "Dear Tunde,\n\ni mizz you",
+            suggestion: "Dear Dami,\n\ni miss you",
+          },
+        ],
+      }),
+      NOW,
+    );
+    expect(result.findings.map((f) => f.type)).toEqual(["greeting_mismatch", "spelling"]);
+  });
+
   it("falls back to UTC for a time zone it doesn't recognise", () => {
     expect(writtenAt({ now: NOW, timeZone: "Mars/Olympus" })).toBe(
       "Thursday, 29 October 2026 at 12:00 (UTC)",

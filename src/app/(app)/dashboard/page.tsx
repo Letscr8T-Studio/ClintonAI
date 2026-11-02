@@ -52,7 +52,7 @@ export default async function HomePage({ searchParams }: Props) {
       {dashboard ? (
         <>
           <StatTiles stats={dashboard[0]} />
-          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
             <RecentEmails emails={dashboard[1]} />
             <div className="flex flex-col gap-6">
               <CaughtList items={dashboard[2]} />
@@ -62,7 +62,7 @@ export default async function HomePage({ searchParams }: Props) {
         </>
       ) : null}
       {setupDone ? null : (
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <GmailCard accounts={accounts} outcome={connectOutcome(gmail)} />
           <SetupSteps gmailConnected={gmailConnected} hasSent={hasSent} triedSafeSend={triedSafeSend} />
         </div>
