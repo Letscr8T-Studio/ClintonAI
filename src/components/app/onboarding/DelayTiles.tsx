@@ -13,7 +13,7 @@ export function DelayTiles({ value, onChange, describedBy }: Props) {
       <legend className="mb-3 p-0 font-mono text-[11px] tracking-wider text-muted uppercase">
         {copy.delayLegend}
       </legend>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
         {delayOptions.map((option) => (
           <label
             key={option.seconds}
@@ -26,7 +26,7 @@ export function DelayTiles({ value, onChange, describedBy }: Props) {
               checked={value === option.seconds}
               onChange={() => onChange(option.seconds)}
               className="sr-only"
-              aria-label={copy.optionLabel(option.minutes, option.recommended)}
+              aria-label={option.off ? copy.offLabel : copy.optionLabel(option.minutes, option.recommended)}
             />
             <span
               aria-hidden="true"
@@ -38,7 +38,7 @@ export function DelayTiles({ value, onChange, describedBy }: Props) {
               aria-hidden="true"
               className="mt-1 font-mono text-[11px] text-muted group-has-checked:text-on-brand"
             >
-              {copy.minutesUnit}
+              {option.off ? copy.offUnit : copy.minutesUnit}
             </span>
             {option.recommended ? (
               <span

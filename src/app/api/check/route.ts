@@ -21,7 +21,8 @@ export async function POST(request: Request) {
   const parsed = await parseJson(request, checkRequestSchema);
   if (parsed.response) return parsed.response;
 
-  const result = await runCheck(parsed.data, getCheckModel());
+  const { timeZone, ...draft } = parsed.data;
+  const result = await runCheck(draft, getCheckModel(), new Date(), timeZone);
   const checkId = await recordCheck({
     userId: user.id,
     findingTypes: result.findings.map((f) => f.type),

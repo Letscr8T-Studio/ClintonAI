@@ -11,6 +11,7 @@ export const settingsCopy = {
     caption: "Default",
     saving: "Saving…",
     saved: (minutes: string) => `Saved. New emails wait ${minutes}.`,
+    savedOff: "Saved. Smart Delay is off: new emails leave as soon as you send them.",
   },
   name: {
     id: "sender-name",

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { emailActionErrors as errors } from "@/content/app/outbox";
 import { queueRequestSchema } from "@/lib/validation/compose";
 import { getCurrentUser } from "@/server/auth/user";
-import { queueEmail } from "@/server/emails/service";
+import { queueEmail, sendNow } from "@/server/emails/service";
 import { fail, parseJson } from "@/server/http";
 import { getProfile } from "@/server/profiles/repository";
 import { createRateLimiter } from "@/server/rate-limit";
@@ -33,6 +33,13 @@ export async function POST(request: Request) {
       checkIds,
     });
     if (!queued) return fail(errors.noAccount, 409);
+    // Smart Delay off: send it now instead of waiting for the dispatcher. If this fails, the
+    // email is still held and due, so the dispatcher picks it up with the normal retries.
+    if (delay === 0) {
+      await sendNow(user, queued.id).catch((error: unknown) =>
+        console.error("Immediate send failed", error instanceof Error ? error.message : error),
+      );
+    }
     return NextResponse.json({ ok: true, id: queued.id, sendAt: queued.sendAt.toISOString() });
   } catch (error) {
     console.error("Queueing failed", error instanceof Error ? error.message : error);

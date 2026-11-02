@@ -7,7 +7,7 @@ import type { CheckModel } from "./model";
 import { MAX_MODEL_FINDINGS, type ModelAnswer } from "./prompt";
 
 /** The model gets this long; after that the rule findings are returned on their own. */
-export const MODEL_TIMEOUT_MS = 2500;
+export const MODEL_TIMEOUT_MS = 6000;
 
 /** Model finding types that say the same thing as a rule, when that rule has fired. */
 const COVERED_BY_RULE: Partial<Record<ModelType, RuleType>> = { recipient: "greeting_mismatch" };
@@ -40,7 +40,8 @@ export function modelFindings(answer: ModelAnswer, draft: DraftEmail, rules: Fin
       if (covering && ruleTypes.has(covering)) return [];
       // A suggestion only makes sense as a swap for real, quoted words.
       const suggestion = f.suggestion.trim();
-      const usable = excerpt !== "" && suggestion !== "" && suggestion !== excerpt;
+      // A passed time has no right answer Clinton can know: point at it, never rewrite it.
+      const usable = f.type !== "timing" && excerpt !== "" && suggestion !== "" && suggestion !== excerpt;
       return [
         {
           id: `model-${i}-${f.type}`,
@@ -72,6 +73,8 @@ export async function runCheck(
   draft: DraftEmail,
   model: CheckModel | null,
   now = new Date(),
+  /** The writer's IANA time zone, so "10am today" can be judged against their clock. */
+  timeZone?: string,
 ): Promise<CheckRun> {
   const started = Date.now();
   const rules = toRuleFindings(runRules(draft, now), describeHit);
@@ -80,7 +83,7 @@ export async function runCheck(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS);
   try {
-    const answer = await model.check(draft, controller.signal);
+    const answer = await model.check(draft, controller.signal, { now, timeZone });
     return {
       findings: [
         ...withSubjectSuggestion(rules, draft, answer.subject),

@@ -63,7 +63,7 @@ export function useComposeCheck() {
       const res = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
+        body: JSON.stringify({ ...draft, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
       });
       const json = (await res.json()) as CheckResponse;
       if (json.ok) {

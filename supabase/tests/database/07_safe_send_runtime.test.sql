@@ -1,7 +1,7 @@
 -- Safe Send runtime: an exact 24 h window, keys in Vault, opens counted only while readable,
 -- withdrawn / expired content shredded, and nothing callable by clients.
 begin;
-select plan(14);
+select plan(15);
 
 insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111', 'ada@example.com');
 update public.profiles set display_name = 'Ada Obi' where user_id = '11111111-1111-1111-1111-111111111111';
@@ -69,6 +69,24 @@ select is_empty(
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
 select throws_ok($$ select * from public.open_safe_send(repeat('a', 64)) $$, '42501', null, 'clients cannot call Safe Send functions');
+reset role;
+
+-- Deleting an account takes its Safe Send keys with it (trust rule 6), not just the rows.
+insert into public.emails (id, user_id, account_id, subject, to_recipients, send_at, status, sent_at, safe_send) values
+  ('eeeeeeee-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111',
+   'aaaaaaaa-0000-0000-0000-000000000001', 'Second', '["kemi@client.co"]', now(), 'sent', now(), true);
+create temporary table second as
+  select * from public.create_safe_send(
+    'eeeeeeee-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'ada/msg2.bin', 'data-key-2',
+    jsonb_build_array(jsonb_build_object('email', 'kemi@client.co', 'token_hash', repeat('c', 64)))
+  );
+create temporary table second_key as
+  select key_ref from public.safe_send_messages where id = (select message_id from second);
+delete from auth.users where id = '11111111-1111-1111-1111-111111111111';
+select is_empty(
+  $$ select 1 from vault.secrets where id = (select key_ref from second_key) $$,
+  'deleting an account destroys its Safe Send keys'
+);
 
 select * from finish();
 rollback;

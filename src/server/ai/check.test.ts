@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { DraftEmail } from "@/lib/check/types";
 import { MODEL_TIMEOUT_MS, runCheck } from "./check";
 import type { CheckModel } from "./model";
-import type { ModelAnswer } from "./prompt";
+import { formatEmail, writtenAt, type CheckContext, type ModelAnswer } from "./prompt";
 
 const NOW = new Date("2026-10-29T12:00:00Z");
 const draft: DraftEmail = {
@@ -171,9 +171,9 @@ describe("runCheck", () => {
     );
     let slowSignal: AbortSignal | undefined;
     const check = slow.check;
-    slow.check = (d, signal) => {
+    slow.check = (d, signal, context) => {
       slowSignal = signal;
-      return check(d, signal);
+      return check(d, signal, context);
     };
 
     const pending = runCheck(draft, slow, NOW);
@@ -182,5 +182,41 @@ describe("runCheck", () => {
     expect(slowSignal?.aborted).toBe(true);
     expect(result.modelUsed).toBe(false);
     expect(result.findings.map((f) => f.source)).toEqual(["rules"]);
+  });
+
+  it("tells the model the writer's own date and time, so passed times can be caught", async () => {
+    const check = vi.fn(async () => ({ subject: "", findings: [] }));
+    await runCheck(draft, { name: "test/model", check }, NOW, "Africa/Lagos");
+    const context = (check.mock.calls[0] as unknown[])[2] as CheckContext;
+    expect(writtenAt(context)).toBe("Thursday, 29 October 2026 at 13:00 (Africa/Lagos)");
+    expect(formatEmail(draft, context).split("\n")[0]).toBe(`Written: ${writtenAt(context)}`);
+  });
+
+  it("points at a time that has passed but never rewrites it (only the sender knows the new time)", async () => {
+    const passed = { ...draft, body: "Hi Dami, let's talk today by 10am." };
+    const result = await runCheck(
+      passed,
+      model({
+        findings: [
+          {
+            type: "timing",
+            message: "That time has already passed.",
+            excerpt: "today by 10am",
+            suggestion: "tomorrow by 10am",
+          },
+        ],
+      }),
+      NOW,
+      "Africa/Lagos",
+    );
+    const timing = result.findings.find((f) => f.type === "timing");
+    expect(timing).toMatchObject({ excerpt: "today by 10am" });
+    expect(timing).not.toHaveProperty("suggestion");
+  });
+
+  it("falls back to UTC for a time zone it doesn't recognise", () => {
+    expect(writtenAt({ now: NOW, timeZone: "Mars/Olympus" })).toBe(
+      "Thursday, 29 October 2026 at 12:00 (UTC)",
+    );
   });
 });

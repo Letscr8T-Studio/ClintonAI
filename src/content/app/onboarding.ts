@@ -50,7 +50,14 @@ export const tourSteps: TourStep[] = [
   },
 ];
 
-export type DelayOption = { seconds: number; minutes: string; mood: string; recommended?: boolean };
+export type DelayOption = {
+  seconds: number;
+  minutes: string;
+  mood: string;
+  recommended?: boolean;
+  /** Smart Delay off: no wait, no cancel. */
+  off?: boolean;
+};
 
 export const delayOptions: DelayOption[] = [
   { seconds: 60, minutes: "1", mood: "Just a breath before it goes." },
@@ -64,6 +71,12 @@ export const delayOptions: DelayOption[] = [
   { seconds: 600, minutes: "10", mood: "Room to reread it with fresh eyes." },
   { seconds: 900, minutes: "15", mood: "Enough to cool off after a heated reply." },
   { seconds: 1800, minutes: "30", mood: "Maximum calm. Ideal for the big ones." },
+  {
+    seconds: 0,
+    minutes: "Off",
+    mood: "No wait: emails leave the moment you send them, so you can't cancel or edit them. Clinton still checks first.",
+    off: true,
+  },
 ];
 
 export const onboardingCopy = {
@@ -79,10 +92,13 @@ export const onboardingCopy = {
     "How long should sent emails wait before they leave? You can change it for any single email, or later in settings.",
   delayLegend: "Default delay, in minutes",
   minutesUnit: "min",
+  offUnit: "no wait",
   recommended: "Recommended",
   optionLabel: (minutes: string, recommended?: boolean) =>
     `${minutes} min${recommended ? ", recommended" : ""}`,
+  offLabel: "Off, no Smart Delay",
   previewCaption: (minutes: string) => `Every email waits ${minutes} min before it leaves.`,
+  previewOff: "Emails leave as soon as you send them.",
   finish: "Start using Clinton AI",
   finishing: "Saving…",
 };

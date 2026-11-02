@@ -1,13 +1,19 @@
 import "server-only";
 import type { DraftEmail } from "@/lib/check/types";
 import type { CheckModel } from "./model";
-import { FINDINGS_JSON_SCHEMA, SYSTEM_PROMPT, formatEmail, modelAnswerSchema } from "./prompt";
+import {
+  FINDINGS_JSON_SCHEMA,
+  SYSTEM_PROMPT,
+  formatEmail,
+  modelAnswerSchema,
+  type CheckContext,
+} from "./prompt";
 
 const URL = "https://api.openai.com/v1/chat/completions";
 
 export class ModelError extends Error {}
 
-/** Reasoning off (or minimal) for speed: the check has a ~2.5 s budget. */
+/** Reasoning off (or minimal) for speed: the check has a 6 s budget (see check.ts). */
 function reasoningEffort(model: string): string | undefined {
   if (/^gpt-5\.\d/.test(model)) return "none";
   if (/^gpt-5/.test(model)) return "minimal";
@@ -18,7 +24,7 @@ function reasoningEffort(model: string): string | undefined {
 export function createOpenAiModel(apiKey: string, model: string): CheckModel {
   return {
     name: `openai/${model}`,
-    async check(draft: DraftEmail, signal: AbortSignal) {
+    async check(draft: DraftEmail, signal: AbortSignal, context: CheckContext) {
       const effort = reasoningEffort(model);
       const res = await fetch(URL, {
         method: "POST",
@@ -30,7 +36,7 @@ export function createOpenAiModel(apiKey: string, model: string): CheckModel {
           ...(effort ? { reasoning_effort: effort } : {}),
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: formatEmail(draft) },
+            { role: "user", content: formatEmail(draft, context) },
           ],
           response_format: {
             type: "json_schema",

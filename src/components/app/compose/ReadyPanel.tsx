@@ -47,12 +47,14 @@ export function ReadyPanel({ state, send }: { state: CheckState; send: SendContr
           >
             {delayOptions.map((o) => (
               <option key={o.seconds} value={o.seconds} className="text-ink">
-                {copy.delayOption(o.minutes)}
+                {o.off ? copy.delayOff : copy.delayOption(o.minutes)}
               </option>
             ))}
           </select>
         </div>
-        <p className="mt-2 mb-0 text-[13px] text-on-brand">{copy.delayHint}</p>
+        <p className="mt-2 mb-0 text-[13px] text-on-brand">
+          {send.delaySeconds === 0 ? copy.delayOffHint : copy.delayHint}
+        </p>
 
         {send.error ? (
           <p

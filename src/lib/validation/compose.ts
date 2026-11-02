@@ -35,13 +35,15 @@ export const checkRequestSchema = z.object({
   subject: z.string().max(LIMITS.subject).default(""),
   body: z.string().trim().min(1, "Write something first.").max(LIMITS.body),
   attachments: z.array(z.string().max(255)).max(LIMITS.attachments).default([]),
+  /** The writer's IANA time zone ("Africa/Lagos"), so times like "today at 10am" can be judged. */
+  timeZone: z.string().max(64).optional(),
 });
 
 export type CheckRequest = z.infer<typeof checkRequestSchema>;
 
 /** POST /api/emails: the checked draft, its Smart Delay, and how the AI check went (counts only). */
 export const queueRequestSchema = checkRequestSchema
-  .omit({ attachments: true })
+  .omit({ attachments: true, timeZone: true })
   .extend({
     delaySeconds: delaySecondsSchema.optional(),
     findingsCount: z.number().int().min(0).max(100).default(0),

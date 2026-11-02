@@ -4,8 +4,7 @@ import { useActionState, useId, useState, type Ref } from "react";
 import { finishOnboarding, type OnboardingState } from "@/app/onboarding/actions";
 import { ArrowRight } from "@/components/ui/icons";
 import { delayOptions, onboardingCopy as copy } from "@/content/app/onboarding";
-import { SMART_DELAY } from "@/lib/validation/profile";
-import { formatClock } from "@/lib/time";
+import { SMART_DELAY, delayClock } from "@/lib/validation/profile";
 import { ProgressRing } from "@/components/app/ProgressRing";
 import { VisualStage } from "./visuals";
 import { DelayTiles } from "./DelayTiles";
@@ -69,10 +68,12 @@ export function DelayPicker({ defaultSeconds, headingRef, onBack }: Props) {
       <VisualStage tone="ink" className="hidden lg:flex">
         <div className="flex flex-col items-center gap-6 text-center">
           <ProgressRing value={seconds / SMART_DELAY.max} caption={copy.delayStepLabel}>
-            {formatClock(seconds)}
+            {delayClock(seconds)}
           </ProgressRing>
           <p className="m-0 max-w-[320px] text-[15px] text-navy-text">
-            {copy.previewCaption(selected?.minutes ?? String(Math.round(seconds / 60)))}
+            {selected?.off
+              ? copy.previewOff
+              : copy.previewCaption(selected?.minutes ?? String(Math.round(seconds / 60)))}
           </p>
         </div>
       </VisualStage>

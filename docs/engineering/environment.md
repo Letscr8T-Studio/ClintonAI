@@ -20,7 +20,7 @@
 | `EMAIL_ENCRYPTION_KEY`                 | server | app      | 32 bytes base64 (`openssl rand -base64 32`). Encrypts held email bodies. Back it up: losing it makes waiting emails unreadable |
 | `APP_URL`                              | server | app      | Base URL for links in emails (Safe Send). Dev `http://localhost:3000`; prod `https://tryclinton.com`                           |
 | `CRON_SECRET`                          | server | app      | 32+ chars. pg_cron sends it to `/api/cron/dispatch`; register it with `npm run db:dispatcher`                                  |
-| `OPENAI_MODEL`                         | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 2.5 s budget                                                             |
+| `OPENAI_MODEL`                         | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 6 s budget                                                               |
 
 Server vars are validated by `src/server/env.ts`. A missing Supabase var fails the request that needs it
 with a clear message; missing admin vars disable console login. Add every new var to this table,

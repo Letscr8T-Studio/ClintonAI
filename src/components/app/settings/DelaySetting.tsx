@@ -6,8 +6,7 @@ import { DelayTiles } from "@/components/app/onboarding/DelayTiles";
 import { ProgressRing } from "@/components/app/ProgressRing";
 import { delayOptions } from "@/content/app/onboarding";
 import { settingsCopy } from "@/content/app/settings";
-import { SMART_DELAY, formatDelay } from "@/lib/validation/profile";
-import { formatClock } from "@/lib/time";
+import { SMART_DELAY, delayClock, formatDelay } from "@/lib/validation/profile";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 
 const copy = settingsCopy.delay;
@@ -26,7 +25,11 @@ export function DelaySetting({ initialSeconds }: { initialSeconds: number }) {
     setStatus({ kind: "saving" });
     startTransition(async () => {
       const result = await saveDefaultDelay(next);
-      if (result.ok) return setStatus({ kind: "saved", text: copy.saved(formatDelay(next)) });
+      if (result.ok)
+        return setStatus({
+          kind: "saved",
+          text: next === SMART_DELAY.off ? copy.savedOff : copy.saved(formatDelay(next)),
+        });
       setSeconds(previous); // the server didn't take it: show what's really saved
       setStatus({ kind: "error", text: result.error });
     });
@@ -42,7 +45,7 @@ export function DelaySetting({ initialSeconds }: { initialSeconds: number }) {
           valueClassName="text-[26px]"
           sizeClassName="w-32"
         >
-          {formatClock(seconds)}
+          {delayClock(seconds)}
         </ProgressRing>
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">

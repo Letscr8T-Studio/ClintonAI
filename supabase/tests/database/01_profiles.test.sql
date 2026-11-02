@@ -1,6 +1,6 @@
 -- Profiles: auto-created on sign-up; users read and edit only their own settings.
 begin;
-select plan(9);
+select plan(10);
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('11111111-1111-1111-1111-111111111111', 'ada@example.com', '{"full_name":"Ada Obi","avatar_url":"https://x.test/a.png"}'),
@@ -34,7 +34,11 @@ select lives_ok(
 );
 select throws_ok(
   $$ update public.profiles set default_delay_seconds = 5 where user_id = auth.uid() $$,
-  '23514', null, 'Smart Delay must be between 1 and 30 minutes'
+  '23514', null, 'Smart Delay must be Off or between 1 and 30 minutes'
+);
+select lives_ok(
+  $$ update public.profiles set default_delay_seconds = 0 where user_id = auth.uid() $$,
+  'Smart Delay can be turned off'
 );
 select is_empty(
   $$ update public.profiles set display_name = 'hacked'

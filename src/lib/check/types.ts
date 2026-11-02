@@ -20,7 +20,16 @@ export type RuleType =
   | "empty_subject";
 
 /** Categories the model may report. Kept small so the UI can label them. */
-export const MODEL_TYPES = ["tone", "contradiction", "unfinished", "recipient", "clarity", "other"] as const;
+export const MODEL_TYPES = [
+  "tone",
+  "contradiction",
+  "timing",
+  "spelling",
+  "unfinished",
+  "recipient",
+  "clarity",
+  "other",
+] as const;
 export type ModelType = (typeof MODEL_TYPES)[number];
 
 export type FindingField = "to" | "subject" | "body";

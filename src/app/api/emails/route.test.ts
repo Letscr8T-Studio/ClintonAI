@@ -47,6 +47,23 @@ describe("POST /api/emails", () => {
   it("uses a delay chosen for this email", async () => {
     await queue(jsonRequest("http://localhost/api/emails", { ...draft, delaySeconds: 60 }));
     expect(m.queue.mock.calls[0]![1].delaySeconds).toBe(60);
+    expect(m.sendNow).not.toHaveBeenCalled();
+  });
+
+  it("with Smart Delay off, sends it straight away", async () => {
+    m.profile.mockResolvedValue({ default_delay_seconds: 0 });
+    m.sendNow.mockResolvedValue("sent");
+    const res = await queue(jsonRequest("http://localhost/api/emails", draft));
+    expect((await res.json()).ok).toBe(true);
+    expect(m.queue.mock.calls[0]![1].delaySeconds).toBe(0);
+    expect(m.sendNow).toHaveBeenCalledWith(expect.objectContaining({ id: expect.any(String) }), ID);
+  });
+
+  it("if that immediate send fails, the email stays queued for the dispatcher to retry", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    m.sendNow.mockRejectedValue(new Error("Gmail down"));
+    const res = await queue(jsonRequest("http://localhost/api/emails", { ...draft, delaySeconds: 0 }));
+    expect(await res.json()).toMatchObject({ ok: true, id: ID });
   });
 
   it("rejects a delay outside 1-30 minutes, and bad drafts", async () => {

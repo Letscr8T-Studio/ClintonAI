@@ -50,6 +50,9 @@ export const panelCopy = {
   readyAfterReview: "You've reviewed everything Clinton raised.",
   delayLabel: "Smart Delay",
   delayOption: (minutes: string) => `${minutes} min`,
+  delayOff: "Off: send now",
+  /** Shown instead of delayHint when this email has no Smart Delay. */
+  delayOffHint: "It leaves as soon as you press Send. You won't be able to cancel it.",
   delayHint: "It waits in your Outbox first. You can cancel or edit until it leaves.",
   send: "Send",
   sending: "Sending to your Outbox…",
@@ -71,6 +74,8 @@ export const findingLabels: Record<RuleType | ModelType, string> = {
   empty_subject: "Subject",
   tone: "Tone",
   contradiction: "Contradiction",
+  timing: "Time passed",
+  spelling: "Spelling",
   unfinished: "Unfinished",
   recipient: "Recipient",
   clarity: "Clarity",

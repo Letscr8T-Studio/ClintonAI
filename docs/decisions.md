@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-02: Smart Delay can be Off; the check knows the time and has 6 s
+
+- **Decision:** Smart Delay accepts Off (0) as well as 1 to 30 minutes, in Settings, onboarding and per email. Off emails are sent straight away by the queue route (the dispatcher retries if that fails). The default stays 5 minutes. The AI check now gets the writer's local date, time and time zone ("Written: …"), reports times that have already passed (`timing`, never rewritten: only the sender knows the new time), obvious typos (`spelling`) and greetings left without a name. The model budget went from 2.5 s to 6 s, and up to 4 model findings.
+- **Why:** Users asked to opt out of waiting. A real email ("Dear, i mizz you… lets talk today by 10am", written at 17:10) got no findings: from Lagos the model regularly took 2.3–2.6 s and was cut off at 2.5 s, falling back to the rules; and the model couldn't know the time had passed. Measured after the change: 1.3–2.3 s, all three mistakes caught in 5 of 5 runs.
+- **Consequences:** With Smart Delay off there is no cancel window; Settings and Compose say so plainly. Pressing Check & send can take a few seconds longer on slow networks. An empty delay value is rejected, never read as Off. Deleting a Safe Send message row (e.g. account deletion) now also deletes its Vault key.
+
 ## 2026-11-02: Dashboard counts the last 30 days; checks are linked to the email they led to
 
 - **Decision:** The dashboard numbers cover a rolling 30 days, not the calendar month. Every AI check run while writing an email is linked to that email (`ai_check_events.email_id`) when it is queued, and `findings_count` counts the distinct mistakes across all those checks, not just the last one.

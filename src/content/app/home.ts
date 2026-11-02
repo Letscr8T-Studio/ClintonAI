@@ -36,6 +36,7 @@ export const homeCopy = {
     change: "Change",
     changeLabel: "Change your Smart Delay",
     body: (minutes: string) => `Every email waits ${minutes} before it leaves.`,
+    off: "Smart Delay is off. Emails leave as soon as you send them.",
   },
 };
 

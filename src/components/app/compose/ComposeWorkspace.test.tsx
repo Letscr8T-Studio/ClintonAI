@@ -69,6 +69,8 @@ describe("ComposeWorkspace", () => {
       subject: "Offer",
       body: "Hi Tunde, welcome.",
       attachments: [],
+      // The writer's own time zone, so "today at 10am" can be judged against their clock.
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     expect(await screen.findByText(panelCopy.caught(1))).toBeInTheDocument();
     expect(screen.getByText(finding.message)).toBeInTheDocument();
