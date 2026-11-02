@@ -38,12 +38,12 @@ export async function listOutbox(days = 7): Promise<OutboxEmail[]> {
   }));
 }
 
-export async function hasSentEmail(): Promise<boolean> {
+/** Ever sent an email (or, with safeSendOnly, a Safe Send one) through Clinton AI. */
+export async function hasSentEmail({ safeSendOnly = false } = {}): Promise<boolean> {
   const supabase = await getSupabaseForUser();
-  const { count, error } = await supabase
-    .from("emails")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "sent");
+  let query = supabase.from("emails").select("id", { count: "exact", head: true }).eq("status", "sent");
+  if (safeSendOnly) query = query.eq("safe_send", true);
+  const { count, error } = await query;
   if (error) throw fail("count sent emails", error.message);
   return (count ?? 0) > 0;
 }

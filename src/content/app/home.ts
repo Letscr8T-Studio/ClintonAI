@@ -1,4 +1,4 @@
-// Home (signed-in): hero, getting-started steps and the Smart Delay card.
+// Home (signed-in): hero, getting-started steps and the Smart Delay ring. Dashboard copy: dashboard.ts.
 
 import { appRoutes } from "@/config/routes";
 
@@ -10,6 +10,8 @@ export const homeCopy = {
   title: "Every send,",
   accent: "a safe one.",
   body: "Connect your Gmail and Clinton checks, holds and protects every email you send through Clinton AI.",
+  /** Once Gmail is connected there is nothing to connect: just the promise. */
+  bodyConnected: "Clinton checks, holds and protects every email you send through Clinton AI.",
   progress: (done: number, total: number) => `${done} of ${total}`,
   progressLabel: (done: number, total: number) => `${done} of ${total} steps done`,
   stepsTitle: "Getting started",
@@ -22,9 +24,13 @@ export const homeCopy = {
       body: "Write it here. Clinton checks it, then holds it for your Smart Delay.",
       href: appRoutes.compose,
     },
-    { id: "safe-send", title: "Try Safe Send", body: "Send something you can take back for 24 hours." },
+    {
+      id: "safe-send",
+      title: "Try Safe Send",
+      body: "Turn it on in Compose to send something you can withdraw for 24 hours.",
+      href: appRoutes.compose,
+    },
   ] as SetupStep[],
-  soonNote: "Safe Send arrives in the next beta update.",
   delay: {
     caption: "Smart Delay",
     change: "Change",

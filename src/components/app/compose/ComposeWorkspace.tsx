@@ -22,7 +22,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
   const [delaySeconds, setDelaySeconds] = useState(defaultDelaySeconds);
   const [fixed, setFixed] = useState(0);
   const [safeSend, setSafeSend] = useState(false);
-  const { state, check, resolve, sendAnyway, markEdited } = useComposeCheck();
+  const { state, check, resolve, sendAnyway, markEdited, checkHistory } = useComposeCheck();
   const { send, sending, error } = useSendEmail();
   const toRef = useRef<HTMLInputElement>(null);
   const subjectRef = useRef<HTMLInputElement>(null);
@@ -45,8 +45,16 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
     markEdited();
   };
 
-  const queue = (findingsCount: number) =>
-    send(toDraft(values), { delaySeconds, findingsCount, findingsAccepted: fixed, safeSend });
+  const queue = () => {
+    const { checkIds, caught } = checkHistory();
+    return send(toDraft(values), {
+      delaySeconds,
+      findingsCount: caught,
+      findingsAccepted: Math.min(fixed, caught),
+      safeSend,
+      checkIds,
+    });
+  };
 
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -55,7 +63,7 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
     if (Object.keys(found).length) return;
     const result = await check({ ...toDraft(values), attachments: [] });
     // Nothing to flag: it goes straight to the Outbox; the Smart Delay is the safety net.
-    if (result.status === "ready") await queue(0);
+    if (result.status === "ready") await queue();
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -117,12 +125,12 @@ export function ComposeWorkspace({ fromEmail, defaultDelaySeconds }: Props) {
           onIgnore={resolve}
           onSendAnyway={() => {
             sendAnyway();
-            void queue(state.findings.length);
+            void queue();
           }}
           send={{
             delaySeconds,
             onDelayChange: setDelaySeconds,
-            onSend: () => void queue(state.findings.length),
+            onSend: () => void queue(),
             sending,
             error,
           }}

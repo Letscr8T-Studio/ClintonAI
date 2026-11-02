@@ -47,6 +47,8 @@ export const queueRequestSchema = checkRequestSchema
     findingsCount: z.number().int().min(0).max(100).default(0),
     findingsAccepted: z.number().int().min(0).max(100).default(0),
     safeSend: z.boolean().default(false),
+    /** The checks run while writing it, so the dashboard can show what Clinton caught. */
+    checkIds: z.array(z.uuid()).max(20).default([]),
   })
   .refine((d) => !d.safeSend || d.to.length + d.cc.length <= SAFE_SEND_MAX_RECIPIENTS, {
     message: `Safe Send works for up to ${SAFE_SEND_MAX_RECIPIENTS} people.`,

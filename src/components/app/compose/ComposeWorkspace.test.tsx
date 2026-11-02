@@ -147,6 +147,33 @@ describe("ComposeWorkspace", () => {
       findingsCount: 0,
       findingsAccepted: 0,
       safeSend: false,
+      checkIds: [],
+    });
+  });
+
+  it("counts a mistake found again on a re-check once, and sends every check's id", async () => {
+    const ids = ["00000000-0000-4000-8000-000000000001", "00000000-0000-4000-8000-000000000002"];
+    let n = 0;
+    const fetchMock = vi.fn<typeof fetch>(async (url) => {
+      const body =
+        url === "/api/check"
+          ? { ok: true, findings: [finding], modelUsed: true, checkId: ids[n++] }
+          : { ok: true };
+      return new Response(JSON.stringify(body));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<ComposeWorkspace fromEmail="ada@example.com" defaultDelaySeconds={300} />);
+    await write("dami@brightlane.io", "Hi Tunde, welcome.");
+    await submit();
+    await screen.findByRole("button", { name: panelCopy.sendAnyway });
+    await submit();
+    await waitFor(() => expect(n).toBe(2));
+    await userEvent.click(await screen.findByRole("button", { name: panelCopy.sendAnyway }));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[2]![1]!.body as string)).toMatchObject({
+      findingsCount: 1,
+      findingsAccepted: 0,
+      checkIds: ids,
     });
   });
 

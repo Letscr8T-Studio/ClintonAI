@@ -409,6 +409,18 @@ export type Database = {
           message_id: string;
         }[];
       };
+      dashboard_stats: {
+        Args: { p_since: string };
+        Returns: {
+          caught: number;
+          fixed: number;
+          safe_send_opened: number;
+          safe_send_people: number;
+          sent: number;
+          waiting: number;
+          withdrawable: number;
+        }[];
+      };
       get_account_refresh_token: { Args: { p_account_id: string }; Returns: string };
       get_safe_send_key: { Args: { p_message_id: string }; Returns: string };
       invoke_dispatcher: { Args: Record<PropertyKey, never>; Returns: undefined };

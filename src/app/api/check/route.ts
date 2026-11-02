@@ -22,14 +22,15 @@ export async function POST(request: Request) {
   if (parsed.response) return parsed.response;
 
   const result = await runCheck(parsed.data, getCheckModel());
-  await recordCheck({
+  const checkId = await recordCheck({
     userId: user.id,
     findingTypes: result.findings.map((f) => f.type),
     model: result.modelUsed ? result.modelName : null,
     latencyMs: result.latencyMs,
-  }).catch((error: unknown) =>
-    console.error("Check not recorded", error instanceof Error ? error.message : error),
-  );
+  }).catch((error: unknown) => {
+    console.error("Check not recorded", error instanceof Error ? error.message : error);
+    return null;
+  });
 
-  return NextResponse.json({ ok: true, findings: result.findings, modelUsed: result.modelUsed });
+  return NextResponse.json({ ok: true, findings: result.findings, modelUsed: result.modelUsed, checkId });
 }

@@ -9,15 +9,18 @@ type Status = keyof typeof copy.stepStatus;
 
 const chipTone: Record<Status, ChipTone> = { done: "tint", next: "brand", soon: "neutral" };
 
-/** Where each step stands. Safe Send arrives in a later milestone. */
-export function stepStatuses(gmailConnected: boolean, hasSent: boolean): Status[] {
+type Progress = { gmailConnected: boolean; hasSent: boolean; triedSafeSend: boolean };
+
+/** Where each step stands: one "next" at a time, later steps wait their turn. */
+export function stepStatuses({ gmailConnected, hasSent, triedSafeSend }: Progress): Status[] {
   if (!gmailConnected) return ["next", "soon", "soon"];
-  return ["done", hasSent ? "done" : "next", "soon"];
+  if (!hasSent) return ["done", "next", "soon"];
+  return ["done", "done", triedSafeSend ? "done" : "next"];
 }
 
 /** The three-step "Getting started" checklist. */
-export function SetupSteps({ gmailConnected, hasSent }: { gmailConnected: boolean; hasSent: boolean }) {
-  const statuses = stepStatuses(gmailConnected, hasSent);
+export function SetupSteps(progress: Progress) {
+  const statuses = stepStatuses(progress);
   const done = statuses.filter((s) => s === "done").length;
   const total = statuses.length;
   return (
@@ -91,7 +94,6 @@ export function SetupSteps({ gmailConnected, hasSent }: { gmailConnected: boolea
           );
         })}
       </ol>
-      <p className="m-0 mt-5 rounded-xl bg-paper px-4 py-3 text-[13px] text-muted">{copy.soonNote}</p>
     </section>
   );
 }

@@ -37,11 +37,13 @@ select results_eq(
 );
 select is((select open_count from public.safe_send_recipients where token_hash = repeat('a', 64)), 1, 'the open is counted');
 select is(
-  (select count(*)::int from public.activity_log where action = 'opened'), 1, 'the first open lands in the history'
+  (select count(*)::int from public.activity_log where action = 'opened'
+     and user_id = '11111111-1111-1111-1111-111111111111'), 1, 'the first open lands in the history'
 );
 select * from public.open_safe_send(repeat('a', 64));
 select is(
-  (select count(*)::int from public.activity_log where action = 'opened'), 1, 'later opens are counted, not re-logged'
+  (select count(*)::int from public.activity_log where action = 'opened'
+     and user_id = '11111111-1111-1111-1111-111111111111'), 1, 'later opens are counted, not re-logged'
 );
 select is_empty($$ select * from public.open_safe_send(repeat('f', 64)) $$, 'an unknown link finds nothing');
 

@@ -19,7 +19,8 @@ export async function POST(request: Request) {
 
   const parsed = await parseJson(request, queueRequestSchema);
   if (parsed.response) return parsed.response;
-  const { to, cc, subject, body, delaySeconds, findingsCount, findingsAccepted, safeSend } = parsed.data;
+  const { to, cc, subject, body, delaySeconds, findingsCount, findingsAccepted, safeSend, checkIds } =
+    parsed.data;
 
   try {
     const delay = delaySeconds ?? (await getProfile(user.id))?.default_delay_seconds ?? 300;
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
       findingsCount,
       findingsAccepted,
       safeSend,
+      checkIds,
     });
     if (!queued) return fail(errors.noAccount, 409);
     return NextResponse.json({ ok: true, id: queued.id, sendAt: queued.sendAt.toISOString() });

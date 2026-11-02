@@ -7,10 +7,10 @@ import { formatClock } from "@/lib/time";
 
 const at = (ms: number) => ({ animationDelay: `${ms}ms` });
 
-type Props = { firstName: string | null; delaySeconds: number };
+type Props = { firstName: string | null; delaySeconds: number; connected: boolean };
 
 /** Brand banner: greeting, the promise, and the user's Smart Delay as a ring. */
-export function HomeHero({ firstName, delaySeconds }: Props) {
+export function HomeHero({ firstName, delaySeconds, connected }: Props) {
   const minutes = formatDelay(delaySeconds);
   return (
     <section
@@ -35,7 +35,7 @@ export function HomeHero({ firstName, delaySeconds }: Props) {
             </span>
           </h1>
           <p className="mt-4 mb-0 max-w-[520px] text-[clamp(15px,1.3vw,17px)] leading-relaxed text-on-brand">
-            {copy.body}
+            {connected ? copy.bodyConnected : copy.body}
           </p>
         </div>
 

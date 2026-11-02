@@ -3,6 +3,12 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-02: Dashboard counts the last 30 days; checks are linked to the email they led to
+
+- **Decision:** The dashboard numbers cover a rolling 30 days, not the calendar month. Every AI check run while writing an email is linked to that email (`ai_check_events.email_id`) when it is queued, and `findings_count` counts the distinct mistakes across all those checks, not just the last one.
+- **Why:** The server doesn't know the user's time zone, and on the 2nd of a month "this month" shows almost nothing. Counting only the last check recorded "0 caught" whenever the user fixed things and Clinton checked again, hiding exactly the catches the dashboard exists to show.
+- **Consequences:** Checks for emails never sent stay unlinked and don't appear in the caught list. Only finding types are stored, never the words (trust rule 6). Linking is best effort: a failure is logged and never blocks the send.
+
 ## 2026-10-31: Safe Send is card-only, one link per person, crypto-shredded
 
 - **Update (deliverability):** the first branded card ("Ada Obi sent you a message", one big button) landed in Gmail spam. The card is now a short plain note in the sender's voice with the full link address visible, no banner, no button. Keep it that way: branded "you have a message" layouts read as phishing.

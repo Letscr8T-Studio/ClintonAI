@@ -14,6 +14,7 @@ type SendOptions = {
   findingsCount: number;
   findingsAccepted: number;
   safeSend: boolean;
+  checkIds: string[];
 };
 
 /** Puts the email in the Outbox, then goes there to watch the countdown. */

@@ -1,6 +1,7 @@
 import "server-only";
 import type { EmailDraft } from "@/types/emails";
 import { listAccounts } from "@/server/accounts/repository";
+import { linkChecks } from "@/server/ai/repository";
 import { decryptBody, encryptBody } from "./crypto";
 import { deliver, type DeliveryOutcome } from "./deliver";
 import * as repo from "./repository";
@@ -14,6 +15,8 @@ export type QueueInput = {
   findingsAccepted: number;
   /** Trust rule 3: chosen per email, never on by default. */
   safeSend: boolean;
+  /** The AI checks run while writing it. */
+  checkIds?: string[];
 };
 
 /** Puts an email in the Outbox: encrypted, held until now + its Smart Delay. */
@@ -36,9 +39,13 @@ export async function queueEmail(
     safeSend: input.safeSend,
     sendAt,
     findingsCount: input.findingsCount,
-    findingsAccepted: input.findingsAccepted,
+    findingsAccepted: Math.min(input.findingsAccepted, input.findingsCount),
   });
   await repo.recordActivity([{ userId: user.id, emailId: id, action: "held", recipient: input.draft.to[0] }]);
+  // The dashboard's "caught" list only; never worth failing a send over.
+  await linkChecks(user.id, id, input.checkIds ?? []).catch((error: unknown) =>
+    console.error("Checks not linked", error instanceof Error ? error.message : error),
+  );
   return { id, sendAt };
 }
 

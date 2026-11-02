@@ -80,7 +80,10 @@ read/write), view `waitlist_stats`.
 Phase 1 tables (`profiles`, `connected_accounts`, `emails`, `safe_send_messages`,
 `safe_send_recipients`, `ai_check_events`, `activity_log`) are in place: users read their own rows
 through RLS, the server writes with the service role, and triggers enforce the trust rules. Details in
-the [Phase 1 plan](../phases/phase-1-safety-platform.md) (Data model).
+the [Phase 1 plan](../phases/phase-1-safety-platform.md) (Data model). The Home dashboard reads
+through `src/server/dashboard/repository.ts` as the user: `dashboard_stats(p_since)` (security
+invoker, so RLS applies) for the four numbers, plus emails, linked `ai_check_events` and
+`activity_log` for the lists.
 
 Types: `src/types/supabase.gen.ts` is generated (`npm run db:types`); `src/types/database.ts`
 re-exports it with friendly row names (`EmailRow`, `Profile`…). Import from `database.ts`.
