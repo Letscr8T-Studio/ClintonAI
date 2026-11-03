@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import { outboxDefaults } from "@/test/fixtures";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { stepStatuses } from "@/components/app/home/SetupSteps";
 import { activityCopy, caughtCopy, recentCopy, statsCopy } from "@/content/app/dashboard";
@@ -35,6 +36,7 @@ const emails: OutboxEmail[] = [
     subject: "Board update",
     to: ["kemi@client.co"],
     cc: [],
+    ...outboxDefaults,
     status: "held",
     sendAt: at(3 * 60_000 + 5_000),
     sentAt: null,
@@ -54,6 +56,7 @@ const emails: OutboxEmail[] = [
     subject: "Pricing",
     to: ["tunde@client.co"],
     cc: [],
+    ...outboxDefaults,
     status: "sent",
     sendAt: at(-3_600_000),
     sentAt: at(-3_600_000),

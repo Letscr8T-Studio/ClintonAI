@@ -3,6 +3,20 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-03: Compose extras before launch: Bcc, attachments, Send later, Likely opened, Rewrite
+
+- **Decision:** Founder decision to ship these everyday-email features in Phase 1. Bulk outreach (CSV import, mail merge, follow-ups) stays Phase 2.
+  - **Attachments.** The browser uploads each file straight to the private `attachments` bucket with a one-time signed URL from `POST /api/attachments`, so large files never pass through our functions (Vercel's 4.5 MB body limit). The email row keeps only `{path, name, size, type}`. The dispatcher downloads the files, sends them as `multipart/mixed`, then deletes them. Cancel deletes them too; Edit/Undo keeps them so they come back into Compose. Uploads unused for 24 h are swept by the dispatcher.
+  - **Gmail sending.** Every message now goes through the media-upload endpoint (`message/rfc822`, up to 35 MB) instead of the JSON `raw` field.
+  - **Send later.** Uses the same hold and dispatcher as Smart Delay (`send_at` = the chosen time, `scheduled = true`), between 1 minute and 30 days ahead.
+  - **"Likely opened".** Opt-in (`profiles.open_tracking`, off by default; switchable per email). Adds an HTML copy of the text with a 1×1 image; only the token's SHA-256 is stored. Never used with Safe Send, which already knows who opened it.
+  - **Rewrite with Clinton.** Same provider as the check, `store: false`, never stored or logged, 20 s budget. The result replaces the text with Undo until the user edits it.
+- **Why:** Bcc, attachments and scheduling are table stakes for a daily email tool. "Likely opened" was the most requested insight. Rewrite turns the check from "spot problems" into "fix them for me".
+- **Consequences:**
+  - **Attachments at rest.** Files are not encrypted by us (Supabase encrypts storage at rest). Unlike email bodies, they are protected by the bucket being service-role only and by a short life. Revisit with client-side encryption if the security review asks.
+  - **Pixel limits.** Opens are a guess (Apple Mail preloads; other apps block images). The pixel can't tell recipients apart, and it may slightly raise spam scoring, so it stays opt-in and is listed in the launch checklist.
+  - **Rewrite is a user edit.** It marks the check result out of date, so the email is checked again on send.
+
 ## 2026-11-02: Premium app pass: dark mode, inline highlights, Undo bar, command menu
 
 - **Decision:** The signed-in app gets:

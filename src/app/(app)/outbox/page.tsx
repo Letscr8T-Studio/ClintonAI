@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { OutboxView } from "@/components/app/outbox/OutboxView";
-import { listOutbox } from "@/server/emails/repository";
+import { listOutbox } from "@/server/emails/outbox-repository";
 import { attachSafeSend } from "@/server/safe-send/service";
 
 export const metadata: Metadata = { title: "Outbox" };

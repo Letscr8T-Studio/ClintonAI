@@ -2,6 +2,7 @@ import "server-only";
 import type { EmailDraft } from "@/types/emails";
 import { listAccounts } from "@/server/accounts/repository";
 import { linkChecks } from "@/server/ai/repository";
+import { attachmentRefs, removeAttachments } from "./attachments";
 import { decryptBody, encryptBody } from "./crypto";
 import { deliver, type DeliveryOutcome } from "./deliver";
 import * as repo from "./repository";
@@ -11,6 +12,10 @@ type User = { id: string };
 export type QueueInput = {
   draft: EmailDraft;
   delaySeconds: number;
+  /** Send later: leaves at this time instead of after the Smart Delay. */
+  sendAt?: Date | null;
+  /** "Likely opened" for this email. Never with Safe Send (it has certain opens). */
+  trackOpens?: boolean;
   findingsCount: number;
   findingsAccepted: number;
   /** Trust rule 3: chosen per email, never on by default. */
@@ -19,7 +24,7 @@ export type QueueInput = {
   checkIds?: string[];
 };
 
-/** Puts an email in the Outbox: encrypted, held until now + its Smart Delay. */
+/** Puts an email in the Outbox: encrypted, held until now + its Smart Delay (or the time picked). */
 export async function queueEmail(
   user: User,
   input: QueueInput,
@@ -28,16 +33,20 @@ export async function queueEmail(
   const account = (await listAccounts()).find((a) => a.status === "active");
   if (!account) return null;
 
-  const sendAt = new Date(now.getTime() + input.delaySeconds * 1000);
+  const sendAt = input.sendAt ?? new Date(now.getTime() + input.delaySeconds * 1000);
   const id = await repo.insertHeldEmail({
     userId: user.id,
     accountId: account.id,
     subject: input.draft.subject,
     to: input.draft.to,
     cc: input.draft.cc,
+    bcc: input.draft.bcc,
+    attachments: input.draft.attachments,
     bodyEncrypted: encryptBody(input.draft.body),
     safeSend: input.safeSend,
     sendAt,
+    scheduled: Boolean(input.sendAt),
+    trackOpens: Boolean(input.trackOpens) && !input.safeSend,
     findingsCount: input.findingsCount,
     findingsAccepted: Math.min(input.findingsAccepted, input.findingsCount),
   });
@@ -50,15 +59,19 @@ export async function queueEmail(
 }
 
 export async function cancelEmail(user: User, id: string): Promise<boolean> {
+  const email = await repo.findHeldEmail(user.id, id);
   const [cancelled] = await repo.cancelHeld(user.id, { id });
   if (!cancelled) return false;
   await repo.recordActivity([{ userId: user.id, emailId: cancelled, action: "cancelled" }]);
+  // Cancelled for good: its files go too.
+  await removeAttachments(attachmentRefs(email?.attachments).map((a) => a.path));
   return true;
 }
 
 /**
  * Edit: the email comes back out of the Outbox into Compose. It is cancelled here (so it can never
  * leave mid-edit) and its text is returned once; sending again starts a new check and countdown.
+ * Its attached files stay, so they come back with it.
  */
 export async function takeBackForEdit(user: User, id: string): Promise<EmailDraft | null> {
   const email = await repo.findHeldEmail(user.id, id);
@@ -68,7 +81,14 @@ export async function takeBackForEdit(user: User, id: string): Promise<EmailDraf
   if (!cancelled) return null; // it left in the meantime
   await repo.recordActivity([{ userId: user.id, emailId: id, action: "edited" }]);
   const list = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
-  return { to: list(email.to_recipients), cc: list(email.cc_recipients), subject: email.subject, body };
+  return {
+    to: list(email.to_recipients),
+    cc: list(email.cc_recipients),
+    bcc: list(email.bcc_recipients),
+    subject: email.subject,
+    body,
+    attachments: attachmentRefs(email.attachments),
+  };
 }
 
 /** Send now: skip the rest of the countdown for one of the user's own held emails. */

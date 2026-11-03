@@ -3,6 +3,7 @@ import { GmailCard } from "@/components/app/gmail/GmailCard";
 import { AppearanceSetting } from "@/components/app/settings/AppearanceSetting";
 import { DelaySetting } from "@/components/app/settings/DelaySetting";
 import { NameSetting } from "@/components/app/settings/NameSetting";
+import { OpenTrackingSetting } from "@/components/app/settings/OpenTrackingSetting";
 import { PrivacySummary } from "@/components/app/settings/PrivacySummary";
 import { SettingsSection } from "@/components/app/settings/SettingsSection";
 import { settingsCopy as copy } from "@/content/app/settings";
@@ -35,6 +36,15 @@ export default async function SettingsPage() {
 
       <SettingsSection id={copy.name.id} title={copy.name.title} body={copy.name.body} delay={120}>
         <NameSetting initialName={profile.display_name ?? ""} email={sender} />
+      </SettingsSection>
+
+      <SettingsSection
+        id={copy.tracking.id}
+        title={copy.tracking.title}
+        body={copy.tracking.body}
+        delay={140}
+      >
+        <OpenTrackingSetting initialOn={profile.open_tracking} />
       </SettingsSection>
 
       <SettingsSection

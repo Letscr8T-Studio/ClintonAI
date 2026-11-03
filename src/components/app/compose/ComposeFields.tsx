@@ -1,17 +1,21 @@
 import type { Ref, RefObject } from "react";
 import { composeCopy as copy } from "@/content/app/compose";
+import { recipientsCopy } from "@/content/app/compose-options";
 import type { Finding } from "@/lib/check/types";
 import { cn } from "@/lib/cn";
+import { AddressRow, FieldError, fieldInput, fieldLabel, fieldRow } from "./AddressRow";
 import { MessageField } from "./MessageField";
 
-export type DraftFields = { to: string; cc: string; subject: string; body: string };
-export type FieldErrors = Partial<Record<"to" | "cc" | "body", string>>;
+export type DraftFields = { to: string; cc: string; bcc: string; subject: string; body: string };
+export type FieldErrors = Partial<Record<"to" | "cc" | "bcc" | "body", string>>;
+/** Cc and Bcc rows are hidden until asked for, or until they have something in them. */
+export type ExtraRows = { cc: boolean; bcc: boolean };
 
 type Props = {
   values: DraftFields;
   errors: FieldErrors;
-  showCc: boolean;
-  onShowCc: () => void;
+  rows: ExtraRows;
+  onShowRow: (row: keyof ExtraRows) => void;
   onChange: (field: keyof DraftFields, value: string) => void;
   toRef: Ref<HTMLInputElement>;
   subjectRef: Ref<HTMLInputElement>;
@@ -20,89 +24,59 @@ type Props = {
   flags: { findings: Finding[]; onFix: (finding: Finding) => void; onIgnore: (id: string) => void };
 };
 
-const row = "flex items-center gap-3 border-b border-line px-5 sm:px-7";
-const label = "w-16 shrink-0 py-4 text-sm text-muted";
-const input =
-  "min-w-0 flex-1 bg-transparent py-4 text-[15px] text-ink outline-none placeholder:text-placeholder";
+const reveal =
+  "cursor-pointer rounded-full px-2.5 py-1.5 text-sm font-medium text-muted hover:bg-paper hover:text-ink";
 
-function FieldError({ id, message }: { id: string; message?: string }) {
-  if (!message) return null;
-  return (
-    <p
-      id={id}
-      className="m-0 border-b border-line bg-danger-bg px-5 py-2 text-[13px] font-medium text-danger-ink sm:px-7"
-    >
-      {message}
-    </p>
-  );
-}
-
-/** To, Cc, Subject and Message, as hairline-separated rows. */
-export function ComposeFields({
-  values,
-  errors,
-  showCc,
-  onShowCc,
-  onChange,
-  toRef,
-  subjectRef,
-  bodyRef,
-  flags,
-}: Props) {
+/** To, Cc, Bcc, Subject and Message, as hairline-separated rows. */
+export function ComposeFields(props: Props) {
+  const { values, errors, rows, onShowRow, onChange, flags, toRef, subjectRef, bodyRef } = props;
   return (
     <>
-      <div className={cn(row, "focus-within:bg-brand-wash/60")}>
-        <label htmlFor="compose-to" className={label}>
-          {copy.to}
-        </label>
-        <input
-          id="compose-to"
-          ref={toRef}
-          type="text"
-          inputMode="email"
-          autoComplete="email"
-          value={values.to}
-          onChange={(e) => onChange("to", e.target.value)}
-          placeholder={copy.toPlaceholder}
-          aria-invalid={Boolean(errors.to)}
-          aria-describedby={errors.to ? "compose-to-error" : undefined}
-          className={input}
+      <AddressRow
+        id="compose-to"
+        label={copy.to}
+        value={values.to}
+        onChange={(v) => onChange("to", v)}
+        error={errors.to}
+        placeholder={copy.toPlaceholder}
+        inputRef={toRef}
+      >
+        {(["cc", "bcc"] as const).map((r) =>
+          rows[r] ? null : (
+            <button
+              key={r}
+              type="button"
+              onClick={() => onShowRow(r)}
+              aria-label={r === "cc" ? recipientsCopy.addCcLabel : recipientsCopy.addBccLabel}
+              className={reveal}
+            >
+              {r === "cc" ? recipientsCopy.addCc : recipientsCopy.addBcc}
+            </button>
+          ),
+        )}
+      </AddressRow>
+      {rows.cc ? (
+        <AddressRow
+          id="compose-cc"
+          label={copy.cc}
+          value={values.cc}
+          onChange={(v) => onChange("cc", v)}
+          error={errors.cc}
         />
-        {!showCc ? (
-          <button
-            type="button"
-            onClick={onShowCc}
-            className="cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium text-muted hover:bg-paper hover:text-ink"
-          >
-            {copy.addCc}
-          </button>
-        ) : null}
-      </div>
-      <FieldError id="compose-to-error" message={errors.to} />
-
-      {showCc ? (
-        <>
-          <div className={cn(row, "focus-within:bg-brand-wash/60")}>
-            <label htmlFor="compose-cc" className={label}>
-              {copy.cc}
-            </label>
-            <input
-              id="compose-cc"
-              type="text"
-              inputMode="email"
-              value={values.cc}
-              onChange={(e) => onChange("cc", e.target.value)}
-              aria-invalid={Boolean(errors.cc)}
-              aria-describedby={errors.cc ? "compose-cc-error" : undefined}
-              className={input}
-            />
-          </div>
-          <FieldError id="compose-cc-error" message={errors.cc} />
-        </>
+      ) : null}
+      {rows.bcc ? (
+        <AddressRow
+          id="compose-bcc"
+          label={recipientsCopy.bcc}
+          value={values.bcc}
+          onChange={(v) => onChange("bcc", v)}
+          error={errors.bcc}
+          hint={recipientsCopy.bccHint}
+        />
       ) : null}
 
-      <div className={cn(row, "focus-within:bg-brand-wash/60")}>
-        <label htmlFor="compose-subject" className={label}>
+      <div className={cn(fieldRow, "focus-within:bg-brand-wash/60")}>
+        <label htmlFor="compose-subject" className={fieldLabel}>
           {copy.subject}
         </label>
         <input
@@ -111,7 +85,7 @@ export function ComposeFields({
           type="text"
           value={values.subject}
           onChange={(e) => onChange("subject", e.target.value)}
-          className={cn(input, "font-semibold")}
+          className={cn(fieldInput, "font-semibold")}
         />
       </div>
 

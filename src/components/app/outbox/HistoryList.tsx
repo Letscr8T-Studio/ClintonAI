@@ -3,6 +3,7 @@
 import { Chip } from "@/components/ui/Chip";
 import { outboxCopy as copy } from "@/content/app/outbox";
 import type { OutboxEmail } from "@/types/emails";
+import { EmailBadges } from "./EmailBadges";
 import { SafeSendPanel } from "./SafeSendPanel";
 import { clockTime, useNow } from "./useNow";
 
@@ -33,7 +34,10 @@ export function HistoryList({ emails, empty, busyId = null, onWithdraw }: Props)
         <li key={email.id} className="px-5 py-4">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
             <div className="min-w-0 flex-1">
-              <p className="m-0 truncate font-semibold text-ink">{email.subject || copy.noSubject}</p>
+              <p className="m-0 flex items-center gap-2">
+                <span className="truncate font-semibold text-ink">{email.subject || copy.noSubject}</span>
+                <EmailBadges email={email} />
+              </p>
               <p className="m-0 mt-0.5 truncate text-sm text-muted">{copy.to(email.to.join(", "))}</p>
               {email.failureReason && email.status !== "cancelled" ? (
                 <p

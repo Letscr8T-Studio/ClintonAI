@@ -1,52 +1,12 @@
 import "server-only";
 import type { ActivityAction, EmailRow } from "@/types/database";
-import type { OutboxEmail } from "@/types/emails";
-import { getSupabaseForUser } from "@/server/auth/user-client";
+import type { AttachmentRef } from "@/types/emails";
 import { getSupabaseAdmin } from "@/server/supabase";
 
-// Reads for the Outbox run as the user (RLS, no body column). Writes and anything touching the
-// encrypted body run with the service role, always filtered by the owner.
+// Writes, and anything touching the encrypted body, run with the service role, always filtered by
+// the owner. The user's own reads (Outbox, Home) are in outbox-repository.ts.
 
-const OUTBOX_COLUMNS =
-  "id, subject, to_recipients, cc_recipients, status, safe_send, send_at, sent_at, failure_reason, created_at";
-const list = (value: unknown): string[] =>
-  Array.isArray(value) ? value.filter((v) => typeof v === "string") : [];
 const fail = (what: string, message: string) => new Error(`Could not ${what}: ${message}`);
-
-/** The last `days` of the user's emails, newest first. */
-export async function listOutbox(days = 7): Promise<OutboxEmail[]> {
-  const since = new Date(Date.now() - days * 86_400_000);
-  const supabase = await getSupabaseForUser();
-  const { data, error } = await supabase
-    .from("emails")
-    .select(OUTBOX_COLUMNS)
-    .gte("created_at", since.toISOString())
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (error) throw fail("load the Outbox", error.message);
-  return data.map((r) => ({
-    id: r.id,
-    safeSend: r.safe_send,
-    subject: r.subject,
-    to: list(r.to_recipients),
-    cc: list(r.cc_recipients),
-    status: r.status,
-    sendAt: r.send_at,
-    sentAt: r.sent_at,
-    failureReason: r.failure_reason,
-    createdAt: r.created_at,
-  }));
-}
-
-/** Ever sent an email (or, with safeSendOnly, a Safe Send one) through Clinton AI. */
-export async function hasSentEmail({ safeSendOnly = false } = {}): Promise<boolean> {
-  const supabase = await getSupabaseForUser();
-  let query = supabase.from("emails").select("id", { count: "exact", head: true }).eq("status", "sent");
-  if (safeSendOnly) query = query.eq("safe_send", true);
-  const { count, error } = await query;
-  if (error) throw fail("count sent emails", error.message);
-  return (count ?? 0) > 0;
-}
 
 export async function insertHeldEmail(row: {
   userId: string;
@@ -54,9 +14,13 @@ export async function insertHeldEmail(row: {
   subject: string;
   to: string[];
   cc: string[];
+  bcc: string[];
+  attachments: AttachmentRef[];
   bodyEncrypted: string;
   safeSend: boolean;
   sendAt: Date;
+  scheduled: boolean;
+  trackOpens: boolean;
   findingsCount: number;
   findingsAccepted: number;
 }): Promise<string> {
@@ -68,9 +32,13 @@ export async function insertHeldEmail(row: {
       subject: row.subject,
       to_recipients: row.to,
       cc_recipients: row.cc,
+      bcc_recipients: row.bcc,
+      attachments: row.attachments,
       body_encrypted: row.bodyEncrypted,
       safe_send: row.safeSend,
       send_at: row.sendAt.toISOString(),
+      scheduled: row.scheduled,
+      track_opens: row.trackOpens,
       findings_count: row.findingsCount,
       findings_accepted: row.findingsAccepted,
     })
@@ -131,6 +99,7 @@ export async function updateEmail(
     provider_message_id?: string;
     send_at?: string;
     failure_reason?: string | null;
+    open_token_hash?: string;
   },
 ): Promise<void> {
   const { error } = await getSupabaseAdmin().from("emails").update(change).eq("id", id);
@@ -152,4 +121,10 @@ export async function recordActivity(
       })),
     );
   if (error) throw fail("record activity", error.message);
+}
+
+/** A "Likely opened" pixel was loaded. Counted only for sent, tracked emails (see the migration). */
+export async function recordOpen(tokenHash: string): Promise<void> {
+  const { error } = await getSupabaseAdmin().rpc("record_email_open", { p_token_hash: tokenHash });
+  if (error) throw fail("record an open", error.message);
 }

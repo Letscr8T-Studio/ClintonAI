@@ -4,6 +4,8 @@
 export type DraftEmail = {
   to: string[];
   cc: string[];
+  /** Counted for "many recipients"; never shown to the model. */
+  bcc?: string[];
   subject: string;
   body: string;
   /** File names. Compose has no attachments yet, so this is empty until Safe Send. */

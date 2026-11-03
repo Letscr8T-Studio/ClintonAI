@@ -70,6 +70,7 @@ describe("ComposeWorkspace", () => {
     expect(JSON.parse(fetchMock.mock.calls[0]![1]!.body as string)).toEqual({
       to: ["dami@brightlane.io"],
       cc: [],
+      bcc: [],
       subject: "Offer",
       body: "Hi Tunde, welcome.",
       attachments: [],
@@ -147,12 +148,15 @@ describe("ComposeWorkspace", () => {
     expect(JSON.parse(init!.body as string)).toEqual({
       to: ["dami@brightlane.io"],
       cc: [],
+      bcc: [],
       subject: "Offer",
       body: "Hi Dami, welcome.",
+      attachments: [],
       delaySeconds: 300,
       findingsCount: 0,
       findingsAccepted: 0,
       safeSend: false,
+      trackOpens: false,
       checkIds: [],
     });
   });

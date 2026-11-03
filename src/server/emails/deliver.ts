@@ -3,13 +3,16 @@ import { failureReasons as reasons } from "@/content/app/outbox";
 import { safeSendCopy } from "@/content/app/safe-send";
 import type { EmailRow } from "@/types/database";
 import { getAccountForSending, getRefreshToken, setAccountStatus } from "@/server/accounts/repository";
+import { getAppUrl } from "@/server/env";
 import { GmailSendError, sendRawMessage } from "@/server/google/gmail";
 import { MimeError, buildPlainEmail } from "@/server/google/mime";
 import { GoogleAuthError, refreshAccessToken } from "@/server/google/oauth";
 import { getSenderName } from "@/server/profiles/repository";
 import { sendSafeSendCopies } from "@/server/safe-send/deliver";
+import { attachmentRefs, downloadAttachments, removeAttachments } from "./attachments";
 import { DecryptError, decryptBody } from "./crypto";
 import { recordActivity, updateEmail } from "./repository";
+import { newOpenToken, trackedHtml } from "./tracking";
 
 export const MAX_ATTEMPTS = 3;
 /** Wait before attempt 2, then attempt 3. */
@@ -26,12 +29,16 @@ const strings = (value: unknown): string[] =>
  */
 export async function deliver(email: EmailRow, now = new Date()): Promise<DeliveryOutcome> {
   const to = strings(email.to_recipients);
+  const files = attachmentRefs(email.attachments);
+  // Once an email has left (or never will), its files are deleted.
+  const done = () => removeAttachments(files.map((f) => f.path));
   const activity = (action: "sent" | "failed") =>
     recordActivity([{ userId: email.user_id, emailId: email.id, action, recipient: to[0] }]);
 
   const fail = async (reason: string): Promise<DeliveryOutcome> => {
     await updateEmail(email.id, { status: "failed", failure_reason: reason });
     await activity("failed");
+    await done();
     return "failed";
   };
   const retryOrFail = async (): Promise<DeliveryOutcome> => {
@@ -58,6 +65,9 @@ export async function deliver(email: EmailRow, now = new Date()): Promise<Delive
     throw error;
   }
 
+  const attached = files.length ? await downloadAttachments(files) : [];
+  if (!attached) return fail(reasons.attachmentsMissing);
+
   const refreshToken = await getRefreshToken(account.id);
   if (!refreshToken) return fail(reasons.revoked);
   let accessToken: string;
@@ -75,6 +85,7 @@ export async function deliver(email: EmailRow, now = new Date()): Promise<Delive
     const from = { email: account.email, name: await getSenderName(email.user_id) };
     let messageId: string;
     let note: string | null = null;
+    const open = email.track_opens && !email.safe_send ? newOpenToken() : null;
     if (email.safe_send) {
       // Each person gets a card with their own private link instead of the text.
       const result = await sendSafeSendCopies(email, body, from, accessToken);
@@ -88,6 +99,8 @@ export async function deliver(email: EmailRow, now = new Date()): Promise<Delive
         bcc: strings(email.bcc_recipients),
         subject: email.subject,
         body,
+        attachments: attached,
+        ...(open ? { html: trackedHtml(body, `${getAppUrl()}/api/o/${open.token}`) } : {}),
       });
       messageId = await sendRawMessage(accessToken, raw);
     }
@@ -96,8 +109,10 @@ export async function deliver(email: EmailRow, now = new Date()): Promise<Delive
       sent_at: now.toISOString(),
       provider_message_id: messageId,
       failure_reason: note,
+      ...(open ? { open_token_hash: open.hash } : {}),
     });
     await activity("sent");
+    await done();
     return "sent";
   } catch (error) {
     // Rate limits and Google outages are worth another try; a refused message is not.

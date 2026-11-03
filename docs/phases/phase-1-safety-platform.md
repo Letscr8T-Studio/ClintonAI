@@ -98,6 +98,16 @@ Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, mode
 5. [x] Smart Delay: Outbox, countdown, edit/cancel/send-now, pg_cron dispatcher. Body AES-256-GCM encrypted while held (`EMAIL_ENCRYPTION_KEY`); `claim_emails()` (FOR UPDATE SKIP LOCKED, crashed sends marked failed, never retried); pg_cron every 20 s → pg_net → `POST /api/cron/dispatch` (Bearer `CRON_SECRET`, URL + secret in Vault via `configure_dispatcher()`); retries 1 min / 5 min, 3 attempts; `invalid_grant` fails at once and marks the account revoked; Edit takes the email back into Compose (cancelled, re-checked on send); disconnect cancels held emails and keeps history (`on delete set null (account_id)`). `/outbox` with live countdowns; clean emails go straight to the Outbox from Compose; phones get a bottom tab bar. Verified live 2026-10-30: real email held, counted down and delivered from the founder's Gmail.
 6. [x] Safe Send: encryption, storage, recipient page `/m/[token]`, card email template, withdraw, expiry job. Card only (no text in the inbox). Per-message AES-256-GCM key in Vault (`create_safe_send` / `get_safe_send_key` / `open_safe_send` / `shred_safe_send`, service role only); ciphertext in the private `safe-send` bucket; one copy and one 256-bit link per person (only its SHA-256 stored), Bcc never revealed; withdraw for one person or everyone (everyone = key destroyed at once); expiry shredded by the 20 s dispatcher heartbeat; opens counted only while readable and labelled approximate; Compose toggle off by default, suggested for sensitive data / many recipients, max 20 people.
 7. [x] Dashboard (stats, table, caught list) + activity history. Home becomes the dashboard after the first send: four numbers for the last 30 days (`dashboard_stats()`, security invoker so RLS applies), recent emails with live time left to cancel or withdraw, emails Clinton flagged with the kinds of mistake (from `ai_check_events` linked to the email) and what the user did, and the activity history. Getting started stays until Gmail, a first send and a first Safe Send are done. (Settings page built early, 2026-10-30: default Smart Delay with instant save, sender name with From preview, Gmail account, what Clinton keeps.)
+       7b. [x] Compose extras (2026-11-03), before launch by founder decision:
+   - **Bcc.**
+   - **Attachments**, up to 10 files and 18 MB:
+     - uploaded straight from the browser to the private `attachments` bucket with one-time signed URLs;
+     - sent as `multipart/mixed` through Gmail's media-upload endpoint;
+     - deleted when the email leaves or is cancelled;
+     - leftovers swept after 24 h by `stale_attachments()`.
+   - **Send later**: quick picks or any time up to 30 days ahead, held like Smart Delay with `scheduled = true`.
+   - **"Likely opened"**: opt-in per account (`profiles.open_tracking`) and per email. A 1×1 pixel at `/api/o/[token]` (only the SHA-256 is stored); `record_email_open()` ignores the first 5 s; always labelled a guess.
+   - **Rewrite with Clinton**: fix, shorter, friendlier, formal. `POST /api/rewrite`, text never stored, Undo in Compose.
 8. [ ] Hardening: every item in the [launch checklist](../launch-checklist.md) (shared rate limits, CSP, signed Tally webhook, real console auth, Sentry), plus privacy policy + Limited Use page and terms.
 9. [ ] Human + AI security review of auth, tokens, encryption. Deliverability tests (Gmail, Outlook, Yahoo spam folders).
 10. [ ] Google verification submission (demo video, scope justifications). Invite beta in batches.
@@ -107,5 +117,5 @@ Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, mode
 - Default Smart Delay value: set to 5 min for now; confirm from beta testing.
 - ~~`gmail.send` offline tokens~~ Decided 2026-10-29: our own "Connect Gmail" OAuth step, separate from sign-in (see decisions.md).
 - ~~Disconnecting an account with held emails~~ Done in milestone 5: held emails are cancelled first; sent history is kept.
-- Attachment size limit for Safe Send and storage cost.
+- Attachments with Safe Send (not supported yet: Compose and the API refuse the combination). Normal emails: 18 MB, decided 2026-11-03.
 - Optional one-time code for very sensitive Safe Send emails: in v1 or later?

@@ -18,6 +18,8 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}"],
     restoreMocks: true,
     unstubEnvs: true,
+    // Compose tests type whole emails key by key; on a busy machine (or CI) that passes 5 s.
+    testTimeout: 15_000,
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],

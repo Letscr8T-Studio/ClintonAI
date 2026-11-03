@@ -12,7 +12,7 @@ import { connectOutcome } from "@/content/app/gmail";
 import { listAccounts } from "@/server/accounts/repository";
 import { requireProfile } from "@/server/auth/user";
 import { getStats, listActivity, listCaught } from "@/server/dashboard/repository";
-import { hasSentEmail, listOutbox } from "@/server/emails/repository";
+import { hasSentEmail, listOutbox } from "@/server/emails/outbox-repository";
 import { attachSafeSend } from "@/server/safe-send/service";
 
 export const metadata: Metadata = { title: "Home" };

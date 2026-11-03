@@ -31,6 +31,12 @@ export async function saveDefaultDelay(seconds: number): Promise<SettingResult> 
   return save({ default_delay_seconds: parsed.data });
 }
 
+/** "Likely opened" for new emails (each email can still switch it in Compose). */
+export async function saveOpenTracking(on: boolean): Promise<SettingResult> {
+  if (typeof on !== "boolean") return { ok: false, error: copy.saveFailed };
+  return save({ open_tracking: on });
+}
+
 /** Appearance is per device, so it lives in a cookie rather than the profile. */
 export async function saveTheme(theme: string): Promise<SettingResult> {
   await requireUser();

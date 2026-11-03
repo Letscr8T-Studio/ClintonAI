@@ -1,5 +1,6 @@
 "use client";
 
+import { EmailBadges } from "@/components/app/outbox/EmailBadges";
 import { useNow } from "@/components/app/outbox/useNow";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { LocalTime } from "@/components/ui/LocalTime";
@@ -78,6 +79,7 @@ export function RecentEmails({ emails }: { emails: OutboxEmail[] }) {
                           {copy.safeSend}
                         </Chip>
                       ) : null}
+                      <EmailBadges email={email} />
                     </p>
                     <p className="m-0 mt-0.5 truncate text-[13px] text-muted">
                       {copy.to(email.to.join(", "))}

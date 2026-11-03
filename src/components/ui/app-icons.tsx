@@ -70,3 +70,38 @@ export function PlusIcon({ size = 18, className }: IconProps) {
     </Svg>
   );
 }
+
+export function PaperclipIcon({ size = 18, className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path
+        d="m20 11.5-8.2 8.2a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        {...round}
+      />
+    </Svg>
+  );
+}
+
+export function ClockIcon({ size = 18, className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth={1.8} />
+      <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth={1.8} {...round} />
+    </Svg>
+  );
+}
+
+export function SparkleIcon({ size = 18, className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path
+        d="M12 3.5 13.8 9 19.5 11 13.8 13 12 18.5 10.2 13 4.5 11 10.2 9zM18.5 16.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"
+        stroke="currentColor"
+        strokeWidth={1.6}
+        {...round}
+      />
+    </Svg>
+  );
+}

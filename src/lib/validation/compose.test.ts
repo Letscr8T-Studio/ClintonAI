@@ -19,6 +19,7 @@ describe("checkRequestSchema", () => {
     expect(checkRequestSchema.parse({ to: ["a@x.co"], body: "Hi" })).toEqual({
       to: ["a@x.co"],
       cc: [],
+      bcc: [],
       subject: "",
       body: "Hi",
       attachments: [],

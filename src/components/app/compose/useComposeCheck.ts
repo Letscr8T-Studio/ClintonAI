@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { describeHit, panelCopy } from "@/content/app/compose";
 import { toRuleFindings } from "@/lib/check/findings";
 import { runRules } from "@/lib/check/rules";
@@ -118,5 +118,13 @@ export function useComposeCheck() {
     [state],
   );
 
-  return { state, flagged, check, resolve, sendAnyway, markEdited, checkHistory, reset };
+  // On phones Clinton's panel sits below the form: bring the result into view.
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if ((state.status === "review" || state.status === "ready") && window.innerWidth < 1024) {
+      panelRef.current?.scrollIntoView({ block: "start" });
+    }
+  }, [state.status]);
+
+  return { state, flagged, panelRef, check, resolve, sendAnyway, markEdited, checkHistory, reset };
 }

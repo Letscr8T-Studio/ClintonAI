@@ -61,8 +61,8 @@ function greetingMismatch({ body, to, cc }: DraftEmail): RuleHit | null {
       };
 }
 
-function manyRecipients({ to, cc }: DraftEmail): RuleHit | null {
-  const count = new Set([...to, ...cc].map((a) => a.toLowerCase())).size;
+function manyRecipients({ to, cc, bcc = [] }: DraftEmail): RuleHit | null {
+  const count = new Set([...to, ...cc, ...bcc].map((a) => a.toLowerCase())).size;
   return count > MANY_RECIPIENTS ? { type: "many_recipients", field: "to", params: { count } } : null;
 }
 

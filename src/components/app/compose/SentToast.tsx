@@ -6,6 +6,7 @@ import { clockTime, useNow } from "@/components/app/outbox/useNow";
 import { Check, Close } from "@/components/ui/icons";
 import { appRoutes } from "@/config/routes";
 import { sentToastCopy as copy } from "@/content/app/compose";
+import { formatWhen } from "@/lib/schedule";
 import { formatClock } from "@/lib/time";
 import type { SentEmail } from "./useSendEmail";
 
@@ -53,6 +54,11 @@ export function SentToast({ email, onUndo, undoing, error, onDismiss }: Props) {
           <>
             <span className="font-semibold">{copy.sent}</span>
             <span className="sr-only">. {copy.sentNote}</span>
+          </>
+        ) : email.scheduled ? (
+          <>
+            <span className="font-semibold">{copy.scheduled(formatWhen(new Date(email.sendAt)))}</span>
+            <span className="sr-only">. {copy.scheduledNote}</span>
           </>
         ) : (
           <>

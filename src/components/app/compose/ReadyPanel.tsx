@@ -2,12 +2,16 @@ import { useId } from "react";
 import { Check } from "@/components/ui/icons";
 import { palette } from "@/config/brand";
 import { panelCopy as copy } from "@/content/app/compose";
+import { scheduleCopy } from "@/content/app/compose-options";
 import { delayOptions } from "@/content/app/onboarding";
+import { formatWhen } from "@/lib/schedule";
 import type { CheckState } from "./useComposeCheck";
 
 export type SendControls = {
   delaySeconds: number;
   onDelayChange: (seconds: number) => void;
+  /** Send later: the time picked in Compose; the Smart Delay doesn't apply. */
+  scheduledFor: Date | null;
   onSend: () => void;
   sending: boolean;
   error: string | null;
@@ -37,25 +41,35 @@ export function ReadyPanel({ state, send }: { state: CheckState; send: SendContr
           {reviewed ? copy.readyAfterReview : copy.readyBody}
         </p>
 
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-white/10 px-4 py-3">
-          <label htmlFor={delayId} className="text-sm font-medium">
-            {copy.delayLabel}
-          </label>
-          <select
-            id={delayId}
-            value={send.delaySeconds}
-            onChange={(e) => send.onDelayChange(Number(e.target.value))}
-            className="cursor-pointer rounded-xl border border-white/25 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white"
-          >
-            {delayOptions.map((o) => (
-              <option key={o.seconds} value={o.seconds} className="text-ink">
-                {o.off ? copy.delayOff : copy.delayOption(o.minutes)}
-              </option>
-            ))}
-          </select>
-        </div>
+        {send.scheduledFor ? (
+          <p className="mt-5 mb-0 rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold">
+            {scheduleCopy.chip(formatWhen(send.scheduledFor))}
+          </p>
+        ) : (
+          <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-white/10 px-4 py-3">
+            <label htmlFor={delayId} className="text-sm font-medium">
+              {copy.delayLabel}
+            </label>
+            <select
+              id={delayId}
+              value={send.delaySeconds}
+              onChange={(e) => send.onDelayChange(Number(e.target.value))}
+              className="cursor-pointer rounded-xl border border-white/25 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white"
+            >
+              {delayOptions.map((o) => (
+                <option key={o.seconds} value={o.seconds} className="text-ink">
+                  {o.off ? copy.delayOff : copy.delayOption(o.minutes)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <p className="mt-2 mb-0 text-[13px] text-on-brand">
-          {send.delaySeconds === 0 ? copy.delayOffHint : copy.delayHint}
+          {send.scheduledFor
+            ? scheduleCopy.body
+            : send.delaySeconds === 0
+              ? copy.delayOffHint
+              : copy.delayHint}
         </p>
 
         {send.error ? (
@@ -73,7 +87,7 @@ export function ReadyPanel({ state, send }: { state: CheckState; send: SendContr
           aria-busy={send.sending}
           className="mt-5 inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-2xl bg-white px-6 text-[15px] font-semibold text-brand-deep transition-[translate] hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none"
         >
-          {send.sending ? copy.sending : copy.send}
+          {send.sending ? copy.sending : send.scheduledFor ? scheduleCopy.set : copy.send}
         </button>
       </div>
     </div>

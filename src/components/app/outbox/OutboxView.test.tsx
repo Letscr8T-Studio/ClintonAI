@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { outboxDefaults } from "@/test/fixtures";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DRAFT_HANDOFF_KEY } from "@/components/app/compose/useSendEmail";
@@ -17,6 +18,7 @@ const email = (over: Partial<OutboxEmail>): OutboxEmail => ({
   subject: "Q3 investor update",
   to: ["investor@fund.co"],
   cc: [],
+  ...outboxDefaults,
   status: "held",
   sendAt: new Date(NOW + 4 * 60_000 + 59_000).toISOString(),
   sentAt: null,

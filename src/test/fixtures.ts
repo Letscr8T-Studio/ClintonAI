@@ -23,3 +23,12 @@ export function jsonRequest(url: string, body: unknown, headers: Record<string, 
     body: typeof body === "string" ? body : JSON.stringify(body),
   });
 }
+
+/** Send options an Outbox email has by default (no files, not scheduled, not tracked). */
+export const outboxDefaults = {
+  attachments: [] as string[],
+  scheduled: false,
+  trackOpens: false,
+  opensCount: 0,
+  firstOpenedAt: null,
+};

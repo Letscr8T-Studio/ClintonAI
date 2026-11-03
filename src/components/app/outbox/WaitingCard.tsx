@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { ProgressRing } from "@/components/app/ProgressRing";
-import { outboxCopy as copy } from "@/content/app/outbox";
-import { formatClock } from "@/lib/time";
+import { badgeCopy, outboxCopy as copy } from "@/content/app/outbox";
+import { formatWhen } from "@/lib/schedule";
+import { formatCountdown } from "@/lib/time";
 import { cn } from "@/lib/cn";
 import type { OutboxEmail } from "@/types/emails";
 import { clockTime, useNow } from "./useNow";
@@ -28,21 +29,30 @@ export function WaitingCard({ email, busy, onAction }: Props) {
       <div aria-hidden="true" className="stage-grid absolute inset-0" />
       <ProgressRing
         value={left === null ? 1 : left / total}
-        valueClassName="text-[20px]"
+        valueClassName={left !== null && left >= 3_600_000 ? "text-[15px]" : "text-[20px]"}
         sizeClassName="w-24"
         className="relative shrink-0"
       >
-        {left === null ? "--:--" : formatClock(Math.ceil(left / 1000))}
+        {left === null ? "--:--" : formatCountdown(Math.ceil(left / 1000))}
       </ProgressRing>
 
       <div className="relative min-w-0 flex-1">
         <p className="m-0 font-mono text-[11px] tracking-wider text-navy-text uppercase" aria-live="polite">
-          {leaving ? copy.leaving : now === null ? copy.leavingIn : copy.leavesAt(clockTime(email.sendAt))}
+          {leaving
+            ? copy.leaving
+            : now === null
+              ? copy.leavingIn
+              : email.scheduled
+                ? copy.scheduledFor(formatWhen(new Date(email.sendAt), new Date(now)))
+                : copy.leavesAt(clockTime(email.sendAt))}
         </p>
         <h3 className="mt-1.5 mb-0 truncate font-display text-xl font-bold tracking-tight">
           {email.subject || copy.noSubject}
         </h3>
-        <p className="m-0 mt-1 truncate text-sm text-navy-text">{copy.to(email.to.join(", "))}</p>
+        <p className="m-0 mt-1 truncate text-sm text-navy-text">
+          {copy.to(email.to.join(", "))}
+          {email.attachments.length ? ` · ${badgeCopy.files(email.attachments.length)}` : ""}
+        </p>
         {email.failureReason ? (
           <p className="mt-2 mb-0 text-[13px] text-amber">{email.failureReason}</p>
         ) : null}

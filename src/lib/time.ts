@@ -82,3 +82,13 @@ export function formatTimeLeft(ms: number): string {
   const m = minutes % 60;
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
+
+/** A countdown that also reads well for days: "04:59", "3h 05m", "2d 4h". */
+export function formatCountdown(totalSeconds: number): string {
+  const s = Math.max(0, Math.floor(totalSeconds));
+  if (s < 3600) return formatClock(s);
+  const days = Math.floor(s / 86400);
+  const hours = Math.floor((s % 86400) / 3600);
+  if (days > 0) return `${days}d ${hours}h`;
+  return `${hours}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m`;
+}

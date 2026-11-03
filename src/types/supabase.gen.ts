@@ -124,6 +124,7 @@ export type Database = {
       emails: {
         Row: {
           account_id: string | null;
+          attachments: NonNullable<Json>;
           attempt_count: number;
           bcc_recipients: NonNullable<Json>;
           body_encrypted: string | null;
@@ -132,20 +133,27 @@ export type Database = {
           failure_reason: string | null;
           findings_accepted: number;
           findings_count: number;
+          first_opened_at: string | null;
           id: string;
+          last_opened_at: string | null;
+          open_token_hash: string | null;
+          opens_count: number;
           provider_message_id: string | null;
           safe_send: boolean;
+          scheduled: boolean;
           send_at: string;
           sent_at: string | null;
           status: Database["public"]["Enums"]["email_status"];
           subject: string;
           to_recipients: NonNullable<Json>;
+          track_opens: boolean;
           updated_at: string;
           user_id: string;
         };
         ComputedFields: never;
         Insert: {
           account_id?: string | null;
+          attachments?: NonNullable<Json>;
           attempt_count?: number;
           bcc_recipients?: NonNullable<Json>;
           body_encrypted?: string | null;
@@ -154,19 +162,26 @@ export type Database = {
           failure_reason?: string | null;
           findings_accepted?: number;
           findings_count?: number;
+          first_opened_at?: string | null;
           id?: string;
+          last_opened_at?: string | null;
+          open_token_hash?: string | null;
+          opens_count?: number;
           provider_message_id?: string | null;
           safe_send?: boolean;
+          scheduled?: boolean;
           send_at: string;
           sent_at?: string | null;
           status?: Database["public"]["Enums"]["email_status"];
           subject?: string;
           to_recipients: NonNullable<Json>;
+          track_opens?: boolean;
           updated_at?: string;
           user_id: string;
         };
         Update: {
           account_id?: string | null;
+          attachments?: NonNullable<Json>;
           attempt_count?: number;
           bcc_recipients?: NonNullable<Json>;
           body_encrypted?: string | null;
@@ -175,14 +190,20 @@ export type Database = {
           failure_reason?: string | null;
           findings_accepted?: number;
           findings_count?: number;
+          first_opened_at?: string | null;
           id?: string;
+          last_opened_at?: string | null;
+          open_token_hash?: string | null;
+          opens_count?: number;
           provider_message_id?: string | null;
           safe_send?: boolean;
+          scheduled?: boolean;
           send_at?: string;
           sent_at?: string | null;
           status?: Database["public"]["Enums"]["email_status"];
           subject?: string;
           to_recipients?: NonNullable<Json>;
+          track_opens?: boolean;
           updated_at?: string;
           user_id?: string;
         };
@@ -369,6 +390,7 @@ export type Database = {
         Args: { p_email_id?: string; p_limit?: number; p_user_id?: string };
         Returns: {
           account_id: string | null;
+          attachments: NonNullable<Json>;
           attempt_count: number;
           bcc_recipients: NonNullable<Json>;
           body_encrypted: string | null;
@@ -377,14 +399,20 @@ export type Database = {
           failure_reason: string | null;
           findings_accepted: number;
           findings_count: number;
+          first_opened_at: string | null;
           id: string;
+          last_opened_at: string | null;
+          open_token_hash: string | null;
+          opens_count: number;
           provider_message_id: string | null;
           safe_send: boolean;
+          scheduled: boolean;
           send_at: string;
           sent_at: string | null;
           status: Database["public"]["Enums"]["email_status"];
           subject: string;
           to_recipients: NonNullable<Json>;
+          track_opens: boolean;
           updated_at: string;
           user_id: string;
         }[];
@@ -440,6 +468,7 @@ export type Database = {
           withdrawn_at: string;
         }[];
       };
+      record_email_open: { Args: { p_token_hash: string }; Returns: undefined };
       save_google_account: {
         Args: { p_email: string; p_refresh_token: string; p_scopes: string[]; p_user_id: string };
         Returns: string;
@@ -453,6 +482,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      stale_attachments: { Args: { p_limit?: number }; Returns: string[] };
     };
     Enums: {
       account_status: "active" | "revoked" | "error";

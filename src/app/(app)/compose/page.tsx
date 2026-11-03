@@ -22,5 +22,11 @@ export default async function ComposePage() {
     );
   }
 
-  return <ComposeLoader fromEmail={account.email} defaultDelaySeconds={profile.default_delay_seconds} />;
+  return (
+    <ComposeLoader
+      fromEmail={account.email}
+      defaultDelaySeconds={profile.default_delay_seconds}
+      defaultTrackOpens={profile.open_tracking}
+    />
+  );
 }

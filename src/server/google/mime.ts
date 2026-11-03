@@ -1,7 +1,8 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 
-// Minimal RFC 5322 message builder (plain text, optionally with an HTML alternative) for the Gmail API.
+// Minimal RFC 5322 message builder for the Gmail API: plain text, optionally with an HTML
+// alternative and attached files.
 // Every header value is checked for CR/LF so user input can never inject headers.
 
 export type PlainEmail = {
@@ -14,7 +15,11 @@ export type PlainEmail = {
   body: string;
   /** Optional HTML version; `body` stays as the plain-text alternative. */
   html?: string;
+  attachments?: MailFile[];
 };
+
+/** A file to attach, already read into memory. */
+export type MailFile = { name: string; type: string; data: Buffer };
 
 export class MimeError extends Error {}
 
@@ -67,9 +72,46 @@ export function buildPlainEmail(email: PlainEmail, now = new Date()): string {
     `Date: ${now.toUTCString().replace("GMT", "+0000")}`,
     `Message-ID: <${randomBytes(16).toString("hex")}@${domain}>`,
     "MIME-Version: 1.0",
-    ...(email.html ? alternative(email.body, email.html) : part("text/plain", email.body)),
+    ...withFiles(email.html ? alternative(email.body, email.html) : part("text/plain", email.body), email),
   ];
   return Buffer.from(lines.join("\r\n"), "utf8").toString("base64url");
+}
+
+const boundary = () => `clinton-${randomBytes(12).toString("hex")}`;
+
+/** The message text first, then each file: clients list the files as attachments. */
+function withFiles(content: string[], { attachments = [] }: PlainEmail): string[] {
+  if (attachments.length === 0) return content;
+  const b = boundary();
+  return [
+    `Content-Type: multipart/mixed; boundary="${b}"`,
+    "",
+    `--${b}`,
+    ...content,
+    ...attachments.flatMap((file) => [`--${b}`, ...filePart(file)]),
+    `--${b}--`,
+  ];
+}
+
+/** name="report.pdf", or RFC 2231 (name*=UTF-8''...) for anything beyond plain ASCII. */
+export function fileParam(param: "name" | "filename", name: string): string {
+  assertHeader(name);
+  if (/^[\x20-\x7e]*$/.test(name) && !/["\\]/.test(name)) return `${param}="${name}"`;
+  const encoded = encodeURIComponent(name).replace(
+    /['()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+  return `${param}*=UTF-8''${encoded}`;
+}
+
+function filePart({ name, type, data }: MailFile): string[] {
+  return [
+    `Content-Type: ${assertHeader(type)}; ${fileParam("name", name)}`,
+    `Content-Disposition: attachment; ${fileParam("filename", name)}`,
+    "Content-Transfer-Encoding: base64",
+    "",
+    (data.toString("base64").match(/.{1,76}/g) ?? []).join("\r\n"),
+  ];
 }
 
 function part(type: "text/plain" | "text/html", content: string): string[] {
@@ -83,14 +125,14 @@ function part(type: "text/plain" | "text/html", content: string): string[] {
 
 /** Plain text first, HTML second: clients show the richest part they support. */
 function alternative(text: string, html: string): string[] {
-  const boundary = `clinton-${randomBytes(12).toString("hex")}`;
+  const b = boundary();
   return [
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    `Content-Type: multipart/alternative; boundary="${b}"`,
     "",
-    `--${boundary}`,
+    `--${b}`,
     ...part("text/plain", text),
-    `--${boundary}`,
+    `--${b}`,
     ...part("text/html", html),
-    `--${boundary}--`,
+    `--${b}--`,
   ];
 }

@@ -6,6 +6,7 @@ const dispatchDue = vi.hoisted(() => vi.fn());
 const expireDue = vi.hoisted(() => vi.fn());
 vi.mock("@/server/emails/service", () => ({ dispatchDue }));
 vi.mock("@/server/safe-send/service", () => ({ expireDue }));
+vi.mock("@/server/emails/attachments", () => ({ removeStaleAttachments: async () => 4 }));
 
 const SECRET = "s".repeat(40);
 const call = (auth?: string) =>
@@ -28,7 +29,7 @@ describe("POST /api/cron/dispatch", () => {
   it("sends due emails when called with the secret", async () => {
     const res = await call(`Bearer ${SECRET}`);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true, sent: 2, retry: 0, failed: 1, expired: 3 });
+    expect(await res.json()).toEqual({ ok: true, sent: 2, retry: 0, failed: 1, expired: 3, swept: 4 });
   });
 
   it.each([

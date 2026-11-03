@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { outboxDefaults } from "@/test/fixtures";
 import type { OutboxEmail, SafeSendInfo } from "@/types/emails";
 import { emailState } from "./email-state";
 
@@ -12,6 +13,7 @@ const email = (over: Partial<OutboxEmail> = {}): OutboxEmail => ({
   subject: "Hi",
   to: ["a@b.co"],
   cc: [],
+  ...outboxDefaults,
   status: "sent",
   sendAt: later,
   sentAt: earlier,

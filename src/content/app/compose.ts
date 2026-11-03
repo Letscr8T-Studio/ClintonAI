@@ -75,6 +75,8 @@ export const sentToastCopy = {
   sent: "Sent",
   sentNote: "It's on its way from your Gmail.",
   leavesAt: (time: string) => `In your Outbox. It leaves at ${time}. You can undo until then.`,
+  scheduled: (when: string) => `Scheduled: ${when}`,
+  scheduledNote: "It waits in your Outbox until then. You can undo or edit it before it leaves.",
   undo: "Undo",
   undoing: "Taking it back…",
   view: "View",

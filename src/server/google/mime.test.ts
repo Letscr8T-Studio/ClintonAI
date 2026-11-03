@@ -77,3 +77,39 @@ describe("encodeHeader", () => {
     expect(encodeHeader("Plain subject")).toBe("Plain subject");
   });
 });
+
+describe("attachments", () => {
+  const file = { name: "Offer – Dami.pdf", type: "application/pdf", data: Buffer.from("%PDF-1.7 fake") };
+
+  it("sends the text first, then each file as a base64 attachment", () => {
+    const message = decode(buildPlainEmail({ ...base, attachments: [file] }));
+    const boundary = /multipart\/mixed; boundary="([^"]+)"/.exec(message)![1]!;
+    const parts = message.split(`--${boundary}`);
+    expect(parts).toHaveLength(4); // preamble, text, file, closing
+    expect(parts[1]).toContain('Content-Type: text/plain; charset="UTF-8"');
+    expect(parts[2]).toContain("Content-Type: application/pdf; name*=UTF-8''Offer%20%E2%80%93%20Dami.pdf");
+    expect(parts[2]).toContain(
+      "Content-Disposition: attachment; filename*=UTF-8''Offer%20%E2%80%93%20Dami.pdf",
+    );
+    const data = parts[2]!.split("\r\n\r\n")[1]!.replace(/\r\n/g, "");
+    expect(Buffer.from(data, "base64").toString("utf8")).toBe("%PDF-1.7 fake");
+    expect(parts[3]).toBe("--"); // the closing boundary
+  });
+
+  it("keeps plain ASCII names readable, and an HTML version inside the mixed message", () => {
+    const message = decode(
+      buildPlainEmail({ ...base, html: "<p>Hello</p>", attachments: [{ ...file, name: "deck.pdf" }] }),
+    );
+    expect(message).toContain('filename="deck.pdf"');
+    expect(message).toContain("multipart/alternative");
+  });
+
+  it("refuses a file name or type with a line break (no header injection)", () => {
+    expect(() => buildPlainEmail({ ...base, attachments: [{ ...file, name: "a\r\nBcc: x@y.z" }] })).toThrow(
+      MimeError,
+    );
+    expect(() =>
+      buildPlainEmail({ ...base, attachments: [{ ...file, type: "text/plain\r\nX: y" }] }),
+    ).toThrow(MimeError);
+  });
+});

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   formatClock,
+  formatCountdown,
   formatTimeLeft,
   greeting,
   lagosDay,
@@ -62,5 +63,13 @@ describe("formatTimeLeft", () => {
     expect(formatTimeLeft(18 * 3_600_000 + 42 * 60_000 + 5_000)).toBe("18h 42m");
     expect(formatTimeLeft(42 * 60_000)).toBe("42m");
     expect(formatTimeLeft(30_000)).toBe("under a minute");
+  });
+});
+
+describe("formatCountdown", () => {
+  it("is mm:ss under an hour, then hours and minutes, then days and hours", () => {
+    expect(formatCountdown(299)).toBe("04:59");
+    expect(formatCountdown(3 * 3600 + 5 * 60 + 9)).toBe("3h 05m");
+    expect(formatCountdown(2 * 86400 + 4 * 3600 + 59)).toBe("2d 4h");
   });
 });

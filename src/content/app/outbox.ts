@@ -10,6 +10,7 @@ export const outboxCopy = {
   notSentTitle: "Not sent",
   leavingIn: "Leaving in",
   leavesAt: (time: string) => `Leaves at ${time}`,
+  scheduledFor: (when: string) => `Scheduled · ${when}`,
   leaving: "Leaving now…",
   to: (list: string) => `To ${list}`,
   noSubject: "(no subject)",
@@ -27,6 +28,15 @@ export const outboxCopy = {
   compose: "Write an email",
 };
 
+/** Beside an email's subject: its files, Send later, and "Likely opened" (always called a guess). */
+export const badgeCopy = {
+  files: (n: number) => (n === 1 ? "1 file" : `${n} files`),
+  scheduled: "Scheduled",
+  likelyOpened: "Likely opened",
+  noOpens: "No opens seen",
+  guess: "a guess from a tracking image",
+};
+
 /** Why an email could not be sent; stored with the email and shown in the Outbox. */
 export const failureReasons = {
   noAccount: "Gmail was disconnected before this email left.",
@@ -35,6 +45,8 @@ export const failureReasons = {
   refused: "Gmail refused this email. Check the addresses and try again.",
   temporary: "Gmail was busy. Clinton will try again in a moment.",
   gaveUp: "Gmail kept failing, so Clinton stopped after 3 tries. Write it again when Gmail is back.",
+  attachmentsMissing:
+    "An attached file had expired or was too large, so this email wasn't sent. Attach it again.",
 };
 
 export const emailActionErrors = {
@@ -42,4 +54,5 @@ export const emailActionErrors = {
   notFound: "This email has already left, or was cancelled.",
   failed: "Something went wrong. Please try again.",
   rateLimited: "Too many emails at once. Wait a minute and try again.",
+  badAttachment: "One of the attachments couldn't be found. Attach it again.",
 };

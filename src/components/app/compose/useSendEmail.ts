@@ -9,14 +9,26 @@ export const DRAFT_HANDOFF_KEY = "clinton-compose-draft";
 
 type SendOptions = {
   delaySeconds: number;
+  /** Send later: an ISO time instead of the Smart Delay. */
+  sendAt?: string;
+  trackOpens: boolean;
   findingsCount: number;
   findingsAccepted: number;
   safeSend: boolean;
   checkIds: string[];
 };
 
-/** The email just sent, for the Undo bar. `immediate`: Smart Delay was off, so it has already left. */
-export type SentEmail = { id: string; sendAt: string; immediate: boolean; safeSend: boolean };
+/**
+ * The email just sent, for the Undo bar. `immediate`: Smart Delay was off, so it has already left.
+ * `scheduled`: Send later, so Undo stays possible until that time.
+ */
+export type SentEmail = {
+  id: string;
+  sendAt: string;
+  immediate: boolean;
+  scheduled: boolean;
+  safeSend: boolean;
+};
 
 type Json = { ok: boolean; error?: string; id?: string; sendAt?: string; draft?: EmailDraft };
 
@@ -49,7 +61,8 @@ export function useSendEmail() {
       setSent({
         id: json.id!,
         sendAt: json.sendAt!,
-        immediate: options.delaySeconds === 0,
+        immediate: options.delaySeconds === 0 && !options.sendAt,
+        scheduled: Boolean(options.sendAt),
         safeSend: options.safeSend,
       });
       setUndoError(null);

@@ -18,6 +18,8 @@ deployed and verified; add the PR link next to it.
 - [ ] Privacy policy (with Google's Limited Use disclosure) and terms of service live on tryclinton.com.
 - [ ] Deliverability tests: Safe Send emails land in the inbox, not spam, on Gmail, Outlook and Yahoo.
 - [ ] Trademark search on "Clinton AI" for software.
+- [ ] Attachments in production: the CSP's `connect-src` allows the Supabase storage origin (uploads go straight there); the `attachments` bucket is confirmed private; a real email with a PDF and a non-English file name is received correctly in Gmail and Outlook.
+- [ ] "Likely opened" disclosed: the privacy policy explains the tracking image (what it records, that it's off unless turned on, that it's a guess) for both senders and recipients (GDPR / ePrivacy, CCPA, NDPA). Measure whether tracked emails land in spam more often before promoting the feature.
 - [ ] Smart Delay in production: `EMAIL_ENCRYPTION_KEY` and `CRON_SECRET` set in Vercel (key backed up in the team password manager), dispatcher registered against the hosted project with `DISPATCH_URL=https://tryclinton.com/api/cron/dispatch`, and one real email verified end to end. Gmail sending quotas understood (about 500/day on personal Gmail).
 - [ ] Safe Send in production: `APP_URL=https://tryclinton.com` in Vercel; card email deliverability tested (Gmail, Outlook, Yahoo: inbox, not spam); the recipient page checked on phones; storage bucket confirmed private.
 - [ ] AI provider data terms: the privacy policy names the AI check provider (OpenAI today) and its retention (API requests kept up to 30 days for abuse monitoring; not used for training). Request zero data retention if available, or switch provider, before real users. Our side already stores no email text.

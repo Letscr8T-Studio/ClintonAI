@@ -47,6 +47,11 @@ service and acceptable use: no spam, no bought lists, no using Safe Send to dece
 
 - Google tokens encrypted at rest (Vault), never sent to the browser, revocable by the user.
 - Safe Send content and attachments encrypted at rest with keys stored separately; deleted on withdrawal or when the 24 h window closes.
-- Email text sent to the AI model for checking only; never stored; covered by the provider's no-training terms for API data.
+- Email text sent to the AI model for checking or rewriting only; never stored or logged; covered by the provider's no-training terms for API data.
+- Attachments on normal emails live in the private, service-role-only `attachments` bucket.
+  - Uploads use one-time signed URLs for the user's own folder (the API refuses any other folder).
+  - Files are deleted when the email leaves or is cancelled, and swept after 24 h if unused.
+  - They rely on storage encryption at rest, not our own key (see the decision log, 3 Nov 2026).
+- "Likely opened" is opt-in. The pixel URL carries a 256-bit random token; only its SHA-256 is stored, and the pixel endpoint returns the same image whatever happens.
 - RLS on every user table (`user_id = auth.uid()`); admin access logged.
 - **A human backend engineer and an AI security review sign off before real users connect Gmail.** Every login, token and encryption change is reviewed by a person.

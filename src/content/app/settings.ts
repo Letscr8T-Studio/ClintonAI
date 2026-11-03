@@ -35,6 +35,17 @@ export const settingsCopy = {
     },
     saved: "Saved on this device.",
   },
+  tracking: {
+    id: "likely-opened",
+    title: "Likely opened",
+    body: "See if an email was probably opened. Off unless you turn it on, and you can switch it per email in Compose.",
+    toggle: "Turn on for new emails",
+    how: "How it works: Clinton adds a tiny invisible image to the email. When it loads, the email counts as likely opened.",
+    honest:
+      "It's a guess. Apple Mail loads images for everyone, so some emails look opened when they weren't; other apps block images, so real opens can be missed. Safe Send emails don't need it: they show exactly who opened them.",
+    savedOn: "Saved. New emails will show if they were likely opened.",
+    savedOff: "Saved. New emails won't be tracked.",
+  },
   gmail: { id: "gmail", title: "Gmail account" },
   privacy: {
     id: "privacy",

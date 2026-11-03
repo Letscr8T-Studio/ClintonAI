@@ -25,7 +25,14 @@ function mockApi(findings: Finding[]) {
     if (url === "/api/check") return new Response(JSON.stringify({ ok: true, findings, modelUsed: true }));
     if (url === "/api/emails")
       return new Response(JSON.stringify({ ok: true, id: EMAIL_ID, sendAt: inFiveMinutes() }));
-    const draft = { to: ["dami@x.co"], cc: [], subject: "Offer", body: "I miss you." };
+    const draft = {
+      to: ["dami@x.co"],
+      cc: [],
+      bcc: [],
+      subject: "Offer",
+      body: "I miss you.",
+      attachments: [],
+    };
     return new Response(JSON.stringify({ ok: true, draft }));
   });
   vi.stubGlobal("fetch", fetchMock);
