@@ -39,6 +39,47 @@ export type Database = {
           },
         ];
       };
+      admin_access_log: {
+        Row: {
+          action: string;
+          created_at: string;
+          id: number;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          created_at?: string;
+          id?: never;
+          user_id?: string | null;
+        };
+        Update: {
+          action?: string;
+          created_at?: string;
+          id?: never;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
+      admins: {
+        Row: {
+          added_at: string;
+          note: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          added_at?: string;
+          note?: string | null;
+          user_id: string;
+        };
+        Update: {
+          added_at?: string;
+          note?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       ai_check_events: {
         Row: {
           accepted: number;
@@ -248,6 +289,25 @@ export type Database = {
           open_tracking?: boolean;
           updated_at?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      rate_limit_hits: {
+        Row: {
+          bucket: string;
+          hits: number;
+          window_start: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          bucket: string;
+          hits?: number;
+          window_start: string;
+        };
+        Update: {
+          bucket?: string;
+          hits?: number;
+          window_start?: string;
         };
         Relationships: [];
       };
@@ -468,6 +528,7 @@ export type Database = {
           withdrawn_at: string;
         }[];
       };
+      rate_limit_take: { Args: { p_bucket: string; p_window_seconds: number }; Returns: number };
       record_email_open: { Args: { p_token_hash: string }; Returns: undefined };
       save_google_account: {
         Args: { p_email: string; p_refresh_token: string; p_scopes: string[]; p_user_id: string };

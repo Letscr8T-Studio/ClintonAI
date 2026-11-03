@@ -33,10 +33,12 @@ const graph = {
   ],
 };
 
-export function JsonLd() {
+/** `nonce`: this request's CSP nonce (see src/proxy.ts). */
+export function JsonLd({ nonce }: { nonce?: string }) {
   return (
     <script
       type="application/ld+json"
+      nonce={nonce}
       // Static, trusted data; "<" is escaped so the content can never close the script tag.
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graph).replace(/</g, "\\u003c") }}
     />

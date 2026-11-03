@@ -4,17 +4,21 @@
 
 - **Secrets server-only.** Supabase service-role key and admin credentials are read only in `src/server/` (guarded by `import "server-only"`). Only `NEXT_PUBLIC_*` vars reach the browser.
 - **Database locked down.** `waitlist` has RLS enabled with no policies; only the service role can touch it.
-- **Founders console:** HMAC-signed, httpOnly, `SameSite=Lax`, `Secure` (prod) cookie, 7-day expiry; constant-time comparisons; email allow-list re-checked on every request; 5 failed logins per IP per 15 min. Double guard: `proxy.ts` and `requireAdmin()` on each page/route. `noindex` and disallowed in robots.
+- **Founders console:** the product's Google sign-in, plus a row in `admins` (only the service role can add one), plus TOTP MFA (the session must be `aal2`). Non-admins get a 404. Every page view and export is logged in `admin_access_log`. `noindex` and disallowed in robots.
 - **Public API:** zod validation, honeypot, 10 requests/min/IP on `/api/waitlist`, generic error messages (internals only in server logs).
+- **Rate limits** are shared by every instance through the database (`rate_limit_take()`; keys are SHA-256 hashed, so no IPs or emails are stored). They fail open, with a logged error, if the database is unreachable.
+- **Content-Security-Policy** per request from `src/proxy.ts`: scripts only with the request's nonce (`'strict-dynamic'`), no `unsafe-inline` or `eval` in production, `frame-ancestors 'none'`, network and form targets limited to Supabase, Tally and Google sign-in. Every page renders per request so it can carry the nonce.
+- **Tally webhook** verified with HMAC-SHA256 (`Tally-Signature`), compared in constant time.
+- **Error tracking (Sentry):** off until a DSN is set; every `dataCollection` category off (no user info, cookies, headers, bodies, query strings, AI inputs or local variables); every event scrubbed of email addresses (`src/lib/error-scrub.ts`); no session replay; sent through our own `/monitoring` tunnel.
 - **CSV export:** formula-injection defused (`csvCell`).
 - **Headers** (`next.config.ts`): `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, HSTS; `X-Powered-By` removed.
 - **JSON-LD** is static and `<`-escaped.
 
 ### Known gaps (block launch)
 
-Rate limits are per instance, there is no CSP, survey completion is client-reported, the founders
-console uses a shared password, and there is no error tracking. Each is a required item, with the fix
-spelled out, in the **[launch checklist](../launch-checklist.md)**. Track progress there, not here.
+The five "Must fix" items were built on 3 November 2026 and wait for deploy and verification in the
+**[launch checklist](../launch-checklist.md)**, with the human security review, the legal review of
+the privacy policy and terms, and production configuration. Track progress there, not here.
 
 ## Google verification (Phase 1 gate)
 

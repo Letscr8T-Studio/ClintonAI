@@ -5,14 +5,13 @@ import { addToWaitlist } from "@/server/waitlist/repository";
 
 export const runtime = "nodejs";
 
-const limiter = createRateLimiter({ max: 10, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "waitlist", max: 10, windowMs: 60_000 });
 
 // POST /api/waitlist  { email, company?, source? }
 // Saves the email. Joining twice is success; a filled honeypot is silently accepted.
 export async function POST(request: Request) {
   const ip = clientIp(request.headers);
-  if (limiter.isLimited(ip)) return fail(MESSAGES.rateLimited, 429);
-  limiter.hit(ip);
+  if (await limiter.take(ip)) return fail(MESSAGES.rateLimited, 429);
 
   const { data, response } = await parseJson(request, joinWaitlistSchema);
   if (response) return response;

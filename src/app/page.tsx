@@ -14,12 +14,14 @@ import { ProductShot } from "@/components/marketing/sections/ProductShot";
 import { Roadmap } from "@/components/marketing/sections/Roadmap";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sectionIds } from "@/content/navigation";
+import { headers } from "next/headers";
 
 // The public landing page. Sections appear in this order; their copy lives in src/content/.
-export default function Home() {
+export default async function Home() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <>
-      <JsonLd />
+      <JsonLd nonce={nonce} />
       <Announcement />
       <main id={sectionIds.main} tabIndex={-1} className="outline-none">
         <Hero />

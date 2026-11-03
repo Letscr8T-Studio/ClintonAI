@@ -81,10 +81,8 @@ export function useWaitlist() {
 
   function startSurvey() {
     const value = (email || savedEmail || "").trim().toLowerCase();
-    openSurvey(value, () => {
-      setSurveyDone(true);
-      postJson("/api/survey-complete", { email: value }).catch(() => {});
-    });
+    // Tally tells our server itself, with a signed webhook (/api/webhooks/tally).
+    openSurvey(value, () => setSurveyDone(true));
   }
 
   return { email, setEmail, honeypot, setHoneypot, status, error, surveyDone, join, startSurvey };

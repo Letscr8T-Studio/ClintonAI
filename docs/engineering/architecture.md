@@ -68,7 +68,7 @@ but they are still only imported from server code.
 
 - **Join waitlist:** `WaitlistForm` → `useWaitlist` → `POST /api/waitlist` → rate limit → zod parse →
   honeypot check → `repository.addToWaitlist` (upsert, duplicates ignored) → `{ ok: true }`.
-- **Survey done:** Tally popup `onSubmit` → `POST /api/survey-complete` → `markSurveyDone` (only flips false → true).
+- **Survey done:** Tally sends a signed webhook → `POST /api/webhooks/tally` (HMAC-SHA256 checked with `TALLY_SIGNING_SECRET`; reads the hidden `email` field) → `markSurveyDone` (only flips false → true).
 - **Founders console:** `proxy.ts` checks the signed cookie for `/owner/*` and `/api/owner/*`; each page also calls `requireAdmin()`. Pages fetch via repositories and compute with pure `buildAnalytics()`. Errors render `(console)/error.tsx`.
 
 ## Data model today

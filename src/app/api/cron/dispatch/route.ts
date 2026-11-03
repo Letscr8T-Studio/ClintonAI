@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { safeEqual } from "@/server/auth/session";
+import { safeEqual } from "@/server/secure-compare";
 import { removeStaleAttachments } from "@/server/emails/attachments";
 import { dispatchDue } from "@/server/emails/service";
 import { expireDue } from "@/server/safe-send/service";

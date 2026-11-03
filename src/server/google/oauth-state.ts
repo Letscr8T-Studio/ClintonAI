@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
-import { safeEqual } from "@/server/auth/session";
+import { safeEqual } from "@/server/secure-compare";
 
 // The "Connect Gmail" round trip: a random state (CSRF) and a PKCE verifier, kept in a short-lived
 // httpOnly cookie and bound to the signed-in user, so a callback can't be replayed or swapped.

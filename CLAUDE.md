@@ -68,6 +68,7 @@ npm run db:start       # local Supabase in Docker (ports 547xx), applies migrati
 npm run test:db        # pgTAP database tests (RLS + trust-rule triggers)
 npm run db:types       # regenerate src/types/supabase.gen.ts after a migration
 npm run db:dispatcher  # point local pg_cron at the dev server's Smart Delay dispatcher
+npm run admin:add -- you@example.com  # give a signed-up account founders console access (then MFA)
 ```
 
 ## Definition of done

@@ -10,16 +10,19 @@ import { getSupabaseAuthEnv } from "@/server/env";
  */
 export async function refreshUserSession(
   request: NextRequest,
+  /** Request headers to pass on to the page (e.g. the CSP nonce). */
+  headers: Headers = new Headers(request.headers),
 ): Promise<{ response: NextResponse; signedIn: boolean }> {
   const { url, publishableKey } = getSupabaseAuthEnv();
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next({ request: { headers } });
 
   const supabase = createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (list) => {
         for (const { name, value } of list) request.cookies.set(name, value);
-        response = NextResponse.next({ request });
+        headers.set("cookie", request.headers.get("cookie") ?? "");
+        response = NextResponse.next({ request: { headers } });
         for (const { name, value, options } of list) response.cookies.set(name, value, options);
       },
     },

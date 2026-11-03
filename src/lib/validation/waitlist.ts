@@ -37,8 +37,6 @@ export const joinWaitlistSchema = z.object({
   source: optionalText(200),
 });
 
-export const surveyCompleteSchema = z.object({ email });
-
 export type JoinWaitlistInput = z.infer<typeof joinWaitlistSchema>;
 
 /** Shape every public JSON endpoint returns. */

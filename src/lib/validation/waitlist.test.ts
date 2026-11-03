@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MESSAGES, joinWaitlistSchema, surveyCompleteSchema } from "./waitlist";
+import { MESSAGES, joinWaitlistSchema } from "./waitlist";
 
 describe("joinWaitlistSchema", () => {
   it("normalises the email and defaults optional fields", () => {
@@ -17,12 +17,5 @@ describe("joinWaitlistSchema", () => {
     const result = joinWaitlistSchema.safeParse({ email: "nope" });
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.message).toBe(MESSAGES.invalidEmail);
-  });
-});
-
-describe("surveyCompleteSchema", () => {
-  it("requires a valid email", () => {
-    expect(surveyCompleteSchema.safeParse({}).success).toBe(false);
-    expect(surveyCompleteSchema.parse({ email: "A@B.CO" }).email).toBe("a@b.co");
   });
 });

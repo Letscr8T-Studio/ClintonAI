@@ -26,13 +26,15 @@
     "db:types": "supabase gen types typescript --local --schema public > src/types/supabase.gen.ts && prettier --write src/types/supabase.gen.ts",
     "test:db": "supabase test db",
     "icons": "node scripts/generate-icons.mjs",
-    "db:dispatcher": "node --env-file=.env.local scripts/configure-dispatcher.mjs"
+    "db:dispatcher": "node --env-file=.env.local scripts/configure-dispatcher.mjs",
+    "admin:add": "node --env-file=.env.local scripts/add-admin.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@sentry/nextjs": "^11.10.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "next": "^16.4.2",

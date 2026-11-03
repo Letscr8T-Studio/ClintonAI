@@ -8,15 +8,14 @@ import { getProfile } from "@/server/profiles/repository";
 import { createRateLimiter } from "@/server/rate-limit";
 
 /** 20 emails per user per minute. */
-const limiter = createRateLimiter({ max: 20, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "emails", max: 20, windowMs: 60_000 });
 
 // POST /api/emails: put a checked email in the Outbox. It leaves when its Smart Delay ends, or at
 // the time the user picked (Send later).
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return fail("Unauthorized", 401);
-  if (limiter.isLimited(user.id)) return fail(errors.rateLimited, 429);
-  limiter.hit(user.id);
+  if (await limiter.take(user.id)) return fail(errors.rateLimited, 429);
 
   const parsed = await parseJson(request, queueRequestSchema);
   if (parsed.response) return parsed.response;

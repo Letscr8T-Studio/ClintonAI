@@ -9,14 +9,13 @@ import { fail, parseJson } from "@/server/http";
 import { createRateLimiter } from "@/server/rate-limit";
 
 /** 30 checks per user per minute. */
-const limiter = createRateLimiter({ max: 30, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "check", max: 30, windowMs: 60_000 });
 
 // POST /api/check: the pre-send AI check. Advises only (trust rule 4); the text is not stored (rule 6).
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return fail("Unauthorized", 401);
-  if (limiter.isLimited(user.id)) return fail(panelCopy.rateLimited, 429);
-  limiter.hit(user.id);
+  if (await limiter.take(user.id)) return fail(panelCopy.rateLimited, 429);
 
   const parsed = await parseJson(request, checkRequestSchema);
   if (parsed.response) return parsed.response;

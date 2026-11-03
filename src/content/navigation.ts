@@ -34,6 +34,12 @@ export const mainNav: NavLink[] = [
 
 export const primaryCta: Cta = { href: anchor("join"), label: "Get early access" };
 
+/** The legal pages; real routes, so they work from any page. */
+export const legalLinks: NavLink[] = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+];
+
 export const footerNav: NavLink[][] = [
   [
     { href: anchor("product"), label: "Product" },
@@ -45,6 +51,7 @@ export const footerNav: NavLink[][] = [
     { href: anchor("faq"), label: "FAQ" },
     { href: anchor("join"), label: "Early access" },
   ],
+  legalLinks,
 ];
 
 export { anchor };

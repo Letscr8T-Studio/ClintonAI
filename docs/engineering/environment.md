@@ -2,25 +2,26 @@
 
 ## Environment variables
 
-| Variable                               | Scope  | Required | Purpose                                                                                                                        |
-| -------------------------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`                 | public | prod     | Canonical URL, sitemap, social cards. Default `https://tryclinton.com`                                                         |
-| `NEXT_PUBLIC_TALLY_FORM_ID`            | public | yes      | Tally survey form ID (`tally.so/r/XXXXXX`)                                                                                     |
-| `NEXT_PUBLIC_SUPABASE_URL`             | public | app      | Supabase URL for user sign-in. Local: `http://127.0.0.1:54721`                                                                 |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public | app      | Publishable key (`sb_publishable_…`); RLS protects the data. Set at **build** time                                             |
-| `SUPABASE_URL`                         | server | yes      | Supabase project URL                                                                                                           |
-| `SUPABASE_SERVICE_ROLE_KEY`            | server | yes      | Service-role key. **Never** prefix with `NEXT_PUBLIC_`                                                                         |
-| `ADMIN_EMAILS`                         | server | console  | Comma-separated founder emails                                                                                                 |
-| `ADMIN_PASSWORD`                       | server | console  | Shared console password (long, unique)                                                                                         |
-| `ADMIN_SESSION_SECRET`                 | server | console  | ≥32 random chars; `openssl rand -base64 32`. Rotating it logs everyone out                                                     |
-| `GOOGLE_CLIENT_ID`                     | server | app      | Same OAuth client as sign-in; used by "Connect Gmail"                                                                          |
-| `GOOGLE_CLIENT_SECRET`                 | server | app      | Its secret. Server only                                                                                                        |
-| `AI_PROVIDER`                          | server | optional | `openai`. Unset: the AI check runs the rules only                                                                              |
-| `OPENAI_API_KEY`                       | server | with AI  | OpenAI key (`sk-…`). Server only                                                                                               |
-| `EMAIL_ENCRYPTION_KEY`                 | server | app      | 32 bytes base64 (`openssl rand -base64 32`). Encrypts held email bodies. Back it up: losing it makes waiting emails unreadable |
-| `APP_URL`                              | server | app      | Base URL for links in emails (Safe Send). Dev `http://localhost:3000`; prod `https://tryclinton.com`                           |
-| `CRON_SECRET`                          | server | app      | 32+ chars. pg_cron sends it to `/api/cron/dispatch`; register it with `npm run db:dispatcher`                                  |
-| `OPENAI_MODEL`                         | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 6 s budget                                                               |
+| Variable                                              | Scope  | Required | Purpose                                                                                                                        |
+| ----------------------------------------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `TALLY_SIGNING_SECRET`                                | server | webhook  | Tally form → Integrations → Webhooks → signing secret. Unset: `/api/webhooks/tally` answers 503                                |
+| `NEXT_PUBLIC_SENTRY_DSN`                              | public | errors   | Sentry project DSN. Unset: Sentry is off                                                                                       |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | build  | errors   | Source map upload on build (Vercel only). Never sent to the browser                                                            |
+| `RATE_LIMIT_STORE`                                    | server | limits   | Leave unset (limits shared through the database). `memory` is for unit tests only                                              |
+| `NEXT_PUBLIC_SITE_URL`                                | public | prod     | Canonical URL, sitemap, social cards. Default `https://tryclinton.com`                                                         |
+| `NEXT_PUBLIC_TALLY_FORM_ID`                           | public | yes      | Tally survey form ID (`tally.so/r/XXXXXX`)                                                                                     |
+| `NEXT_PUBLIC_SUPABASE_URL`                            | public | app      | Supabase URL for user sign-in. Local: `http://127.0.0.1:54721`                                                                 |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`                | public | app      | Publishable key (`sb_publishable_…`); RLS protects the data. Set at **build** time                                             |
+| `SUPABASE_URL`                                        | server | yes      | Supabase project URL                                                                                                           |
+| `SUPABASE_SERVICE_ROLE_KEY`                           | server | yes      | Service-role key. **Never** prefix with `NEXT_PUBLIC_`                                                                         |
+| `GOOGLE_CLIENT_ID`                                    | server | app      | Same OAuth client as sign-in; used by "Connect Gmail"                                                                          |
+| `GOOGLE_CLIENT_SECRET`                                | server | app      | Its secret. Server only                                                                                                        |
+| `AI_PROVIDER`                                         | server | optional | `openai`. Unset: the AI check runs the rules only                                                                              |
+| `OPENAI_API_KEY`                                      | server | with AI  | OpenAI key (`sk-…`). Server only                                                                                               |
+| `EMAIL_ENCRYPTION_KEY`                                | server | app      | 32 bytes base64 (`openssl rand -base64 32`). Encrypts held email bodies. Back it up: losing it makes waiting emails unreadable |
+| `APP_URL`                                             | server | app      | Base URL for links in emails (Safe Send). Dev `http://localhost:3000`; prod `https://tryclinton.com`                           |
+| `CRON_SECRET`                                         | server | app      | 32+ chars. pg_cron sends it to `/api/cron/dispatch`; register it with `npm run db:dispatcher`                                  |
+| `OPENAI_MODEL`                                        | server | no       | Default `gpt-5.4-mini`. Keep it fast: the model has a 6 s budget                                                               |
 
 Server vars are validated by `src/server/env.ts`. A missing Supabase var fails the request that needs it
 with a clear message; missing admin vars disable console login. Add every new var to this table,
@@ -93,9 +94,18 @@ and copy the form ID.
 
 ## Founders console
 
-`/owner/login` (not linked from the site). Signs in with an `ADMIN_EMAILS` address and
-`ADMIN_PASSWORD`; session lasts 7 days. Pages: Overview (`/owner/dashboard`), Signups (search,
+`/owner` (not linked from the site). Founders sign in with the normal Google sign-in, must be in
+the `admins` table, and must pass a second step with an authenticator app (TOTP MFA). Every visit
+and export is written to `admin_access_log`. Pages: Overview (`/owner/dashboard`), Signups (search,
 filter, CSV export), Analytics (sources, weekday, hour; Lagos time).
+
+- **Add a founder:** they sign in to the product once, then `npm run admin:add -- them@example.com`
+  (hosted: run the script with that project's `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`).
+  Remove with `--remove`. On their next visit to `/owner` they scan a QR code to set up the app.
+- **MFA must be on** in the hosted project: Supabase dashboard → Authentication → Multi-factor →
+  TOTP enabled. Locally it's on in `supabase/config.toml` (restart Supabase after changing it).
+- **Lost authenticator:** delete their factor in the Supabase dashboard (Authentication → Users →
+  the user → MFA factors); they set up a new one on their next visit.
 
 ## Deploy (Vercel)
 

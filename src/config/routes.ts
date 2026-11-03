@@ -7,6 +7,9 @@ export const appRoutes = {
   outbox: "/outbox",
   settings: "/settings",
   onboarding: "/onboarding",
+  /** Founders console (admins only, with a second step). */
+  owner: "/owner/dashboard",
+  ownerMfa: "/owner/mfa",
   authCallback: "/auth/callback",
   signOut: "/auth/signout",
   gmailConnect: "/api/google/connect",
@@ -20,6 +23,7 @@ export const protectedPrefixes = [
   appRoutes.outbox,
   appRoutes.settings,
   appRoutes.onboarding,
+  "/owner",
 ] as const;
 
 export function isProtectedPath(pathname: string): boolean {

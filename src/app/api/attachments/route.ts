@@ -9,15 +9,14 @@ import { fail, ok, parseJson } from "@/server/http";
 import { createRateLimiter } from "@/server/rate-limit";
 
 /** 60 files per user per minute. */
-const limiter = createRateLimiter({ max: 60, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "attachments", max: 60, windowMs: 60_000 });
 
 // POST /api/attachments: a one-time URL to upload one file to the user's own folder (the browser
 // sends the file straight to storage). DELETE: remove a file the user took off before sending.
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return fail("Unauthorized", 401);
-  if (limiter.isLimited(user.id)) return fail(errors.rateLimited, 429);
-  limiter.hit(user.id);
+  if (await limiter.take(user.id)) return fail(errors.rateLimited, 429);
 
   const parsed = await parseJson(request, uploadRequestSchema);
   if (parsed.response) return parsed.response;

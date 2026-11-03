@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { SideNav, TabBar } from "@/components/owner/Nav";
 import { Logo } from "@/components/ui/Logo";
-import { requireAdmin } from "@/server/auth/guard";
+import { appRoutes } from "@/config/routes";
+import { requireAdmin } from "@/server/auth/admin";
 
 function LogoutButton({ className = "" }: { className?: string }) {
   return (
-    <form action="/owner/logout" method="post">
+    <form action={appRoutes.signOut} method="post">
       <button type="submit" className={className}>
         Log out
       </button>
@@ -14,7 +15,7 @@ function LogoutButton({ className = "" }: { className?: string }) {
 }
 
 export default async function ConsoleLayout({ children }: { children: ReactNode }) {
-  const email = await requireAdmin();
+  const email = (await requireAdmin()).email ?? "";
 
   return (
     <div className="min-h-dvh">

@@ -10,7 +10,7 @@ import { requireProfile, requireUser } from "@/server/auth/user";
 import { createRateLimiter } from "@/server/rate-limit";
 
 /** 3 test emails per user per 10 minutes. */
-const testLimiter = createRateLimiter({ max: 3, windowMs: 10 * 60 * 1000 });
+const testLimiter = createRateLimiter({ name: "test-email", max: 3, windowMs: 10 * 60 * 1000 });
 
 export async function sendTestEmailAction(
   _prev: AccountActionState,
@@ -19,8 +19,7 @@ export async function sendTestEmailAction(
   const { user, profile } = await requireProfile();
   const parsed = accountActionSchema.safeParse({ accountId: formData.get("accountId") });
   if (!parsed.success) return { ok: false, message: m.invalid };
-  if (testLimiter.isLimited(user.id)) return { ok: false, message: m.rateLimited };
-  testLimiter.hit(user.id);
+  if (await testLimiter.take(user.id)) return { ok: false, message: m.rateLimited };
 
   const firstName = profile.display_name?.split(" ")[0] ?? null;
   try {

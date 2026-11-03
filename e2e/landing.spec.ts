@@ -61,16 +61,36 @@ test.describe("Platform", () => {
     expect(home.headers()["x-frame-options"]).toBe("DENY");
     expect(home.headers()["x-powered-by"]).toBeUndefined();
     expect(await (await request.get("/robots.txt")).text()).toContain("Disallow: /owner");
-    expect(await (await request.get("/sitemap.xml")).text()).toContain("<loc>");
+    expect(await (await request.get("/sitemap.xml")).text()).toContain("/privacy</loc>");
+    const privacy = await request.get("/privacy");
+    expect(privacy.status()).toBe(200);
+    expect(await privacy.text()).toContain("including the Limited Use requirements");
+    expect((await request.get("/terms")).status()).toBe(200);
   });
 
-  test("founders console redirects to login and its API refuses anonymous calls", async ({
+  test("sends a nonce-based Content-Security-Policy that the pages actually satisfy", async ({ page }) => {
+    const violations: string[] = [];
+    page.on("console", (m) => {
+      if (/Content Security Policy|Content-Security-Policy/i.test(m.text())) violations.push(m.text());
+    });
+    const first = await page.goto("/");
+    const csp = first!.headers()["content-security-policy"] ?? "";
+    expect(csp).toMatch(/script-src 'self' 'nonce-[A-Za-z0-9+/=]+' 'strict-dynamic'/);
+    expect(csp).toContain("frame-ancestors 'none'");
+    const again = await page.request.get("/");
+    expect(again.headers()["content-security-policy"]).not.toBe(csp); // a fresh nonce per request
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+    expect(violations).toEqual([]);
+  });
+
+  test("founders console sends visitors to sign in, and its API refuses anonymous calls", async ({
     page,
     request,
   }) => {
     await page.goto("/owner/dashboard");
-    await expect(page).toHaveURL(/\/owner\/login$/);
-    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+    await expect(page).toHaveURL(/\/login\?next=%2Fowner/);
     expect((await request.get("/api/owner/export")).status()).toBe(401);
+    expect((await request.get("/owner/mfa")).url()).toContain("/login");
   });
 });

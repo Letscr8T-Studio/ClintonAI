@@ -16,14 +16,13 @@ export const metadata: Metadata = {
 };
 
 /** Slows anyone trying to guess links: 60 opens per visitor per minute. */
-const limiter = createRateLimiter({ max: 60, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "safe-send-page", max: 60, windowMs: 60_000 });
 
 type Props = { params: Promise<{ token: string }> };
 
 export default async function SafeSendMessagePage({ params }: Props) {
   const ip = clientIp(await headers());
-  if (limiter.isLimited(ip)) return <RecipientView view={{ kind: "not_found" }} />;
-  limiter.hit(ip);
+  if (await limiter.take(ip)) return <RecipientView view={{ kind: "not_found" }} />;
 
   const { token } = await params;
   return <RecipientView view={await viewByToken(token)} />;

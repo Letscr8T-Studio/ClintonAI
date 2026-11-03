@@ -3,6 +3,23 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-03: Launch hardening: shared limits, CSP, signed webhook, real console auth, Sentry
+
+- **Decision:**
+  - **Rate limits** are counted in Postgres: `rate_limit_take(bucket, window)` is one atomic upsert per attempt, and old windows are deleted hourly by pg_cron. No new vendor; keys are SHA-256 hashed with the limiter's name. They fail open on database errors.
+  - **CSP** is per request with a nonce and `'strict-dynamic'`. The root layout reads the request, so every page renders dynamically; a page built ahead of time can't carry a nonce.
+  - **Survey completion** comes only from Tally's signed webhook.
+  - **The founders console** uses Supabase Auth (the product sign-in), an `admins` table, TOTP MFA (`aal2`) and an access log. Non-admins see a 404.
+  - **Sentry 11** has every `dataCollection` category off, events scrubbed of email addresses, no replay, and a `/monitoring` tunnel.
+  - **Privacy policy and terms** are drafted from what the code does, with Google's Limited Use sentence word for word.
+- **Why:** These are the launch checklist's "Must fix" items and the legal pages Google verification needs.
+- **Consequences:**
+  - The marketing page is no longer static: it costs a function invocation per visit. That's acceptable at our traffic; revisit with a CDN or hashes if it grows.
+  - A Postgres round trip per limited request.
+  - Founders must sign in to the product once and be added with `npm run admin:add`.
+  - Sentry 11 collects personal data by default; any future Sentry option must be checked against `sentry-options.ts`.
+  - The privacy policy must change whenever data handling does.
+
 ## 2026-11-03: Compose extras before launch: Bcc, attachments, Send later, Likely opened, Rewrite
 
 - **Decision:** Founder decision to ship these everyday-email features in Phase 1. Bulk outreach (CSV import, mail merge, follow-ups) stays Phase 2.

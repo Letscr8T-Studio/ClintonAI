@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { site } from "@/config/site";
 import { compareRows } from "./compare";
 import { faqs } from "./faq";
-import { footerNav, mainNav, primaryCta, sectionIds } from "./navigation";
+import { footerNav, legalLinks, mainNav, primaryCta, sectionIds } from "./navigation";
 import { pillars } from "./platform";
 import { roadmapStages } from "./roadmap";
 
@@ -13,10 +13,13 @@ const ids = new Set<string>(Object.values(sectionIds));
 const unique = (values: string[]) => new Set(values).size === values.length;
 
 describe("content integrity", () => {
-  it("every nav link points at a known section id", () => {
+  it("every nav link points at a known section id, or at a legal page", () => {
+    const pages = legalLinks.map((l) => l.href);
     for (const link of [...mainNav, ...footerNav.flat(), primaryCta]) {
+      if (pages.includes(link.href)) continue;
       expect(ids, link.href).toContain(link.href.replace(/^#/, ""));
     }
+    expect(pages).toEqual(["/privacy", "/terms"]);
   });
 
   it("has no duplicate pillars, questions or compare rows", () => {

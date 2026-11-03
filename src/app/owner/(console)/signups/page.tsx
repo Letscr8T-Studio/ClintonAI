@@ -6,7 +6,7 @@ import { SignupsFiltersForm } from "@/components/owner/signups/SignupsFilters";
 import { SignupsResults } from "@/components/owner/signups/SignupsResults";
 import { card, consoleButton } from "@/components/owner/styles";
 import { Download } from "@/components/ui/icons";
-import { requireAdmin } from "@/server/auth/guard";
+import { requireAdmin } from "@/server/auth/admin";
 import { PAGE_SIZE, searchSignups } from "@/server/waitlist/repository";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Signups" };
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export default async function SignupsPage({ searchParams }: Props) {
-  await requireAdmin();
+  await requireAdmin("view signups");
   const filters = parseSignupFilters(await searchParams);
   const result = await searchSignups(filters);
   const pages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));

@@ -4,7 +4,7 @@ import { SourcesTable } from "@/components/owner/analytics/SourcesTable";
 import { BarChart } from "@/components/owner/BarChart";
 import { PageHeader, SectionTitle } from "@/components/owner/Headings";
 import { card } from "@/components/owner/styles";
-import { requireAdmin } from "@/server/auth/guard";
+import { requireAdmin } from "@/server/auth/admin";
 import { buildAnalytics } from "@/server/waitlist/analytics";
 import { listAllSignups } from "@/server/waitlist/repository";
 
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Analytics" };
 
 export default async function AnalyticsPage() {
-  await requireAdmin();
+  await requireAdmin("view analytics");
   const a = buildAnalytics(await listAllSignups(), 30);
 
   return (

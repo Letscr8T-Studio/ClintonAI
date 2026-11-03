@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { headers } from "next/headers";
 // Fonts are self-hosted from npm: no request to Google at build or run time.
 import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/inter";
@@ -41,7 +42,10 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // Reading the request makes every page render per request, so Next.js can stamp its scripts
+  // with this request's CSP nonce (src/proxy.ts). Pages built ahead of time would be blocked.
+  await headers();
   return (
     <html lang="en">
       <body>

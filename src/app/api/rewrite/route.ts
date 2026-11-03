@@ -7,15 +7,14 @@ import { fail, parseJson } from "@/server/http";
 import { createRateLimiter } from "@/server/rate-limit";
 
 /** 20 rewrites per user per minute. */
-const limiter = createRateLimiter({ max: 20, windowMs: 60_000 });
+const limiter = createRateLimiter({ name: "rewrite", max: 20, windowMs: 60_000 });
 
 // POST /api/rewrite: "Rewrite with Clinton". Returns the new text; nothing is stored (trust rule 6)
 // and Compose lets the user undo it (trust rule 4).
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return fail("Unauthorized", 401);
-  if (limiter.isLimited(user.id)) return fail(rewriteCopy.rateLimited, 429);
-  limiter.hit(user.id);
+  if (await limiter.take(user.id)) return fail(rewriteCopy.rateLimited, 429);
 
   const parsed = await parseJson(request, rewriteRequestSchema);
   if (parsed.response) return parsed.response;
