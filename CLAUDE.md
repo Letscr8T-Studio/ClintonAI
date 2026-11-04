@@ -107,4 +107,4 @@ docs/                  Product and engineering documentation
 - Product: [vision](docs/product/vision.md) · [features](docs/product/features.md) · [roadmap](docs/product/roadmap.md) · [trust rules](docs/product/trust-rules.md) · [brand](docs/product/brand.md) · [business](docs/product/business.md)
 - Engineering: [architecture](docs/engineering/architecture.md) · [conventions](docs/engineering/conventions.md) · [testing](docs/engineering/testing.md) · [security & compliance](docs/engineering/security.md) · [environment & deploy](docs/engineering/environment.md)
 - Phases: [phase 0](docs/phases/phase-0-validation.md) · [phase 1](docs/phases/phase-1-safety-platform.md)
-- [Launch checklist](docs/launch-checklist.md) (hard gate before users) · [Decision log](docs/decisions.md)
+- [Deploy runbook](docs/deploy.md) · [Launch checklist](docs/launch-checklist.md) (hard gate before users) · [Decision log](docs/decisions.md)

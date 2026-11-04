@@ -27,7 +27,9 @@
     "test:db": "supabase test db",
     "icons": "node scripts/generate-icons.mjs",
     "db:dispatcher": "node --env-file=.env.local scripts/configure-dispatcher.mjs",
-    "admin:add": "node --env-file=.env.local scripts/add-admin.mjs"
+    "admin:add": "node --env-file=.env.local scripts/add-admin.mjs",
+    "deploy:check-env": "node scripts/check-env.mjs",
+    "deploy:verify": "node scripts/verify-deploy.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",

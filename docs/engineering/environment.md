@@ -109,13 +109,14 @@ filter, CSV export), Analytics (sources, weekday, hour; Lagos time).
 
 ## Deploy (Vercel)
 
-1. Import the GitHub repo in Vercel (framework auto-detected).
-2. Add every server and public env var under Project → Settings → Environment Variables.
-3. Add `tryclinton.com` under Domains and set the DNS records shown.
-4. Every push to `main` deploys; PRs get preview URLs.
+Follow the step-by-step **[deploy runbook](../deploy.md)**: Supabase (London), Google Cloud, OpenAI,
+Sentry, Vercel (London, `vercel.json`), DNS at Hostinger, the dispatcher, founders' access.
 
-After deploying, check: `/robots.txt`, `/sitemap.xml`, `/opengraph-image` render; social preview with a
-card validator; Lighthouse ≥ 95 for accessibility and SEO.
+- `npm run deploy:check-env -- .env.production.local` checks every production variable before it goes into Vercel.
+- `npm run deploy:verify -- https://tryclinton.com` smoke-tests the live site: headers, CSP nonce, legal pages, locked routes, webhook and dispatcher refusals.
+
+Every push to `main` deploys. Production variables are scoped to Production only, so previews can't
+touch production data.
 
 ## Checking numbers without the console
 

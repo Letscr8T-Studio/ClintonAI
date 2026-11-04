@@ -9,6 +9,9 @@ import { fail } from "@/server/http";
 // Called by pg_cron (via pg_net) every 20 seconds with the shared secret. Sends every due email
 // shreds expired Safe Send content, and deletes attachment uploads nobody sent.
 // Not a user route: no session; the secret is the only way in.
+/** A batch of sends (and Gmail retries) can take a while; pg_net waits up to 25 s. */
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const secret = getCronSecret();
   const sent = request.headers.get("authorization")?.replace(/^Bearer /, "") ?? "";
