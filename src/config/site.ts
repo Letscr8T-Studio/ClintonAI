@@ -12,7 +12,7 @@ export const site = {
   tagline: "Never regret an email again.",
   title: "Clinton AI: never regret an email again",
   description:
-    "Clinton AI is the AI email copilot that checks every email for mistakes, holds it while you think, and lets you take it back for 24 hours, even after it's opened.",
+    "Clinton AI is the AI email copilot that checks every email for mistakes and lets you take it back for 24 hours, even after it's opened.",
   shortDescription:
     "Your AI for email. Catch mistakes, take emails back, and soon write and follow up for you.",
   keywords: [
