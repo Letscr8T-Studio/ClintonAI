@@ -109,8 +109,8 @@ filter, CSV export), Analytics (sources, weekday, hour; Lagos time).
 
 ## Deploy (Vercel)
 
-Follow the step-by-step **[deploy runbook](../deploy.md)**: Supabase (London), Google Cloud, OpenAI,
-Sentry, Vercel (London, `vercel.json`), DNS at Hostinger, the dispatcher, founders' access.
+Follow the step-by-step **[deploy runbook](../deploy.md)**: Supabase (Frankfurt), Google Cloud, OpenAI,
+Sentry, Vercel (Frankfurt, `vercel.json`), DNS at Hostinger, the dispatcher, founders' access.
 
 - `npm run deploy:check-env -- .env.production.local` checks every production variable before it goes into Vercel.
 - `npm run deploy:verify -- https://tryclinton.com` smoke-tests the live site: headers, CSP nonce, legal pages, locked routes, webhook and dispatcher refusals.

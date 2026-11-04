@@ -17,3 +17,6 @@ blob-report
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Personal data exports (waitlist moves etc.): never committed
+/private/

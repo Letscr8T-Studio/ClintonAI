@@ -7,8 +7,8 @@ password manager and in `.env.production.local` (git-ignored).
 **Where things live:**
 
 - Code: GitHub `Letscr8T-Studio/ClintonAI`.
-- App: Vercel, London (`lhr1`, pinned in `vercel.json`).
-- Database, sign-in and files: Supabase, London (`eu-west-2`). Keep it in the same city as Vercel.
+- App: Vercel, Frankfurt (`fra1`, pinned in `vercel.json`).
+- Database, sign-in and files: Supabase project **ClintonAI** (`mvpplxsjkmsnririkwnq`), organisation **Unsend**, Frankfurt (`eu-central-1`), free plan. Keep it in the same city as Vercel.
 - Domain: `tryclinton.com`, DNS at Hostinger (it shows a parked page today).
 
 ## 0. Before you start
@@ -28,7 +28,7 @@ password manager and in `.env.production.local` (git-ignored).
 
 ## 1. Supabase project
 
-- [ ] **Create the project.** supabase.com → New project. Name `clinton-ai`, region **London (eu-west-2)**, and the database password from step 0.
+- [x] **Create the project.** Done 2026-11-04: `ClintonAI`, Frankfurt, free plan. Free projects pause after 7 days without use; move to Pro before beta testers arrive.
 - [ ] **Copy the API values.** Project Settings → API:
   - the Project URL goes into both `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_URL`;
   - the publishable key goes into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`;
