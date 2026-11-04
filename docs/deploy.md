@@ -146,6 +146,15 @@ the app is (Git Bash, one line; the values come from `.env.production.local`):
 - [ ] **Console:** with the browser console open, use the site end to end. No `Content-Security-Policy` errors.
 - [ ] Tick the matching boxes in [launch-checklist.md](launch-checklist.md). Beta invites wait until every box there is ticked, including the human security review.
 
+## 11. Launch day: retire the old waitlist
+
+The 61 signups up to 31 October were moved into ClintonAI on 4 November 2026. The old Unsend page
+(the bit.ly links) still writes to the old Supabase project (`zzkqbwyedzouchzztgrs`) until it's taken down.
+
+- [ ] Take the old page and the bit.ly links down (or point them at `https://tryclinton.com`).
+- [ ] Then export the old `waitlist` table again to `private/waitlist.csv`. Claude imports only the new emails (no duplicates) and checks the counts.
+- [ ] Delete `private/waitlist.csv`. After a few weeks, pause or delete the old project.
+
 ## If something goes wrong
 
 - **Bad deploy:** Vercel → Deployments → the last good one → **Promote to Production**. It takes seconds.
