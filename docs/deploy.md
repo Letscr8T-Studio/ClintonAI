@@ -71,6 +71,8 @@ password manager and in `.env.production.local` (git-ignored).
 
 ## 4. Sentry (error tracking)
 
+> **Deferred (founder decision, 2026-11-04):** first deploy without Sentry; set it up before beta testers arrive. The app runs without it (the env check only warns). Add the four `SENTRY_*` values in Vercel, then redeploy.
+
 - [ ] sentry.io → new project, platform **Next.js** → DSN into `NEXT_PUBLIC_SENTRY_DSN`.
 - [ ] Organisation slug into `SENTRY_ORG`, project slug into `SENTRY_PROJECT`.
 - [ ] Settings → Auth Tokens → a new organisation token into `SENTRY_AUTH_TOKEN`. It uploads source maps on each build.
