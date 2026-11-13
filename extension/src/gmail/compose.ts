@@ -59,7 +59,7 @@ export function readCompose(compose: Element): GmailDraft {
     cc: readRecipients(compose, "cc"),
     bcc: readRecipients(compose, "bcc"),
     subject,
-    body: editor ? editorText(editor, skip) : "",
+    body: editor ? editorText(editor, { skip }) : "",
     attachments: [],
     signature: signature ? editorText(signature) : "",
     quoted: Boolean(editor?.querySelector(gmail.quoted)),

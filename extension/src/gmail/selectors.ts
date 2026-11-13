@@ -12,6 +12,8 @@ export const gmail = {
   /** Send: its tooltip names the Enter shortcut in English; Gmail's long-lived `aoO` class covers other languages. */
   send: '[role="button"][data-tooltip*="Enter"], [role="button"].aoO',
   subject: 'input[name="subjectbox"]',
+  /** Gmail's bin icon in the compose toolbar ("Discard draft (Ctrl-Shift-D)" in English; class oh). */
+  discard: '[role="button"][data-tooltip^="Discard draft"], [role="button"].oh',
   /** Hidden fields Gmail keeps in step with the recipients ("Ada <ada@x.com>, bola@y.com"). */
   recipientInput: (kind: RecipientKind) => `input[name="${kind}"]`,
   /** The row holding one kind of recipient, when the hidden fields are absent. */

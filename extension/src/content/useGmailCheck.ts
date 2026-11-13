@@ -25,6 +25,7 @@ export function toCheckRequest(draft: GmailDraft): CheckRequest | null {
 }
 
 type Result = { key: string; findings: Finding[]; notice: string | null };
+type History = { checkIds: string[]; caught: ReadonlySet<string>; fixed: number };
 
 /** The site's answer, or the in-browser rules when it can't give one. */
 function settle(reply: CheckReply, request: CheckRequest): Omit<Result, "key"> {
@@ -62,6 +63,7 @@ export function useGmailCheck(
   const [result, setResult] = useState<Result | null>(null);
   const [pending, setPending] = useState<string | null>(null);
   const [ignored, setIgnored] = useState<ReadonlySet<string>>(new Set());
+  const [history, setHistory] = useState<History>({ checkIds: [], caught: new Set(), fixed: 0 });
 
   useEffect(() => {
     if (!enabled || !key || result?.key === key) return;
@@ -73,7 +75,15 @@ export function useGmailCheck(
       };
       setPending(key);
       const reply = await requestCheck(latest).catch((): CheckReply => ({ kind: "failed" }));
-      if (live) setResult({ key, ...settle(reply, latest) });
+      if (!live) return;
+      const settled = settle(reply, latest);
+      setResult({ key, ...settled });
+      setHistory((h) => ({
+        ...h,
+        checkIds:
+          reply.kind === "ok" && reply.checkId ? [...h.checkIds, reply.checkId].slice(-20) : h.checkIds,
+        caught: new Set([...h.caught, ...settled.findings.map(findingKey)]),
+      }));
     }, delayMs);
     return () => {
       live = false;
@@ -81,8 +91,11 @@ export function useGmailCheck(
     };
   }, [enabled, key, result?.key, requestCheck, delayMs]);
 
-  /** Ignore, or a fix that was applied: either way the person has dealt with it. */
-  const settleFinding = useCallback((f: Finding) => setIgnored((s) => new Set(s).add(findingKey(f))), []);
+  /** Ignore, or a fix that was applied (`fixed`): either way the person has dealt with it. */
+  const settleFinding = useCallback((f: Finding, fixed = false) => {
+    setIgnored((s) => new Set(s).add(findingKey(f)));
+    if (fixed) setHistory((h) => ({ ...h, fixed: h.fixed + 1 }));
+  }, []);
 
   const findings = useMemo(
     () =>
@@ -99,5 +112,7 @@ export function useGmailCheck(
     findings,
     notice: enabled && request ? (result?.notice ?? null) : null,
     settle: settleFinding,
+    /** For sending: the checks run and what they caught, as counts (the dashboard's numbers). */
+    history: { checkIds: history.checkIds, caught: history.caught.size, fixed: history.fixed },
   };
 }

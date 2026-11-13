@@ -13,6 +13,7 @@ describe("runCheck", () => {
       kind: "ok",
       findings: [finding],
       modelUsed: true,
+      checkId: null,
     });
     const [url, init] = vi.mocked(fetchImpl).mock.calls[0];
     expect(url).toBe("https://tryclinton.com/api/check");

@@ -3,6 +3,19 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-13: Send with Clinton AI from Gmail: new emails only, in plain text, from the connected account
+
+- **Decision:** The extension sends through the same Outbox as the web app. Gmail's draft is discarded once the email is held, and Undo reopens it in a new Gmail compose window. Not offered for replies and forwards, Gmail attachments, or a Gmail tab signed in to another account than the connected one: the panel says why, and Gmail's Send is used. Formatting and pictures are dropped (said before sending); link addresses are kept in the text.
+- **Why:**
+  - Replies can't stay in their conversation yet: sending has no In-Reply-To/References or thread id.
+  - Gmail attachments can't be read by the extension.
+  - Trust rule 5: the email must go from the address the person is looking at.
+  - The draft is discarded so one email can't go twice (Clinton AI's and Gmail's Send).
+- **Consequences:**
+  - Next for the extension's usefulness: replies in their thread (needs `threadId` and reply headers, still within `gmail.send`), and HTML sending.
+  - Undo relies on Gmail's `view=cm` compose link and its length limit; past 7,500 characters the body is copied to the clipboard instead.
+  - Discard and the account check read Gmail's page (the bin button, the tab title): both live in `extension/src/gmail/` with tests.
+
 ## 2026-11-13: The extension signs in with the site's own session
 
 - **Decision:** The Chrome extension has host permission for tryclinton.com, and its service worker calls the existing API routes with the site's session cookie. Chrome attaches it and treats the request as same-site. The extension stores no token, and there is no new table or auth route. Built and proven live in Chromium.

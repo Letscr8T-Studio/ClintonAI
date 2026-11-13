@@ -44,7 +44,12 @@ describe("useGmailCheck", () => {
   });
 
   it("checks once per version of the email, not on every re-read", async () => {
-    const { requestCheck, result, rerender } = setup({ kind: "ok", findings: [thanks], modelUsed: true });
+    const { requestCheck, result, rerender } = setup({
+      kind: "ok",
+      findings: [thanks],
+      modelUsed: true,
+      checkId: null,
+    });
     await waitFor(() => expect(result.current.status).toBe("done"));
     rerender({ d: draft(), on: true }); // same content, new object
     await new Promise((r) => setTimeout(r, 20));
@@ -54,7 +59,7 @@ describe("useGmailCheck", () => {
   });
 
   it("drops a finding once its words change, and keeps ignored ones ignored after re-checks", async () => {
-    const { result, rerender } = setup({ kind: "ok", findings: [thanks], modelUsed: true });
+    const { result, rerender } = setup({ kind: "ok", findings: [thanks], modelUsed: true, checkId: null });
     await waitFor(() => expect(result.current.findings).toEqual([thanks]));
     rerender({ d: draft({ body: "Thank you for the contract" }), on: true });
     expect(result.current.findings).toEqual([]);
@@ -69,7 +74,11 @@ describe("useGmailCheck", () => {
   });
 
   it("does nothing while signed out", async () => {
-    const { requestCheck, result } = setup({ kind: "ok", findings: [], modelUsed: true }, draft(), false);
+    const { requestCheck, result } = setup(
+      { kind: "ok", findings: [], modelUsed: true, checkId: null },
+      draft(),
+      false,
+    );
     await new Promise((r) => setTimeout(r, 20));
     expect(requestCheck).not.toHaveBeenCalled();
     expect(result.current.status).toBe("idle");

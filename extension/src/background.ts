@@ -2,6 +2,7 @@ import { fetchAccount } from "./account";
 import { runCheck } from "./check";
 import { CLINTON_URL } from "./config";
 import { isExtensionRequest, type ExtensionRequest } from "./messages";
+import { queueEmail, takeBack } from "./send";
 
 // Service worker: the only part of the extension that talks to tryclinton.com.
 
@@ -11,6 +12,10 @@ function handle(request: ExtensionRequest): Promise<unknown> {
       return fetchAccount(CLINTON_URL);
     case "check":
       return runCheck(CLINTON_URL, request.draft);
+    case "queue":
+      return queueEmail(CLINTON_URL, request.request);
+    case "takeBack":
+      return takeBack(CLINTON_URL, request.id);
   }
 }
 

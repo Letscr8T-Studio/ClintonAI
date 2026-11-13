@@ -7,5 +7,6 @@ export const links = {
   login: `${CLINTON_URL}${appRoutes.login}`,
   home: `${CLINTON_URL}${appRoutes.home}`,
   settings: `${CLINTON_URL}${appRoutes.settings}`,
+  outbox: `${CLINTON_URL}${appRoutes.outbox}`,
   gmail: "https://mail.google.com/",
 } as const;
