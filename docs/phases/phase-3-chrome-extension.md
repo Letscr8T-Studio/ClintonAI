@@ -71,7 +71,7 @@ None so far. The extension reads and writes through the same tables and routes a
 | ----------------------------------- | ----------------------------------------------------------------------------- |
 | `GET /api/me`                       | Built. Who is signed in, Gmail account and status, default delay (`meSchema`) |
 | `/api/check`, `/api/emails`, outbox | Unchanged; called by the service worker with the site's session               |
-| `GET /api/outbox`                   | Milestone 6. Small JSON list for the popup (held + withdrawable)              |
+| `GET /api/outbox`                   | Built. What the popup can still act on (`popupOutboxSchema`)                  |
 
 ## Repo layout
 
@@ -95,7 +95,7 @@ tokens for colours, axe on the popup.
 3. [x] Gmail compose windows (2026-11-13): found and watched (new, reply, forward, pop-out; several at once), read (To/Cc/Bcc from hidden fields or chips, subject, body as plain lines without quote or signature, Gmail attachments, what plain text would lose), and a "Clinton AI is on" pill after Send. Awaiting a check on real Gmail.
 4. [x] The check in Gmail (2026-11-13): `POST /api/check` from the service worker (draft validated with `checkRequestSchema` first), 1.5 s after the last change, only with a recipient and some text, never the same content twice; in-browser rules when the site can't answer or rate-limits. The pill shows Checking… / All good / N to check; the panel reuses the web app's `FindingItem` (Fix it or Show me, Ignore). Highlights use the CSS Custom Highlight API, so Gmail's text is never wrapped (the only style added to Gmail's page is the `::highlight` rule). Fix it types through `execCommand("insertText")`, so Gmail saves the draft and Ctrl-Z undoes it; a fixed or ignored finding stays settled for that email. Proven in Chromium on a page built from the captured fixture: highlights drawn, Fix it applied, Ctrl-Z restored, re-check found the next issue.
 5. [x] Send with Clinton AI (2026-11-13): `POST /api/emails` from the service worker (validated with `queueRequestSchema` first; the body with link addresses and the signature; the check's ids and counts for the dashboard), Gmail's draft discarded with its own bin button, the note with Undo (`/api/emails/:id/edit`, then a Gmail `view=cm` window opened during the click so it isn't blocked; past 7,500 characters the body is copied instead). Proven in Chromium against the local app: held in the database, draft gone, Undo cancelled it and reopened it filled in.
-6. [ ] Popup Outbox: countdowns, Cancel, Send now, withdraw.
+6. [x] Popup Outbox (2026-11-13): `GET /api/outbox` (only what can still be acted on, soonest first: waiting emails and withdrawable Safe Sends; subjects and recipients, never text; `popupOutboxSchema`), live countdowns, Send now, Cancel and Withdraw for everyone (both confirm first) through the Outbox page's own routes, reloaded after each action and when a countdown ends. Proven in Chromium against the local app: two queued emails listed, one cancelled.
 7. [ ] Privacy policy update (extension section), store listing, screenshots, permission justifications; submit to the Chrome Web Store, then Edge Add-ons.
 
 ## Open questions

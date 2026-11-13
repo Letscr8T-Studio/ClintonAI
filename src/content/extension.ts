@@ -80,3 +80,15 @@ export const composeBarDevCopy = {
     rich: "Would lose",
   },
 } as const;
+
+/** The popup's Outbox: what can still be cancelled, sent now or withdrawn. Buttons reuse the Outbox page's words. */
+export const popupOutboxCopy = {
+  title: "Outbox",
+  loading: "Loading your Outbox…",
+  empty: "Nothing waiting. Emails you send with Clinton AI wait here during their Smart Delay.",
+  leavesIn: (clock: string) => `Leaves in ${clock}`,
+  leaving: "Leaving now…",
+  failed: "That didn't work. It may have already left: check the Outbox.",
+  offline: "Can't load the Outbox right now.",
+  openOutbox: "Open the full Outbox",
+} as const;

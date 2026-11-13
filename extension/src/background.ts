@@ -2,6 +2,7 @@ import { fetchAccount } from "./account";
 import { runCheck } from "./check";
 import { CLINTON_URL } from "./config";
 import { isExtensionRequest, type ExtensionRequest } from "./messages";
+import { fetchOutbox, runOutboxAction } from "./outbox";
 import { queueEmail, takeBack } from "./send";
 
 // Service worker: the only part of the extension that talks to tryclinton.com.
@@ -16,6 +17,10 @@ function handle(request: ExtensionRequest): Promise<unknown> {
       return queueEmail(CLINTON_URL, request.request);
     case "takeBack":
       return takeBack(CLINTON_URL, request.id);
+    case "outbox":
+      return fetchOutbox(CLINTON_URL);
+    case "outboxAction":
+      return runOutboxAction(CLINTON_URL, request.action);
   }
 }
 

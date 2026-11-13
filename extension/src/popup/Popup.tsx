@@ -5,16 +5,19 @@ import { extensionPopupCopy as copy } from "@/content/extension";
 import { ClintonMark } from "@/components/ui/icons";
 import type { AccountState } from "../account";
 import { AccountView } from "./AccountView";
+import { PopupOutbox } from "./PopupOutbox";
+import type { PopupOutboxApi } from "./usePopupOutbox";
 
 type PopupProps = {
   /** Asks the service worker who is signed in. */
   load: () => Promise<AccountState>;
   /** Opens a page in a new tab (and closes the popup). */
   open: (url: string) => void;
+  outbox: PopupOutboxApi;
 };
 
-/** The window under the toolbar icon: account status and the way into Gmail or the web app. */
-export function Popup({ load, open }: PopupProps) {
+/** The window under the toolbar icon: account status, the Outbox, and the way into Gmail or the web app. */
+export function Popup({ load, open, outbox }: PopupProps) {
   const [state, setState] = useState<AccountState | null>(null);
 
   const refresh = useCallback(() => {
@@ -54,6 +57,9 @@ export function Popup({ load, open }: PopupProps) {
           {copy.loading}
         </p>
       )}
+      {state?.kind === "ready" && state.me.gmail?.status === "active" ? (
+        <PopupOutbox api={outbox} open={open} />
+      ) : null}
       <p className="m-0 border-t border-line pt-3 text-xs text-muted">{copy.privacy}</p>
     </main>
   );

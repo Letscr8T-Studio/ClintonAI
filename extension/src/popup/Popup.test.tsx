@@ -15,7 +15,11 @@ function setup(...states: AccountState[]) {
   const load = vi.fn<() => Promise<AccountState>>();
   states.forEach((s) => load.mockResolvedValueOnce(s));
   const open = vi.fn();
-  return { load, open, ...render(<Popup load={load} open={open} />) };
+  const outbox = {
+    load: vi.fn(async () => ({ kind: "ok" as const, emails: [] })),
+    act: vi.fn(async () => true),
+  };
+  return { load, open, outbox, ...render(<Popup load={load} open={open} outbox={outbox} />) };
 }
 
 describe("extension popup", () => {
