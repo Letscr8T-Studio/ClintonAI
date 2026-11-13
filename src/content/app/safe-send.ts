@@ -6,36 +6,54 @@ import { SAFE_SEND_MAX_RECIPIENTS } from "@/lib/validation/compose";
 export { SAFE_SEND_MAX_RECIPIENTS };
 
 /**
- * The email each recipient receives. Card only: nothing readable stays in their inbox.
- * Written as a short personal note in the sender's voice, with the link address visible: a branded
- * "X sent you a message" banner with one big button reads like phishing and lands in spam.
+ * The email each recipient receives. Card only: nothing readable stays in their inbox. It opens
+ * with a line in the sender's voice, then one quiet card with a single button, and the full link
+ * written out under it: a button that hides where it goes is what phishing filters punish.
  */
 export const cardCopy = {
+  /** The inbox preview line, before anything else in the email. */
+  preheader: (sender: string) => `${sender} sent you a private message.`,
   greeting: "Hi,",
-  intro: (subject: string) =>
-    subject ? `I've sent you "${subject}" with Safe Send.` : "I've sent you a message with Safe Send.",
-  readHere: "You can read it here:",
-  windowNote: "The link is just for you, and I can withdraw the message for 24 hours after sending it.",
+  intro: "I've sent you this privately with Safe Send.",
+  sentYou: "sent you a private message",
+  noSubject: "A private message",
+  privateTo: "Private to you",
+  window: "Can be withdrawn for 24 hours",
+  button: "Read the message",
+  orPaste: "Or paste this link into your browser:",
   alsoTo: (list: string) => `Also sent to ${list}.`,
-  footer: "Sent with Clinton AI (tryclinton.com)",
+  footer:
+    "Sent with Safe Send by Clinton AI. The message isn't in this email: it opens privately in your browser, and the sender can withdraw it for 24 hours.",
+  /** Plain-text version, for email apps that don't show HTML. */
+  textIntro: (subject: string) =>
+    subject
+      ? `I've sent you "${subject}" privately with Safe Send. Read it here:`
+      : "I've sent you a message privately with Safe Send. Read it here:",
+  textWindow: "It's private to you, and I can withdraw it for 24 hours.",
+  textFooter: "Sent with Safe Send by Clinton AI · tryclinton.com",
 };
 
 /** The page a link opens: /m/<token>. */
 export const viewCopy = {
-  title: "Message",
-  from: "From",
+  title: "Private message",
+  privateBadge: "Private message",
   to: "To",
-  sent: (when: string) => `Sent ${when}`,
-  window: "The sender can withdraw this message until",
+  /** "Private to you · Ada can withdraw this until 18:05" (the time follows). */
+  window: (sender: string) => `Private to you · ${sender} can withdraw this until`,
+  timeLeft: "Time left to read",
+  reply: (sender: string) => `Reply to ${sender}`,
   withdrawnTitle: "This message was withdrawn",
   /** Followed by the time, in the reader's own time zone. */
   withdrawnBy: (sender: string) => `${sender} withdrew it on`,
+  withdrawnHelp: "If you still need it, you can reply and ask.",
   expiredTitle: "This message has expired",
   expiredBody: "Safe Send messages can be read for 24 hours. This one can no longer be opened.",
   notFoundTitle: "This link isn't valid",
   notFoundBody: "Check that you copied the whole link from the email.",
   unreadable: "This message couldn't be opened. Ask the sender to send it again.",
-  footer: "Sent safely with Clinton AI",
+  deliveredBy: "Delivered privately by",
+  pitch: "Clinton AI checks your emails before they go and lets you take them back.",
+  pitchLink: "Try it free",
   noSubject: "(no subject)",
 };
 

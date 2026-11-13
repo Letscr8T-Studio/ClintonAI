@@ -95,6 +95,7 @@ describe("viewByToken", () => {
     expect(await viewByToken(token)).toEqual({
       kind: "withdrawn",
       senderName: "Ada Obi",
+      senderEmail: row().sender_email,
       withdrawnAt: "2026-10-31T11:00:00Z",
     });
     repo.openByTokenHash.mockResolvedValue(row({ expires_at: "2020-01-01T00:00:00Z" }));

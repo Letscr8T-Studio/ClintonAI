@@ -1,6 +1,6 @@
 import { Svg, round } from "./icons";
 
-// More inline icons for the signed-in app (search, theme, keyboard). Decorative, like icons.tsx.
+// More inline icons (search, theme, keyboard, lock, reply). Decorative, like icons.tsx.
 
 type IconProps = { size?: number; className?: string };
 
@@ -102,6 +102,23 @@ export function SparkleIcon({ size = 18, className }: IconProps) {
         strokeWidth={1.6}
         {...round}
       />
+    </Svg>
+  );
+}
+
+export function LockIcon({ size = 18, className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <rect x="5" y="10.5" width="14" height="10" rx="2.5" stroke="currentColor" strokeWidth={1.8} />
+      <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" strokeWidth={1.8} {...round} />
+    </Svg>
+  );
+}
+
+export function ReplyIcon({ size = 18, className }: IconProps) {
+  return (
+    <Svg size={size} viewBox="0 0 24 24" className={className}>
+      <path d="M10 6 4 12l6 6M4.5 12H14a6 6 0 0 1 6 6v1" stroke="currentColor" strokeWidth={1.8} {...round} />
     </Svg>
   );
 }

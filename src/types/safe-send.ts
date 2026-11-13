@@ -2,8 +2,8 @@
 export type SafeSendViewModel =
   | { kind: "not_found" }
   | { kind: "unreadable" }
-  | { kind: "withdrawn"; senderName: string; withdrawnAt: string }
-  | { kind: "expired"; senderName: string }
+  | { kind: "withdrawn"; senderName: string; senderEmail: string; withdrawnAt: string }
+  | { kind: "expired"; senderName: string; senderEmail: string }
   | {
       kind: "readable";
       senderName: string;

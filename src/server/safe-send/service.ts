@@ -52,9 +52,10 @@ export async function viewByToken(token: string): Promise<SafeSendView> {
   const row = await repo.openByTokenHash(hashToken(token));
   if (!row) return { kind: "not_found" };
   const senderName = row.sender_name || row.sender_email;
-  if (row.withdrawn_at) return { kind: "withdrawn", senderName, withdrawnAt: row.withdrawn_at };
+  const senderEmail = row.sender_email;
+  if (row.withdrawn_at) return { kind: "withdrawn", senderName, senderEmail, withdrawnAt: row.withdrawn_at };
   if (row.content_deleted_at || new Date(row.expires_at) <= new Date())
-    return { kind: "expired", senderName };
+    return { kind: "expired", senderName, senderEmail };
 
   const [dataKey, sealed] = await Promise.all([
     repo.getDataKey(row.message_id),

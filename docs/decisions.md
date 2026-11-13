@@ -3,6 +3,17 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-13: Safe Send card and reading page redesigned for important recipients
+
+- **Decision:** Founder decision (the plain note looked unprofessional for investors and executives).
+  - **The card:** a hidden inbox preview line ("Preye Omusuku sent you a private message."), one line in the sender's voice, then one card: initials avatar, the subject, "Private to you · can be withdrawn for 24 hours", a "Read the message" button, and the full link written out under it. No images, inline styles only, the button a styled link in a table cell, and a plain-text version alongside.
+  - **The reading page:** a private letter. Sender, date, subject as headline, the body in reading type with web addresses clickable (`linkify`, http(s) only, `rel="noopener noreferrer nofollow"`), a Reply link (`mailto:`), and a strip with the withdrawal time and a bar of the time left. Withdrawn and expired pages show who and when and offer a reply, so they now carry the sender's email. A quiet "Delivered privately by Clinton AI" footer.
+  - `LocalTime` renders the time in UTC on the server and swaps to local time in the browser, so sentences never show a gap.
+- **Why:** The recipient's first impression of Clinton AI is this email and page; they also carry the sender's reputation.
+- **Consequences:**
+  - **This partly reverses the 2026-10-31 deliverability note** (a branded card with one big button went to Gmail spam). The safeguards kept are the personal line first, the link written out, no images and the text part. **Before beta: send Safe Sends to Gmail, Outlook and Yahoo and check inbox placement.** If they land in spam, drop the button (keep the written-out link) before anything else.
+  - Every recipient sees a small invitation to try Clinton AI (`?ref=safe-send`), our cheapest growth loop.
+
 ## 2026-11-13: Send with Clinton AI from Gmail: new emails only, in plain text, from the connected account
 
 - **Decision:** The extension sends through the same Outbox as the web app. Gmail's draft is discarded once the email is held, and Undo reopens it in a new Gmail compose window. Not offered for replies and forwards, Gmail attachments, or a Gmail tab signed in to another account than the connected one: the panel says why, and Gmail's Send is used. Formatting and pictures are dropped (said before sending); link addresses are kept in the text.
@@ -96,7 +107,7 @@ choice a future engineer might question. Format: date, decision, why, consequenc
 
 ## 2026-10-31: Safe Send is card-only, one link per person, crypto-shredded
 
-- **Update (deliverability):** the first branded card ("Ada Obi sent you a message", one big button) landed in Gmail spam. The card is now a short plain note in the sender's voice with the full link address visible, no banner, no button. Keep it that way: branded "you have a message" layouts read as phishing.
+- **Update (deliverability):** the first branded card ("Ada Obi sent you a message", one big button) landed in Gmail spam. The card is now a short plain note in the sender's voice with the full link address visible, no banner, no button. Branded "you have a message" layouts read as phishing. (Revisited 2026-11-13: see the Safe Send redesign entry.)
 - **Decision:** Recipients get a card with a private link, never the text, so withdrawing really works. Each person gets their own copy and a 256-bit link token (only its SHA-256 is stored), so one person can be withdrawn without the others; Bcc recipients are never shown to anyone. Content is AES-256-GCM encrypted with a per-message key held in Vault; withdrawing for everyone or reaching 24 hours destroys the key (and the file), so the ciphertext is unreadable forever. All database steps are service-role functions; the window is set by the database clock (exactly 24 h). Opens are counted only while readable and labelled approximate.
 - **Why:** Trust rules 1, 2, 6, 7: withdraw never edit, always visible, minimal data with a short life, honest claims. A preview in the email would stay in the inbox forever.
 - **Consequences:** Gmail keeps one sent copy per person. The subject line stays visible in the recipient's inbox (the Compose toggle says so). Safe Send is limited to 20 people. If the first copy fails, nothing is kept and normal retries apply; if a later copy fails, that person's link is withdrawn and the Outbox says who missed it.

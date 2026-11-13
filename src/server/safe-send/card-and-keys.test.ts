@@ -14,21 +14,31 @@ describe("buildCard", () => {
   it("carries the link, the sender and who else it went to, never the message itself", () => {
     const { html, text } = buildCard(input);
     expect(html).toContain('href="https://tryclinton.com/m/abc"');
-    expect(html).toContain("I&#39;ve sent you &quot;Pricing deck v2&quot; with Safe Send.");
+    expect(html).toContain("Pricing deck v2");
     expect(html).toContain("Ada Obi");
     expect(html).toContain("Also sent to tunde@client.co.");
-    expect(text).toContain("You can read it here:\nhttps://tryclinton.com/m/abc");
+    expect(text).toContain(
+      '"Pricing deck v2" privately with Safe Send. Read it here:\nhttps://tryclinton.com/m/abc',
+    );
   });
 
-  it("reads like a personal note, not phishing: the link shows its own address, no button", () => {
+  it("starts the inbox preview with who sent it, and shows the sender's initials", () => {
     const { html } = buildCard(input);
-    expect(html).toContain('<a href="https://tryclinton.com/m/abc" style="color:');
+    expect(html.indexOf("Ada Obi sent you a private message.")).toBeLessThan(html.indexOf("Hi,"));
+    expect(html).toContain(">AO</td>");
+  });
+
+  it("stays trustworthy: the full link is written out under the button, and there are no images", () => {
+    const { html } = buildCard(input);
+    expect(html.split('href="https://tryclinton.com/m/abc"')).toHaveLength(3); // the button and the written-out link
     expect(html).toContain(">https://tryclinton.com/m/abc</a>");
-    expect(html).not.toMatch(/sent you a message|View message|display:inline-block/);
+    expect(html).not.toMatch(/<img|background-image|<script/i);
   });
 
   it("still makes sense without a subject", () => {
-    expect(buildCard({ ...input, subject: "" }).text).toContain("I've sent you a message with Safe Send.");
+    const card = buildCard({ ...input, subject: "" });
+    expect(card.text).toContain("I've sent you a message privately with Safe Send.");
+    expect(card.html).toContain("A private message");
   });
 
   it("escapes anything hostile in the subject or name (no HTML injection)", () => {
