@@ -27,7 +27,8 @@ test.describe("Signed-in app", () => {
   test("a Safe Send link page is public, private to search engines, and explains a bad link", async ({
     page,
   }) => {
-    await page.goto(`/m/${"x".repeat(43)}`);
+    // Malformed, so it's refused before any database lookup (CI runs these tests without one).
+    await page.goto("/m/not-a-real-link");
     await expect(page).toHaveURL(/\/m\//); // no sign-in needed
     await expect(page.getByRole("heading", { level: 1, name: "This link isn't valid" })).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
