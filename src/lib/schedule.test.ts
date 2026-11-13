@@ -28,9 +28,17 @@ describe("scheduleOptions", () => {
 
 describe("formatWhen", () => {
   const now = local(2026, 11, 4, 10);
+  // Times follow the reader's own locale ("18:00" in Lagos and London, "06:00 PM" in New York), so
+  // compare with the same formatter instead of one machine's clock style.
+  const time = (date: Date) =>
+    new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(date);
+
   it("says today and tomorrow in words, and other days by date", () => {
-    expect(formatWhen(local(2026, 11, 4, 18), now)).toMatch(/^Today 18:00$/);
-    expect(formatWhen(local(2026, 11, 5, 8), now)).toMatch(/^Tomorrow 08:00$/);
-    expect(formatWhen(local(2026, 11, 9, 8), now)).toMatch(/9.*08:00$/);
+    const evening = local(2026, 11, 4, 18);
+    const morning = local(2026, 11, 5, 8);
+    const monday = local(2026, 11, 9, 8);
+    expect(formatWhen(evening, now)).toBe(`Today ${time(evening)}`);
+    expect(formatWhen(morning, now)).toBe(`Tomorrow ${time(morning)}`);
+    expect(formatWhen(monday, now)).toMatch(new RegExp(`9.*${time(monday)}$`));
   });
 });
