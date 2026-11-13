@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   // The extension's build sets this too (scripts/build-extension.mjs).
-  define: { __CLINTON_URL__: JSON.stringify("http://localhost:3000") },
+  define: { __CLINTON_URL__: JSON.stringify("http://localhost:3000"), __DEV__: "true" },
   test: {
     environment: "jsdom",
     globals: true,

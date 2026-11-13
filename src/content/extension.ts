@@ -40,3 +40,36 @@ export const extensionPopupCopy = {
   },
   privacy: "Clinton AI only sees the email you're writing. Never your inbox.",
 } as const;
+
+/** The pill Clinton AI adds next to Send in each Gmail compose window. */
+export const composeBarCopy = {
+  name: "Clinton AI",
+  loading: "Clinton AI…",
+  ready: "Clinton AI is on",
+  readyHint: "Clinton AI can see this email only. Checking it as you write arrives in the next update.",
+  signIn: "Sign in to Clinton AI",
+  connectGmail: "Connect Gmail to Clinton AI",
+  offline: "Clinton AI is offline",
+} as const;
+
+/** Development builds only: what was read from a compose window, to check against real Gmail. */
+export const composeBarDevCopy = {
+  toggle: "Debug",
+  heading: "What Clinton AI reads (dev build only)",
+  copy: "Copy structure",
+  copied: "Copied: paste it to the developer",
+  none: "—",
+  yes: "yes",
+  no: "no",
+  labels: {
+    to: "To",
+    cc: "Cc",
+    bcc: "Bcc",
+    subject: "Subject",
+    body: "Body",
+    signature: "Signature",
+    quoted: "Quoted reply",
+    attachments: "Gmail attachments",
+    rich: "Would lose",
+  },
+} as const;

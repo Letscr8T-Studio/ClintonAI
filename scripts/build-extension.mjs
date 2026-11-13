@@ -30,6 +30,7 @@ const shared = {
   resolve: { alias: { "@": path.join(root, "src") } },
   define: {
     __CLINTON_URL__: JSON.stringify(site),
+    __DEV__: JSON.stringify(dev),
     "process.env.NODE_ENV": JSON.stringify(dev ? "development" : "production"),
   },
 };
@@ -58,6 +59,22 @@ await build({
   },
 });
 
+// The Gmail content script: one classic script (content scripts can't be ES modules), with its
+// CSS inlined for the shadow root.
+await build({
+  ...shared,
+  plugins: [react()],
+  build: {
+    ...output(out),
+    lib: {
+      entry: path.join(src, "content/main.tsx"),
+      formats: ["iife"],
+      name: "ClintonAI",
+      fileName: () => "content.js",
+    },
+  },
+});
+
 // Toolbar and store icons from the brand kit's app icon.
 await mkdir(path.join(out, "icons"));
 const sizes = [16, 32, 48, 128];
@@ -76,9 +93,10 @@ const manifest = {
   icons,
   action: { default_title: copy.name, default_popup: "popup/index.html", default_icon: icons },
   background: { service_worker: "background.js", type: "module" },
-  // Only the site, so the session cookie goes with our calls. mail.google.com arrives with the
-  // compose integration (milestone 3). Ask for nothing more than we use: the store reviews it.
+  // The site, so the session cookie goes with our calls; Gmail, only for the compose bar. Ask for
+  // nothing more than we use: the store reviews every permission.
   host_permissions: [`${site}/*`],
+  content_scripts: [{ matches: ["https://mail.google.com/*"], js: ["content.js"], run_at: "document_idle" }],
   minimum_chrome_version: "120",
 };
 await writeFile(path.join(out, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
