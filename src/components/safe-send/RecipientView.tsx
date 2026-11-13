@@ -66,10 +66,12 @@ export function RecipientView({ view }: { view: SafeSendViewModel }) {
   return (
     <div className="stage-paper min-h-dvh px-4 py-8 sm:py-14">
       <div className="mx-auto flex max-w-[760px] flex-col gap-7">
-        <p className="m-0 inline-flex items-center gap-2 self-center rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-[13px] font-medium text-body">
-          <LockIcon size={15} />
-          {copy.privateBadge}
-        </p>
+        <header className="self-center">
+          <p className="m-0 inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-[13px] font-medium text-body">
+            <LockIcon size={15} />
+            {copy.privateBadge}
+          </p>
+        </header>
         <main id="main">
           <Message view={view} />
         </main>
