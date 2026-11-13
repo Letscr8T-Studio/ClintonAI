@@ -3,6 +3,15 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-13: Phase 3 (Chrome extension) opens before the Phase 1 gate
+
+- **Decision:** Founder decision to start the Chrome extension now, ahead of Phase 2 (the roadmap allows swapping 2 and 3) and before Phase 1's gate (Google verification approved, beta used weekly). Phase 1 continues in parallel: verification is submitted now ([pack](google-verification.md)), the beta runs, Yahoo deliverability is fixed before Safe Send reaches real users. Plan: [phase 3](phases/phase-3-chrome-extension.md).
+- **Why:** Production is live and passing every check; verification is weeks of waiting on Google, and the extension is the most likely answer to "use it inside Gmail". Building it during that wait saves the time.
+- **Consequences:**
+  - Two phases in progress at once. Phase 1 launch work (verification replies, beta issues, launch checklist) comes first whenever they compete.
+  - The extension adds a second way in (device tokens, Bearer auth) that the security review must cover.
+  - The extension can't be published to real users before Google verification either: it uses the same Gmail connection.
+
 ## 2026-11-03: Launch hardening: shared limits, CSP, signed webhook, real console auth, Sentry
 
 - **Decision:**

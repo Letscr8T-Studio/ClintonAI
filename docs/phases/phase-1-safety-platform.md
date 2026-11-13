@@ -110,7 +110,7 @@ Built (milestone 4): the provider is chosen by `AI_PROVIDER` (OpenAI today, mode
    - **Rewrite with Clinton**: fix, shorter, friendlier, formal. `POST /api/rewrite`, text never stored, Undo in Compose.
 8. [ ] Hardening: every item in the [launch checklist](../launch-checklist.md) (shared rate limits, CSP, signed Tally webhook, real console auth, Sentry), plus privacy policy + Limited Use page and terms.
 9. [ ] Human + AI security review of auth, tokens, encryption. Deliverability tests (Gmail, Outlook, Yahoo spam folders).
-10. [ ] Google verification submission (demo video, scope justifications). Invite beta in batches.
+10. [ ] Google verification submission ([pack](../google-verification.md): domain proof, justification, demo video script). Invite beta in batches.
 
 ## Open decisions
 

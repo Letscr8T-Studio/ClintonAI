@@ -20,13 +20,15 @@ Full vision: [docs/product/vision.md](docs/product/vision.md).
 
 ## Where we are now
 
-| Phase | Name                                                                | Status                                                                    |
-| ----- | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 0     | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                   |
-| 1     | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **In progress**, see [phase plan](docs/phases/phase-1-safety-platform.md) |
-| 2-8   | Outreach, extension, providers, inbox AI, mobile, agent API, teams  | Planned, [roadmap](docs/product/roadmap.md)                               |
+| Phase  | Name                                                                | Status                                                                    |
+| ------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 0      | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                   |
+| 1      | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **In progress**, see [phase plan](docs/phases/phase-1-safety-platform.md) |
+| 3      | Chrome extension: Clinton AI inside Gmail                           | **Planning**, see [phase plan](docs/phases/phase-3-chrome-extension.md)   |
+| 2, 4-8 | Outreach, providers, inbox AI, mobile, agent API, teams             | Planned, [roadmap](docs/product/roadmap.md)                               |
 
-Build **only** the current phase. Each phase opens when its gate is met. Never build ahead.
+Build **only** the current phases. Each phase opens when its gate is met, or by a founder decision
+recorded in [docs/decisions.md](docs/decisions.md) (Phase 3 opened early on 2026-11-13). Never build ahead.
 
 **Before any user connects Gmail or sign-ups open:** every item in
 [docs/launch-checklist.md](docs/launch-checklist.md) must be done (shared rate limits, CSP, signed
@@ -106,5 +108,6 @@ docs/                  Product and engineering documentation
 
 - Product: [vision](docs/product/vision.md) · [features](docs/product/features.md) · [roadmap](docs/product/roadmap.md) · [trust rules](docs/product/trust-rules.md) · [brand](docs/product/brand.md) · [business](docs/product/business.md)
 - Engineering: [architecture](docs/engineering/architecture.md) · [conventions](docs/engineering/conventions.md) · [testing](docs/engineering/testing.md) · [security & compliance](docs/engineering/security.md) · [environment & deploy](docs/engineering/environment.md)
-- Phases: [phase 0](docs/phases/phase-0-validation.md) · [phase 1](docs/phases/phase-1-safety-platform.md)
+- Phases: [phase 0](docs/phases/phase-0-validation.md) · [phase 1](docs/phases/phase-1-safety-platform.md) · [phase 3](docs/phases/phase-3-chrome-extension.md)
+- [Google verification pack](docs/google-verification.md)
 - [Deploy runbook](docs/deploy.md) · [Launch checklist](docs/launch-checklist.md) (hard gate before users) · [Decision log](docs/decisions.md)
