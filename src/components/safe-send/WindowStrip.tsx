@@ -26,7 +26,7 @@ export function WindowStrip({ sender, sentAt, expiresAt }: Props) {
   const left = now === null ? 1 : Math.min(1, Math.max(0, (end - now) / (end - start)));
 
   return (
-    <div className="flex flex-col gap-3 bg-brand-wash px-6 py-5 sm:px-12">
+    <div className="flex flex-col gap-3 rounded-b-[28px] bg-brand-wash px-6 py-5 sm:px-12">
       <p className="m-0 flex items-start gap-2.5 text-[14px] leading-snug text-brand-deep">
         <LockIcon size={17} className="mt-px shrink-0" />
         <span>

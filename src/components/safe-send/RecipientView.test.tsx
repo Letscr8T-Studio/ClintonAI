@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { viewCopy } from "@/content/app/safe-send";
 import { a11yViolations } from "@/test/a11y";
@@ -34,12 +35,32 @@ describe("RecipientView", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer nofollow");
   });
 
-  it("offers a reply to the sender, with the subject", () => {
-    render(<RecipientView view={readable} />);
-    expect(screen.getByRole("link", { name: viewCopy.reply("Ada") })).toHaveAttribute(
+  it("replies in the app the message went to: Gmail for a Gmail address, in that account", async () => {
+    const { container } = render(<RecipientView view={{ ...readable, recipientEmail: "kemi@gmail.com" }} />);
+    const reply = screen.getByRole("link", { name: viewCopy.replyIn("Gmail") });
+    expect(reply.getAttribute("href")).toMatch(
+      /^https:\/\/mail\.google\.com\/mail\/\?authuser=kemi%40gmail\.com&view=cm/,
+    );
+    expect(reply.getAttribute("href")).toContain("su=Re%3A%20Pricing%20deck%20v2");
+    await userEvent.click(screen.getByRole("button", { name: viewCopy.moreReply }));
+    const menu = screen.getByRole("list", { name: viewCopy.moreReply });
+    expect(within(menu).getByRole("link", { name: viewCopy.replyApps.mailto })).toHaveAttribute(
       "href",
       "mailto:ada@gmail.com?subject=Re%3A%20Pricing%20deck%20v2",
     );
+    expect(within(menu).queryByRole("link", { name: viewCopy.replyApps.gmail })).toBeNull();
+    expect(await a11yViolations(container)).toEqual([]);
+  });
+
+  it("offers every app, and copying the address, when the address doesn't say which app", async () => {
+    render(<RecipientView view={readable} />);
+    await userEvent.click(screen.getByRole("button", { name: viewCopy.reply("Ada") }));
+    const menu = screen.getByRole("list", { name: viewCopy.moreReply });
+    for (const app of Object.values(viewCopy.replyApps))
+      expect(within(menu).getByRole("link", { name: app })).toBeInTheDocument();
+    expect(
+      within(menu).getByRole("button", { name: viewCopy.copyAddress("ada@gmail.com") }),
+    ).toBeInTheDocument();
   });
 
   it("renders the body as text, never as HTML", () => {
@@ -64,7 +85,8 @@ describe("RecipientView", () => {
     );
     expect(screen.getByRole("heading", { name: viewCopy.withdrawnTitle })).toBeInTheDocument();
     expect(screen.getByText(viewCopy.withdrawnBy("Ada Obi"), { exact: false })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: viewCopy.reply("Ada") })).toHaveAttribute(
+    await userEvent.click(screen.getByRole("button", { name: viewCopy.reply("Ada") }));
+    expect(screen.getByRole("link", { name: viewCopy.replyApps.mailto })).toHaveAttribute(
       "href",
       "mailto:ada@gmail.com",
     );

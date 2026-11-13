@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import { LockIcon, ReplyIcon } from "@/components/ui/app-icons";
-import { buttonStyles } from "@/components/ui/Button";
+import { LockIcon } from "@/components/ui/app-icons";
 import { ClintonMark } from "@/components/ui/icons";
 import { LocalTime } from "@/components/ui/LocalTime";
 import { palette } from "@/config/brand";
 import { viewCopy as copy } from "@/content/app/safe-send";
 import type { SafeSendViewModel } from "@/types/safe-send";
-import { replyHref, SafeSendLetter, SenderAvatar } from "./SafeSendLetter";
+import { ReplyMenu } from "./ReplyMenu";
+import { SafeSendLetter, SenderAvatar } from "./SafeSendLetter";
 
 type NoticeProps = { title: string; sender?: { name: string; email: string }; children: ReactNode };
 
@@ -29,10 +29,9 @@ function Notice({ title, sender, children }: NoticeProps) {
       </h1>
       <p className="mx-auto mt-3 mb-0 max-w-[420px] leading-relaxed text-muted">{children}</p>
       {sender ? (
-        <a href={replyHref(sender.email)} className={`${buttonStyles({ variant: "secondary" })} mt-8`}>
-          <ReplyIcon size={17} />
-          {copy.reply(sender.name.split(" ")[0])}
-        </a>
+        <div className="mt-8 flex justify-center">
+          <ReplyMenu to={sender.email} senderName={sender.name} />
+        </div>
       ) : null}
     </section>
   );

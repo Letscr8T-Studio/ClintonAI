@@ -42,6 +42,11 @@ export const viewCopy = {
   window: (sender: string) => `Private to you · ${sender} can withdraw this until`,
   timeLeft: "Time left to read",
   reply: (sender: string) => `Reply to ${sender}`,
+  replyIn: (app: string) => `Reply in ${app}`,
+  moreReply: "More ways to reply",
+  replyApps: { gmail: "Gmail", outlook: "Outlook", yahoo: "Yahoo Mail", mailto: "Your email app" },
+  copyAddress: (email: string) => `Copy ${email}`,
+  copied: "Copied",
   withdrawnTitle: "This message was withdrawn",
   /** Followed by the time, in the reader's own time zone. */
   withdrawnBy: (sender: string) => `${sender} withdrew it on`,

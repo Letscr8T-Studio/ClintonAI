@@ -1,16 +1,12 @@
-import { ReplyIcon } from "@/components/ui/app-icons";
-import { buttonStyles } from "@/components/ui/Button";
 import { LocalTime } from "@/components/ui/LocalTime";
 import { viewCopy as copy } from "@/content/app/safe-send";
 import { initialsOf } from "@/lib/initials";
 import { linkify } from "@/lib/linkify";
 import type { SafeSendViewModel } from "@/types/safe-send";
+import { ReplyMenu } from "./ReplyMenu";
 import { WindowStrip } from "./WindowStrip";
 
 type Readable = Extract<SafeSendViewModel, { kind: "readable" }>;
-
-export const replyHref = (email: string, subject?: string) =>
-  `mailto:${email}${subject ? `?subject=${encodeURIComponent(`Re: ${subject}`)}` : ""}`;
 
 /** The sender's initials in a round brand tile: the face of the message. */
 export function SenderAvatar({ name, size = "size-12" }: { name: string; size?: string }) {
@@ -26,12 +22,12 @@ export function SenderAvatar({ name, size = "size-12" }: { name: string; size?: 
 
 /**
  * A Safe Send message as a letter: who it's from, the subject as its headline, the text in
- * comfortable reading type (links clickable, never HTML), a way to reply, and until when it can
+ * comfortable reading type (links clickable, never HTML), ways to reply, and until when it can
  * be withdrawn.
  */
 export function SafeSendLetter({ view }: { view: Readable }) {
   return (
-    <article className="cl-rise overflow-hidden rounded-[28px] border border-line bg-white shadow-mock">
+    <article className="cl-rise rounded-[28px] border border-line bg-white shadow-mock">
       <div className="px-6 pt-8 pb-9 sm:px-12 sm:pt-11">
         <header>
           <div className="flex items-center gap-3.5">
@@ -76,13 +72,14 @@ export function SafeSendLetter({ view }: { view: Readable }) {
             ),
           )}
         </div>
-        <a
-          href={replyHref(view.senderEmail, view.subject)}
-          className={`${buttonStyles({ variant: "secondary", size: "md" })} mt-10`}
-        >
-          <ReplyIcon size={17} />
-          {copy.reply(view.senderName.split(" ")[0])}
-        </a>
+        <div className="mt-10">
+          <ReplyMenu
+            to={view.senderEmail}
+            senderName={view.senderName}
+            subject={view.subject}
+            recipient={view.recipientEmail}
+          />
+        </div>
       </div>
       <WindowStrip sender={view.senderName.split(" ")[0]} sentAt={view.sentAt} expiresAt={view.expiresAt} />
     </article>
