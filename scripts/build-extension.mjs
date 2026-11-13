@@ -90,6 +90,7 @@ const manifest = {
   name: dev ? `${copy.name} (dev)` : copy.name,
   version: pkg.version,
   description: copy.description,
+  homepage_url: site,
   icons,
   action: { default_title: copy.name, default_popup: "popup/index.html", default_icon: icons },
   background: { service_worker: "background.js", type: "module" },

@@ -4,7 +4,7 @@ import { legalEntity as who, type LegalDoc } from "./types";
 
 export const privacyPolicy: LegalDoc = {
   title: "Privacy policy",
-  updated: "3 November 2026",
+  updated: "13 November 2026",
   intro: `${who.name} helps you write, check and send email safely from your own Gmail. This page explains what we collect, why, who helps us run the service, how long we keep things, and your rights. ${who.name} is run by ${who.operator} (${who.country}).`,
   sections: [
     {
@@ -26,8 +26,23 @@ export const privacyPolicy: LegalDoc = {
       id: "ai",
       heading: "The AI check and Rewrite",
       paragraphs: [
-        "When you press Check & send, or ask Clinton to rewrite, the email's text is sent to our AI provider (OpenAI) to look for mistakes or rewrite it. We never store that text, and we tell the provider not to keep it for training (store: false). OpenAI may keep API requests for up to 30 days to detect abuse, then deletes them; it does not use them to train its models.",
+        "When you press Check & send, ask Clinton to rewrite, or pause while writing in Gmail with the Chrome extension, the email's recipients, subject and text are sent to our AI provider (OpenAI) to look for mistakes or rewrite it. We never store that text, and we tell the provider not to keep it for training (store: false). OpenAI may keep API requests for up to 30 days to detect abuse, then deletes them; it does not use them to train its models.",
         "The AI only advises. Nothing changes in your email unless you choose a fix.",
+      ],
+    },
+    {
+      id: "extension",
+      heading: "The Clinton AI Chrome extension",
+      paragraphs: [
+        "The extension brings the check and Send with Clinton AI into Gmail on your computer. Chrome describes its access as reading and changing your data on mail.google.com and tryclinton.com; this is what it actually does with that access:",
+        "Our use of information received through the extension complies with the Chrome Web Store User Data Policy, including the Limited Use requirements. You can remove the extension at any time from Chrome's extensions page; it keeps nothing of its own.",
+      ],
+      list: [
+        "In Gmail it looks only at the compose windows you are writing in: recipients, subject, text and signature. It never reads your inbox, the emails you open, the conversations you reply to, or any other website.",
+        "While you are signed in to Clinton AI, about a second and a half after you stop typing (once the email has a recipient and some text), it sends the recipients, subject and text to the AI check described above. It never sends the same version twice, and sends nothing while you are signed out.",
+        "When you choose Send with Clinton AI, the email goes to your Clinton AI Outbox, exactly as if you had written it on tryclinton.com, and Gmail's copy of the draft is discarded so it can't be sent twice.",
+        "Highlights are drawn without changing your text. Your email changes only when you press Fix it.",
+        "It uses your tryclinton.com sign-in and stores nothing else on your device. No analytics, no advertising, no selling of data, and no code loaded from elsewhere.",
       ],
     },
     {

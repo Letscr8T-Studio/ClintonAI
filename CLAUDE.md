@@ -73,6 +73,8 @@ npm run db:dispatcher  # point local pg_cron at the dev server's Smart Delay dis
 npm run admin:add -- you@example.com  # give a signed-up account founders console access (then MFA)
 npm run ext:dev        # build the Chrome extension for the local app → chrome://extensions → Load unpacked → extension/dist
 npm run ext:build      # store build of the extension (talks to https://tryclinton.com)
+npm run ext:zip        # store build, zipped for upload → extension/clinton-ai-<version>.zip
+npm run store-assets   # Chrome Web Store images → brand/store/
 ```
 
 ## Definition of done
@@ -112,5 +114,5 @@ docs/                  Product and engineering documentation
 - Product: [vision](docs/product/vision.md) · [features](docs/product/features.md) · [roadmap](docs/product/roadmap.md) · [trust rules](docs/product/trust-rules.md) · [brand](docs/product/brand.md) · [business](docs/product/business.md)
 - Engineering: [architecture](docs/engineering/architecture.md) · [conventions](docs/engineering/conventions.md) · [testing](docs/engineering/testing.md) · [security & compliance](docs/engineering/security.md) · [environment & deploy](docs/engineering/environment.md)
 - Phases: [phase 0](docs/phases/phase-0-validation.md) · [phase 1](docs/phases/phase-1-safety-platform.md) · [phase 3](docs/phases/phase-3-chrome-extension.md)
-- [Google verification pack](docs/google-verification.md)
+- [Google verification pack](docs/google-verification.md) · [Chrome Web Store pack](docs/chrome-web-store.md)
 - [Deploy runbook](docs/deploy.md) · [Launch checklist](docs/launch-checklist.md) (hard gate before users) · [Decision log](docs/decisions.md)
