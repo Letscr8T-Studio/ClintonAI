@@ -11,11 +11,13 @@ export default defineConfig({
       "server-only": fileURLToPath(new URL("./src/test/server-only-stub.ts", import.meta.url)),
     },
   },
+  // The extension's build sets this too (scripts/build-extension.mjs).
+  define: { __CLINTON_URL__: JSON.stringify("http://localhost:3000") },
   test: {
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}", "extension/src/**/*.test.{ts,tsx}"],
     restoreMocks: true,
     unstubEnvs: true,
     // Compose tests type whole emails key by key; on a busy machine (or CI) that passes 5 s.

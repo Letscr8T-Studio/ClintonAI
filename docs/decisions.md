@@ -3,6 +3,15 @@
 Short records of decisions that shape the codebase. Newest first. Add an entry whenever you make a
 choice a future engineer might question. Format: date, decision, why, consequences.
 
+## 2026-11-13: The extension signs in with the site's own session
+
+- **Decision:** The Chrome extension has host permission for tryclinton.com, and its service worker calls the existing API routes with the site's session cookie. Chrome attaches it and treats the request as same-site. The extension stores no token, and there is no new table or auth route. Built and proven live in Chromium.
+- **Why:** The repositories run as the signed-in user under row-level security. A separate device token would have meant service-role code paths with hand-written `user_id` filters, a code exchange and a token table: more to get wrong for no gain to the user. Signing out of the site now signs out the extension too.
+- **Consequences:**
+  - Anything that can act with the extension's host permission for tryclinton.com can use the session. That includes another installed extension granted the same site, which could read the page anyway; the security review should still note it.
+  - If Chrome changes how extensions get cookies, fall back to device tokens (see the phase 3 plan).
+  - Firefox and Safari behave differently; they're out of scope for now.
+
 ## 2026-11-13: Phase 3 (Chrome extension) opens before the Phase 1 gate
 
 - **Decision:** Founder decision to start the Chrome extension now, ahead of Phase 2 (the roadmap allows swapping 2 and 3) and before Phase 1's gate (Google verification approved, beta used weekly). Phase 1 continues in parallel: verification is submitted now ([pack](google-verification.md)), the beta runs, Yahoo deliverability is fixed before Safe Send reaches real users. Plan: [phase 3](phases/phase-3-chrome-extension.md).

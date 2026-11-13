@@ -20,12 +20,12 @@ Full vision: [docs/product/vision.md](docs/product/vision.md).
 
 ## Where we are now
 
-| Phase  | Name                                                                | Status                                                                    |
-| ------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 0      | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                   |
-| 1      | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **In progress**, see [phase plan](docs/phases/phase-1-safety-platform.md) |
-| 3      | Chrome extension: Clinton AI inside Gmail                           | **Planning**, see [phase plan](docs/phases/phase-3-chrome-extension.md)   |
-| 2, 4-8 | Outreach, providers, inbox AI, mobile, agent API, teams             | Planned, [roadmap](docs/product/roadmap.md)                               |
+| Phase  | Name                                                                | Status                                                                     |
+| ------ | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 0      | Validation: waitlist, survey, founders console                      | **Live**, this codebase                                                    |
+| 1      | v1 safety platform: Gmail connect, AI check, Smart Delay, Safe Send | **In progress**, see [phase plan](docs/phases/phase-1-safety-platform.md)  |
+| 3      | Chrome extension: Clinton AI inside Gmail                           | **In progress**, see [phase plan](docs/phases/phase-3-chrome-extension.md) |
+| 2, 4-8 | Outreach, providers, inbox AI, mobile, agent API, teams             | Planned, [roadmap](docs/product/roadmap.md)                                |
 
 Build **only** the current phases. Each phase opens when its gate is met, or by a founder decision
 recorded in [docs/decisions.md](docs/decisions.md) (Phase 3 opened early on 2026-11-13). Never build ahead.
@@ -71,6 +71,8 @@ npm run test:db        # pgTAP database tests (RLS + trust-rule triggers)
 npm run db:types       # regenerate src/types/supabase.gen.ts after a migration
 npm run db:dispatcher  # point local pg_cron at the dev server's Smart Delay dispatcher
 npm run admin:add -- you@example.com  # give a signed-up account founders console access (then MFA)
+npm run ext:dev        # build the Chrome extension for the local app → chrome://extensions → Load unpacked → extension/dist
+npm run ext:build      # store build of the extension (talks to https://tryclinton.com)
 ```
 
 ## Definition of done
@@ -99,6 +101,7 @@ src/
   types/          Shared types, including the Supabase Database type
   test/           Test setup, fixtures, axe helper
   proxy.ts        Guards /owner and /api/owner
+extension/src/         Chrome extension (Phase 3): service worker, popup; imports from src/ via @/
 supabase/migrations/   SQL migrations (source of truth for the schema)
 e2e/                   Playwright tests
 docs/                  Product and engineering documentation

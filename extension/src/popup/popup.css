@@ -1,0 +1,22 @@
+/* The popup's styles: the site's design tokens and fonts, and only the Tailwind classes the
+   popup and the shared UI primitives it renders use. */
+@import "tailwindcss" source(none);
+@import "../../../src/styles/tokens.css";
+
+@source "./";
+@source "../../../src/components/ui/Button.tsx";
+
+/* Follows the system theme. Required: the CSS build turns light-dark() into variables that only a
+   color-scheme declaration sets (see src/styles/theme.css). */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  width: 320px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}

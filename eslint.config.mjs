@@ -28,6 +28,7 @@ const config = [
       "coverage/**",
       "playwright-report/**",
       "test-results/**",
+      "extension/dist/**",
       "next-env.d.ts",
       // Generated from the database by `npm run db:types`.
       "src/types/supabase.gen.ts",

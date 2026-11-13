@@ -30,7 +30,9 @@
     "admin:add": "node --env-file=.env.local scripts/add-admin.mjs",
     "deploy:check-env": "node scripts/check-env.mjs",
     "deploy:verify": "node scripts/verify-deploy.mjs",
-    "brand-kit": "node scripts/brand-kit.mjs"
+    "brand-kit": "node scripts/brand-kit.mjs",
+    "ext:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-extension.mjs",
+    "ext:dev": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-extension.mjs --dev"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
@@ -52,6 +54,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
+    "@types/chrome": "^0.3.7",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
