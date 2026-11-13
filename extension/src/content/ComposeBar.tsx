@@ -13,7 +13,8 @@ type ComposeBarProps = {
   open: (url: string) => void;
 };
 
-type Status = { label: string; tone: "on" | "off"; action?: string };
+/** `label` is what's said; `short` what fits in Gmail's crowded toolbar, when they differ. */
+type Status = { label: string; short?: string; tone: "on" | "off"; action?: string };
 
 function status(account: AccountState | null): Status {
   if (!account) return { label: copy.loading, tone: "off" };
@@ -21,24 +22,25 @@ function status(account: AccountState | null): Status {
   if (account.kind === "offline") return { label: copy.offline, tone: "off" };
   if (account.me.gmail?.status !== "active")
     return { label: copy.connectGmail, tone: "off", action: links.home };
-  return { label: copy.ready, tone: "on" };
+  return { label: copy.ready, short: copy.name, tone: "on" };
 }
 
 const pill =
-  "inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 text-[13px] font-medium text-ink";
+  "inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 text-[13px] font-medium whitespace-nowrap text-ink";
 
 /** The pill next to Gmail's Send. Milestone 3: who you are and that Clinton AI sees this email. */
 export function ComposeBar({ compose, loadAccount, open }: ComposeBarProps) {
   const account = useAccount(loadAccount);
   const draft = useDraft(compose);
-  const { label, tone, action } = status(account);
+  const { label, short, tone, action } = status(account);
 
   const content = (
     <>
       <span aria-hidden="true" className="inline-flex size-5 items-center justify-center rounded-md bg-brand">
         <ClintonMark size={14} color={palette.white} />
       </span>
-      <span>{label}</span>
+      <span aria-hidden={short ? true : undefined}>{short ?? label}</span>
+      {short ? <span className="sr-only">{label}</span> : null}
       <span
         aria-hidden="true"
         className={`size-1.5 rounded-full ${tone === "on" ? "bg-brand" : "bg-subtle"}`}

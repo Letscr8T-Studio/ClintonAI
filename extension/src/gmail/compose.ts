@@ -20,16 +20,28 @@ export function composeEditor(compose: Element): Element | null {
   return compose.querySelector(gmail.body);
 }
 
+const isPage = (el: Element) => el === document.body || el === document.documentElement;
+
 /**
- * Every open compose window and inline reply: for each editor, the smallest element around it
- * that also holds a Send button. That works for new emails, replies, forwards and pop-outs.
+ * Every open compose window and inline reply. For each editor: the smallest element around it
+ * that also holds a Send button, widened until it takes in the subject field too. In real Gmail
+ * the recipients and subject sit outside the box holding the editor and Send. Widening stops
+ * before it would take in another compose window.
  */
 export function findComposeWindows(doc: ParentNode): Element[] {
   const found = new Set<Element>();
   for (const editor of doc.querySelectorAll(gmail.body)) {
     let el = editor.parentElement;
     while (el && !el.querySelector(gmail.send)) el = el.parentElement;
-    if (el && el !== document.body && el !== document.documentElement) found.add(el);
+    if (!el || isPage(el)) continue;
+
+    let wide = el;
+    while (!wide.querySelector(gmail.subject)) {
+      const parent = wide.parentElement;
+      if (!parent || isPage(parent) || parent.querySelectorAll(gmail.body).length > 1) break;
+      wide = parent;
+    }
+    found.add(wide.querySelector(gmail.subject) ? wide : el);
   }
   return [...found];
 }

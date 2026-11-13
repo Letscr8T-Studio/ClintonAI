@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { captureStructure } from "./capture";
 import { findComposeWindows, readCompose } from "./compose";
+import capturedCompose from "./fixtures/compose-captured.html?raw";
 import newCompose from "./fixtures/compose-new.html?raw";
 import inlineReply from "./fixtures/reply-inline.html?raw";
 import { addressesIn } from "./recipients";
@@ -73,6 +74,25 @@ describe("reading an inline reply", () => {
     expect(body).not.toMatch(/sign the contract|must not read/);
     expect(quoted).toBe(true);
     expect(gmailAttachments).toBe(1);
+  });
+});
+
+describe("reading real Gmail's layout (editor and Send in a table, header above it)", () => {
+  it("widens to the whole window, so recipients and subject are read too", () => {
+    const [compose] = findComposeWindows(page(capturedCompose));
+    expect(compose.getAttribute("role")).toBe("dialog");
+    expect(readCompose(compose)).toMatchObject({
+      to: ["preshsuku@gmail.com"],
+      subject: "Testing",
+      body: "Hello Guys,\n\nI am just testing if this is working.\n\nLook forward to hearing from you soon\n\nRegards,\nPreye Omusuku\nCo-founder ClintonAI",
+      signature: "",
+    });
+  });
+
+  it("never widens into a neighbouring compose window", () => {
+    const windows = findComposeWindows(page(`<div>${capturedCompose}${capturedCompose}</div>`));
+    expect(windows).toHaveLength(2);
+    expect(windows.every((w) => w.querySelectorAll("[g_editable]").length === 1)).toBe(true);
   });
 });
 
