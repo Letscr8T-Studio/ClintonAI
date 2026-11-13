@@ -23,6 +23,8 @@ export const palette = {
   white: "#FFFFFF",
   amberIcon: "#9A6A00",
   amberDot: "#E0A800",
+  /** Behind words Clinton flagged (light theme). */
+  highlight: "#FFE3A3",
   line: "#ECEAE3",
   body: "#3A3F4E",
   muted: "#5B6070",

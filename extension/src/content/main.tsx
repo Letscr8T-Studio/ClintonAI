@@ -1,3 +1,4 @@
+import type { CheckRequest } from "@/lib/validation/compose";
 import { ask } from "../messages";
 import { watchComposeWindows } from "../gmail/watch";
 import { ComposeBar } from "./ComposeBar";
@@ -7,8 +8,12 @@ import { mountNextToSend } from "./mount";
 // forwards, pop-outs), never the inbox or opened emails, and adds Clinton AI's bar to each.
 
 const loadAccount = () => ask({ type: "account" });
+const requestCheck = (draft: CheckRequest) => ask({ type: "check", draft });
 const open = (url: string) => window.open(url, "_blank", "noopener");
 
 watchComposeWindows(document.body, (compose) =>
-  mountNextToSend(compose, <ComposeBar compose={compose} loadAccount={loadAccount} open={open} />),
+  mountNextToSend(
+    compose,
+    <ComposeBar compose={compose} loadAccount={loadAccount} requestCheck={requestCheck} open={open} />,
+  ),
 );

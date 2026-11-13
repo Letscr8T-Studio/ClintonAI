@@ -5,6 +5,7 @@
 @import "../../../src/styles/tokens.css";
 
 @source "./";
+@source "../../../src/components/app/compose/FindingItem.tsx";
 
 /* Tailwind registers this default with @property, which shadow roots ignore: without it, `border`
    draws nothing. Utilities like border-dashed still override it. */

@@ -15,6 +15,9 @@ export type GmailDraft = DraftEmail & {
   rich: RichContent;
 };
 
+/** Parts of the editor the person didn't write here: quoted earlier messages and the signature. */
+export const NOT_WRITTEN = `${gmail.quoted}, ${gmail.signature}`;
+
 /** Gmail's editor in this compose window (a window can only have one). */
 export function composeEditor(compose: Element): Element | null {
   return compose.querySelector(gmail.body);
@@ -48,7 +51,7 @@ export function findComposeWindows(doc: ParentNode): Element[] {
 
 export function readCompose(compose: Element): GmailDraft {
   const editor = composeEditor(compose);
-  const skip = `${gmail.quoted}, ${gmail.signature}`;
+  const skip = NOT_WRITTEN;
   const subject = compose.querySelector<HTMLInputElement>(gmail.subject)?.value.trim() ?? "";
   const signature = compose.querySelector(gmail.signature);
   return {
