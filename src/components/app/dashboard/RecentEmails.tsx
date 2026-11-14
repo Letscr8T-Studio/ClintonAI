@@ -31,11 +31,25 @@ function windowText(state: EmailState, now: number): string | null {
   return state.kind === "expired" ? copy.window.expired : null;
 }
 
+type Props = {
+  emails: OutboxEmail[];
+  /** How many emails the last 30 days hold, for "View all N in the Outbox". */
+  total?: number;
+  className?: string;
+};
+
 /** The latest emails as a table: status, and how long each can still be taken back (live). */
-export function RecentEmails({ emails }: { emails: OutboxEmail[] }) {
+export function RecentEmails({ emails, total = emails.length, className }: Props) {
   const now = useNow();
   return (
-    <Panel id="recent-h" title={copy.title} link={{ href: appRoutes.outbox, label: copy.link }} delay={160}>
+    <Panel
+      id="recent-h"
+      title={copy.title}
+      footer={total > emails.length ? { href: appRoutes.outbox, label: copy.viewAll(total) } : undefined}
+      link={total > emails.length ? undefined : { href: appRoutes.outbox, label: copy.link }}
+      delay={160}
+      className={className}
+    >
       {emails.length === 0 ? (
         <p className="m-0 px-5 pt-3 pb-6 text-sm text-muted sm:px-6">{copy.empty}</p>
       ) : (
@@ -68,7 +82,11 @@ export function RecentEmails({ emails }: { emails: OutboxEmail[] }) {
               ) : null;
               const takeBack = state && now !== null ? windowText(state, now) : null;
               return (
-                <tr key={email.id} className="border-t border-line first:border-t-0 md:first:border-t">
+                // Stacked (phones, narrow windows): the first 4; side by side, enough to fill the column.
+                <tr
+                  key={email.id}
+                  className="border-t border-line first:border-t-0 max-lg:nth-[n+5]:hidden md:first:border-t"
+                >
                   <td className="w-full max-w-0 py-3.5 pr-3 pl-5 align-top sm:pl-6">
                     <p className="m-0 flex items-center gap-2">
                       <span className="truncate font-semibold text-ink">

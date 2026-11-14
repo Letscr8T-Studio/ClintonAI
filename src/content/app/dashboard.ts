@@ -30,6 +30,7 @@ export const statsCopy = {
 export const recentCopy = {
   title: "Recent emails",
   link: "Open the Outbox",
+  viewAll: (n: number) => (n === 1 ? "View it in the Outbox" : `View all ${n} in the Outbox`),
   empty: "No emails in the last 30 days.",
   caption: "Your most recent emails, their status, and how long you can still take them back.",
   columns: { email: "Email", status: "Status", unsend: "Take back", when: "When" },
@@ -56,6 +57,7 @@ export const recentCopy = {
 
 export const caughtCopy = {
   title: "Caught before sending",
+  seeAll: "See everything Clinton caught",
   empty: "Nothing caught yet. When Clinton spots a mistake before you send, it shows up here.",
   noSubject: "(no subject)",
   kindsLabel: "What Clinton caught",
@@ -68,7 +70,10 @@ const q = (subject: string | null) => `“${subject || "(no subject)"}”`;
 
 export const activityCopy = {
   title: "Activity",
+  seeAll: "See all activity",
   empty: "Your history starts with your first email.",
+  today: "Today",
+  yesterday: "Yesterday",
   /** `subject` is null when the email itself is gone (Gmail account removed). */
   describe(action: ActivityAction, subject: string | null, recipient: string | null): string {
     const s = subject === null ? "an email" : q(subject);
@@ -91,4 +96,13 @@ export const activityCopy = {
         return recipient ? `${recipient} opened ${s}` : `${s} was opened`;
     }
   },
+};
+
+/** The History page: everything Clinton caught and every email action, for the last 30 days. */
+export const historyCopy = {
+  title: "History",
+  intro: "Everything Clinton caught and everything that happened to your emails, in the last 30 days.",
+  tabsLabel: "Show",
+  tabs: { caught: "Caught before sending", all: "All activity" },
+  back: "Back to Home",
 };

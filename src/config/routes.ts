@@ -5,6 +5,8 @@ export const appRoutes = {
   home: "/dashboard",
   compose: "/compose",
   outbox: "/outbox",
+  /** Everything Clinton caught and every email action, beyond what Home shows. */
+  activity: "/activity",
   settings: "/settings",
   onboarding: "/onboarding",
   /** Founders console (admins only, with a second step). */
@@ -21,6 +23,7 @@ export const protectedPrefixes = [
   appRoutes.home,
   appRoutes.compose,
   appRoutes.outbox,
+  appRoutes.activity,
   appRoutes.settings,
   appRoutes.onboarding,
   "/owner",

@@ -88,9 +88,10 @@ describe("Dashboard", () => {
     expect(await a11yViolations(container)).toEqual([]);
   });
 
-  it("caught: the kinds of mistake and what the user did, never the words", async () => {
+  it("caught: two kinds of mistake and a count of the rest, what the user did, and a link to all", async () => {
     const { container } = render(
       <CaughtList
+        footer={{ href: "/activity?view=caught", label: caughtCopy.seeAll }}
         items={[
           {
             id: "e1",
@@ -109,8 +110,12 @@ describe("Dashboard", () => {
       within(kinds)
         .getAllByRole("listitem")
         .map((li) => li.textContent),
-    ).toEqual(["Name", "Attachment", "Tone"]);
+    ).toEqual(["Name", "Attachment", "+1"]);
     expect(screen.getByText("2 of 3 fixed")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: caughtCopy.seeAll })).toHaveAttribute(
+      "href",
+      "/activity?view=caught",
+    );
     vi.useRealTimers();
     expect(await a11yViolations(container)).toEqual([]);
   });
@@ -129,6 +134,30 @@ describe("Dashboard", () => {
     expect(screen.getByText("5m ago")).toBeInTheDocument();
     vi.useRealTimers();
     expect(await a11yViolations(container)).toEqual([]);
+  });
+
+  it("History groups activity by day, with the time of day on each line", () => {
+    render(
+      <ActivityList
+        grouped
+        items={[
+          { id: 3, action: "sent", recipient: "kemi@client.co", subject: "Pricing", at: at(-5 * 60_000) },
+          { id: 2, action: "held", recipient: null, subject: "Pricing", at: at(-6 * 60_000) },
+          { id: 1, action: "cancelled", recipient: null, subject: "Old", at: at(-30 * 3_600_000) },
+        ]}
+      />,
+    );
+    const lines = screen.getAllByRole("listitem").map((li) => li.textContent);
+    expect(lines[0]).toBe(activityCopy.today);
+    expect(lines[3]).toBe(activityCopy.yesterday);
+    expect(lines).toHaveLength(5);
+    expect(screen.getByText("Put “Pricing” in the Outbox")).toBeInTheDocument();
+    expect(screen.queryByText("5m ago")).toBeNull();
+  });
+
+  it("Recent emails links to the Outbox for the rest", () => {
+    render(<RecentEmails emails={emails.slice(0, 1)} total={14} />);
+    expect(screen.getByRole("link", { name: recentCopy.viewAll(14) })).toHaveAttribute("href", "/outbox");
   });
 
   it("empty states explain what will appear", () => {

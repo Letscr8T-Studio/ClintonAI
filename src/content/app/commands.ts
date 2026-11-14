@@ -59,6 +59,13 @@ export const commands: Command[] = [
     href: appRoutes.outbox,
   },
   {
+    id: "history",
+    group: "go",
+    label: "History",
+    keywords: "activity caught mistakes log",
+    href: appRoutes.activity,
+  },
+  {
     id: "settings",
     group: "go",
     label: "Settings",
